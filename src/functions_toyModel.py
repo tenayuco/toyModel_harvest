@@ -9,6 +9,7 @@ Created on Tue Mar 21 11:55:53 2023
 import numpy as np  ##numpy paquete que acelera todo el manejo de matrices y demás
 import random as rd
 import pandas as pd
+import math as m
 
 
 def setScenario(dic_Lattice, dic_Simulation):
@@ -43,6 +44,8 @@ def generalDynamic(dic_Lattice, dic_Simulation, dic_Workers):
     T = 0
     
     initialDF= setScenario(dic_Lattice, dic_Simulation)
+    generalDF= pd.concat([generalDF, initialDF])
+    
     while T< dic_Simulation["Tmax"]:
         tau = 0
         while tau<1:
@@ -53,7 +56,7 @@ def generalDynamic(dic_Lattice, dic_Simulation, dic_Workers):
                 pass
         
         #aplica el modulo contact
-            temporalDF = conctact***### ahora lo cambio cuando defina el modeilo 
+            temporalDF = conctact***(generalDF.tail(dicLattice["num_Plants"]))### ahora lo cambio cuando defina el mode, pero de aqui sazo lo ultimode data rame 
             tau = tau + 0.5
             T = T+tau
             generalDF= pd.concat([generalDF, temporalDF])
@@ -61,7 +64,39 @@ def generalDynamic(dic_Lattice, dic_Simulation, dic_Workers):
     return(generalDF)
 
 
-#def contactModel(dic_Simulation):
+def contactModel(temporal_DF, dic_Simulation,  R_H): #r_h is ruested trees durign harvest
+    tempDF = temporal_DF 
+    LT_temp = tempDF[tempDF["Rust"] == 0.5]
+    RT = tempDF[tempDF["Rust"] == 1]
+    ST = tempDF[tempDF["Rust"] == 0]
+    maxDistance = dic_Simulation["jump"]**2 #lo pongo así para no usar raices cuadrasd
+    
+    for row in range(1, len(RT)):
+        ST_row = ST
+        ST_row["Distance"] = (ST_row["X"] - RT.iloc[row]["X"])**2  + (ST_row["Y"] - RT.iloc[row]["Y"])**2
+        ST_row = ST_row[ST_row["Distance"]<maxDistance]
+        
+#################################
+
+
+
+
+
+
+
+for row in range(1, len(L)):
+    ST_row = intento
+    ST_row["Distance"] = (ST_row["X"] - L.iloc[row]["X"])**2  + (ST_row["Y"] - L.iloc[row]["Y"])**2
+    ST_row = ST_row[ST_row["Distance"]<25] #lo puse como 25 porque la srt no me esta funcioando
+         
+    
+    
+    
+
+
+
+
+
     
 
 
