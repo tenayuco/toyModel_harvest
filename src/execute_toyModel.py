@@ -10,18 +10,22 @@ from functions_toyModel import *  #this works from terminal. I am gonna pause it
 
 #initial conditions
 
-dimIni = [100, 100]
+Tmax = 2
+dimIni = [10, 10]
 iniInf = [0.8, 0.1, 0.1]
 numPlants = 10  #para el intento
 modeArr = "random"
 numWorkers = 3
 modeWorkers = "random"
-
+contactoDis = 5 #meters
+saltos = 5 #estas se van a poner externas en el patung
+rep = 7 # esta se van a controlar externas en el patung 
+harvest = False
 dicLattice = {"dim_Ini": dimIni, "ini_Inf": iniInf, "mode_Arr": modeArr, "num_Plants": numPlants}
 dicWorkers = {"num_Workers": numWorkers, "mode_Workers": modeWorkers}
+dicSimulation = {"jumps_": saltos, "rep_":rep, "har_vest":harvest, "Tmax": Tmax, "contactDistance":contactoDis}
 
-## run funcion
+intento = generalDynamic(dicLattice, dicSimulation, dicWorkers)  
 
-print(ftm.setScenario(dicLattice))
-
+intento.to_csv("../output/intentoDF.csv")   
     
