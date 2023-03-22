@@ -10,14 +10,14 @@ from functions_toyModel import *  #this works from terminal. I am gonna pause it
 
 #initial conditions
 
-Tmax = 2
+Tmax = 5
 dimIni = [10, 10]
 iniInf = [0.8, 0.1, 0.1]
 numPlants = 10  #para el intento
 modeArr = "random"
 numWorkers = 3
 modeWorkers = "random"
-contactoDis = 5 #meters
+contactoDis = 1.5 #meters
 saltos = 5 #estas se van a poner externas en el patung
 rep = 7 # esta se van a controlar externas en el patung 
 harvest = False
@@ -27,5 +27,5 @@ dicSimulation = {"jumps_": saltos, "rep_":rep, "har_vest":harvest, "Tmax": Tmax,
 
 intento = generalDynamic(dicLattice, dicSimulation, dicWorkers)  
 
-intento.to_csv("../output/intentoDF.csv")   
+intento.to_csv("../data/intentoDF.csv")   
     

@@ -16,7 +16,7 @@ mycols3c <- c("#759580", "#1b4a64","#fdb81c")
 ```
 
 ```{r}
-LATTICE_DF <- read.csv("../output/intentoDF.csv")
+LATTICE_DF <- read.csv("../data/intentoDF.csv")
 ```
 
 ```{r}
@@ -28,5 +28,6 @@ FIG_RUST <- LATTICE_DF %>%
   facet_wrap( ~ Time, nrow=2)+
   theme_bw()+
   theme(legend.position="none")
-#ggsave("FigEmpleoSector.png", path= "../output/", width= 8, height = 8)
+
+ggsave("../output/figuraLattice.png", path= "../output/", width= 8, height = 8)
 ```

@@ -1814,24 +1814,20 @@ mycols3b &lt;-c(&quot;#1b4a64&quot;, &quot;#fdb81c&quot;, &quot;#759580&quot;)</
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuRklHX1JVU1QgPC0gTEFUVElDRV9ERiAlPiVcbiAgZ2dwbG90KCkrXG4gIGdlb21fcG9pbnQoYWVzKHg9WCAsIHk9IFksIGNvbG9yPSBSdXN0KSwgc2l6ZT0gNSkrXG4gIGdndGl0bGUoXCJcIikrXG4gIHNjYWxlX2NvbG9yX2Rpc2NyZXRlKHZhbHVlcyA9IG15Y29sczNhKStcbiAgZmFjZXRfd3JhcCggfiBUaW1lLCBuY29sPTIpK1xuICB0aGVtZV9idygpK1xuICB0aGVtZShsZWdlbmQucG9zaXRpb249XCJub25lXCIpXG5cbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuRklHX1JVU1QgPC0gTEFUVElDRV9ERiAlPiVcbiAgZ2dwbG90KCkrXG4gIGdlb21fcG9pbnQoYWVzKHg9WCAsIHk9IFksIGNvbG9yPSBhcy5jaGFyYWN0ZXIoUnVzdCkpLCBzaXplPSAyKStcbiAgZ2d0aXRsZShcIlwiKStcbiAgc2NhbGVfY29sb3JfbWFudWFsKHZhbHVlcyA9IG15Y29sczNjKStcbiAgZmFjZXRfd3JhcCggfiBUaW1lLCBucm93PTIpK1xuICB0aGVtZV9idygpK1xuICB0aGVtZShsZWdlbmQucG9zaXRpb249XCJub25lXCIpXG4jZ2dzYXZlKFwiRmlnRW1wbGVvU2VjdG9yLnBuZ1wiLCBwYXRoPSBcIi4uL291dHB1dC9cIiwgd2lkdGg9IDgsIGhlaWdodCA9IDgpXG5gYGAifQ== -->
 <pre class="r"><code>FIG_RUST &lt;- LATTICE_DF %&gt;%
   ggplot()+
-  geom_point(aes(x=X , y= Y, color= Rust), size= 5)+
+  geom_point(aes(x=X , y= Y, color= as.character(Rust)), size= 2)+
   ggtitle(&quot;&quot;)+
-  scale_color_discrete(values = mycols3a)+
-  facet_wrap( ~ Time, ncol=2)+
+  scale_color_manual(values = mycols3c)+
+  facet_wrap( ~ Time, nrow=2)+
   theme_bw()+
   theme(legend.position=&quot;none&quot;)
-</code></pre>
+#ggsave(&quot;FigEmpleoSector.png&quot;, path= &quot;../output/&quot;, width= 8, height = 8)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gZGlzY3JldGVfc2NhbGUoYWVzdGhldGljcywgXCJodWVcIiwgaHVlX3BhbChoLCBjLCBsLCBoLnN0YXJ0LCBkaXJlY3Rpb24pLCAgOiBcbiAgdW51c2VkIGFyZ3VtZW50ICh2YWx1ZXMgPSBjKFwiIzAyMTEyOFwiLCBcIiNmZDk3MDZcIiwgXCIjMzU4NWEwXCIpKVxuIn0= -->
-<pre><code>Error in discrete_scale(aesthetics, &quot;hue&quot;, hue_pal(h, c, l, h.start, direction),  : 
-  unused argument (values = c(&quot;#021128&quot;, &quot;#fd9706&quot;, &quot;#3585a0&quot;))</code></pre>
-<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKYGBge3J9CmxpYnJhcnkoZ2dwbG90MikKbGlicmFyeSh2aXJpZGlzKQpsaWJyYXJ5KGRwbHlyKQpsaWJyYXJ5KHRpZHl2ZXJzZSkKbGlicmFyeShyZXNoYXBlMikKbXljb2xzIDwtIGMoIiMwMjExMjgiLCIjMWI0YTY0IiwgIiMzNTg1YTAiLCAiIzc1OTU4MCIsICIjYzc4ZjM0IiwgIiNmZDk3MDYiLCIjZmRiODFjIiwiI2ZiZGIzMCIpCm15Y29sczNhIDwtYygiIzAyMTEyOCIsICIjZmQ5NzA2IiwgIiMzNTg1YTAiKQpteWNvbHMzYiA8LWMoIiMxYjRhNjQiLCAiI2ZkYjgxYyIsICIjNzU5NTgwIikKbXljb2xzM2MgPC0gYygiIzc1OTU4MCIsICIjMWI0YTY0IiwiI2ZkYjgxYyIpCmBgYAoKYGBge3J9CkxBVFRJQ0VfREYgPC0gcmVhZC5jc3YoIi4uL291dHB1dC9pbnRlbnRvREYuY3N2IikKYGBgCgpgYGB7cn0KRklHX1JVU1QgPC0gTEFUVElDRV9ERiAlPiUKICBnZ3Bsb3QoKSsKICBnZW9tX3BvaW50KGFlcyh4PVggLCB5PSBZLCBjb2xvcj0gYXMuY2hhcmFjdGVyKFJ1c3QpKSwgc2l6ZT0gMikrCiAgZ2d0aXRsZSgiIikrCiAgc2NhbGVfY29sb3JfbWFudWFsKHZhbHVlcyA9IG15Y29sczNjKSsKICBmYWNldF93cmFwKCB+IFRpbWUsIG5yb3c9MikrCiAgdGhlbWVfYncoKSsKICB0aGVtZShsZWdlbmQucG9zaXRpb249Im5vbmUiKQojZ2dzYXZlKCJGaWdFbXBsZW9TZWN0b3IucG5nIiwgcGF0aD0gIi4uL291dHB1dC8iLCB3aWR0aD0gOCwgaGVpZ2h0ID0gOCkKYGBgCg==</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKYGBge3J9CmxpYnJhcnkoZ2dwbG90MikKbGlicmFyeSh2aXJpZGlzKQpsaWJyYXJ5KGRwbHlyKQpsaWJyYXJ5KHRpZHl2ZXJzZSkKbGlicmFyeShyZXNoYXBlMikKbXljb2xzIDwtIGMoIiMwMjExMjgiLCIjMWI0YTY0IiwgIiMzNTg1YTAiLCAiIzc1OTU4MCIsICIjYzc4ZjM0IiwgIiNmZDk3MDYiLCIjZmRiODFjIiwiI2ZiZGIzMCIpCm15Y29sczNhIDwtYygiIzAyMTEyOCIsICIjZmQ5NzA2IiwgIiMzNTg1YTAiKQpteWNvbHMzYiA8LWMoIiMxYjRhNjQiLCAiI2ZkYjgxYyIsICIjNzU5NTgwIikKbXljb2xzM2MgPC0gYygiIzc1OTU4MCIsICIjMWI0YTY0IiwiI2ZkYjgxYyIpCmBgYAoKYGBge3J9CkxBVFRJQ0VfREYgPC0gcmVhZC5jc3YoIi4uL2RhdGEvaW50ZW50b0RGLmNzdiIpCmBgYAoKYGBge3J9CkZJR19SVVNUIDwtIExBVFRJQ0VfREYgJT4lCiAgZ2dwbG90KCkrCiAgZ2VvbV9wb2ludChhZXMoeD1YICwgeT0gWSwgY29sb3I9IGFzLmNoYXJhY3RlcihSdXN0KSksIHNpemU9IDIpKwogIGdndGl0bGUoIiIpKwogIHNjYWxlX2NvbG9yX21hbnVhbCh2YWx1ZXMgPSBteWNvbHMzYykrCiAgZmFjZXRfd3JhcCggfiBUaW1lLCBucm93PTIpKwogIHRoZW1lX2J3KCkrCiAgdGhlbWUobGVnZW5kLnBvc2l0aW9uPSJub25lIikKCmdnc2F2ZSgiLi4vb3V0cHV0L2ZpZ3VyYUxhdHRpY2UucG5nIiwgcGF0aD0gIi4uL291dHB1dC8iLCB3aWR0aD0gOCwgaGVpZ2h0ID0gOCkKYGBgCg==</div>
 
 
 

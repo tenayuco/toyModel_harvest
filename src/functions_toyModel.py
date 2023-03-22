@@ -56,7 +56,7 @@ def generalDynamic(dic_Lattice, dic_Simulation, dic_Workers):
     generalDF= pd.concat([generalDF, initialDF])
     
     #now w add a empty dataframe or infected plants during harvest just to fill it later
-    RH = pd.DataFrame(columns= ["Jump", "Rep", "ID", "X", "Y", "Harvest", "Rust"]) #dataFRramevacio
+    #RH = pd.DataFrame(columns= ["Jump", "Rep", "ID", "X", "Y", "Harvest", "Rust"]) #dataFRramevacio
     
     
     #whole loop simlation
@@ -66,13 +66,13 @@ def generalDynamic(dic_Lattice, dic_Simulation, dic_Workers):
         
             if dic_Simulation["har_vest"] == True:
                 pass #por lo pront 
-                # se regresa aqui u R_Hno vacio
+                # se regresa aqui u R_Hno vacio debe regresar un temporal con la asignacion 0.25 para lo contagiado durante cosecha
             else:
                 pass
         
         #aplica el modulo contact
             
-            newDF = contactModel(temporalDF, dic_Simulation, RH) #we create next step
+            newDF = contactModel(temporalDF, dic_Simulation) #we create next step
             temporalDF = newDF.copy() #now we set it to the old step 
             
             # we actualize the general dataframe
@@ -86,19 +86,15 @@ def generalDynamic(dic_Lattice, dic_Simulation, dic_Workers):
     return(generalDF)
 
 
-def contactModel(old_DF, dic_Simulation,  R_H): #r_h is ruested trees durign harvest
+def contactModel(old_DF, dic_Simulation): #r_h is ruested trees durign harvest
     tempDF = old_DF 
     #print("tempDF",tempDF)
-    LT_temp = tempDF.loc[tempDF["Rust"] == 0.5].copy()  #https://towardsdatascience.com/explaining-the-settingwithcopywarning-in-pandas-ebc19d799d25
-    LT_temp.loc[LT_temp["Rust"] ==0.5, "Rust"] = 1  #this creates a data frame where L --> I
     
-    #we actualize the harvested to be infected
-
-    R_H.loc[R_H["Rust"] ==0, "Rust"] = 0.5  #this takes the values of RH, that will be among S, and --->L
+    tempDF.loc[tempDF["Rust"] ==0.5, "Rust"] = 0.75 #this will save these data separately before infection 
     
-    #now for the local infection
-    RT = tempDF.loc[tempDF["Rust"] == 1]
-    ST = tempDF.loc[tempDF["Rust"] == 0]
+     #now for the local infection
+    RT = tempDF.loc[tempDF["Rust"] == 1]#this is a view
+    ST = tempDF.loc[tempDF["Rust"] == 0] #this is a view
     maxDistance = dic_Simulation["contactDistance"]**2 #lo pongo así para no usar raices cuadrasd
     RC_total = pd.DataFrame(columns= ["Jump", "Rep", "ID", "X", "Y", "Harvest", "Rust", "T"]) #dataFRramevacio
     
@@ -119,9 +115,15 @@ def contactModel(old_DF, dic_Simulation,  R_H): #r_h is ruested trees durign har
         
     #now the general actualization (this sets should no overlpa)
     
-    tempDF.loc[tempDF.ID.isin(LT_temp.ID), ["Rust"]] = LT_temp[["Rust"]] #esta debe ser un conjunto distinto a los anterioes.
-    tempDF.loc[tempDF.ID.isin(R_H.ID), ["Rust"]] = R_H[["Rust"]]
-    tempDF.loc[tempDF.ID.isin(RC_total.ID), ["Rust"]] = RC_total[["Rust"]] #esta se puede traslapar con la de arriba, pero no hay pedp
+    print("tempDF", tempDF)
+    print("ID_new_rusted", RC_total["ID"])
+    tempDF.loc[tempDF.ID.isin(RC_total.ID), ["Rust"]] = 0.5 #esta se puede traslapar con la de arriba, pero no hay pedp
+    
+    
+    tempDF.loc[tempDF["Rust"] ==0.25, "Rust"] = 0.5 #rusted during harvest
+    
+    tempDF.loc[tempDF["Rust"] ==0.75, "Rust"] = 1 # already infecred at the beignning
+
     
     return(tempDF)
 
