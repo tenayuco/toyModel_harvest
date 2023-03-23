@@ -18,6 +18,9 @@ n= 0
 for(t in unique(LATTICE_DF$Time)){
   FIG_RUST <- LATTICE_DF %>%
     filter(Time == t) %>%
+    add_row(Jump = 0,  Rep= 0,   ID= 999999,  X= NA,  Y=NA , Harvest = 0, Rust= 0)%>% ##ESte es un truquito para que siempre hayan 3 colores en cada graficas, porque le 0.5 siempre desaprece
+    add_row(Jump = 0,  Rep= 0,   ID= 9999999,  X= NA,  Y=NA , Harvest = 0, Rust= 0.5)%>%
+    add_row(Jump = 0,  Rep= 0,   ID= 9999999,  X= NA,  Y=NA , Harvest = 0, Rust= 1)%>%
     ggplot()+
     geom_point(aes(x=X , y= Y, color= as.character(Rust)), size= 3)+
     ggtitle("")+
