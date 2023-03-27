@@ -115,8 +115,8 @@ def contactModel(old_DF, dic_Simulation): #r_h is ruested trees durign harvest
         
     #now the general actualization (this sets should no overlpa)
     
-    print("tempDF", tempDF)
-    print("ID_new_rusted", RC_total["ID"])
+    #print("tempDF", tempDF)
+    #print("ID_new_rusted", RC_total["ID"])
     tempDF.loc[tempDF.ID.isin(RC_total.ID), ["Rust"]] = 0.5 #esta se puede traslapar con la de arriba, pero no hay pedp
     
     
@@ -128,7 +128,7 @@ def contactModel(old_DF, dic_Simulation): #r_h is ruested trees durign harvest
     return(tempDF)
 
     
-    
+#def harvestingModel*
         
         
 #################################

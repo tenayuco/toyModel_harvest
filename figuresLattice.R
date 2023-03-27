@@ -10,7 +10,16 @@ mycols3b <-c("#1b4a64", "#fdb81c", "#759580")
 mycols3c <- c("#759580", "#1b4a64","#fdb81c")
 
 
-LATTICE_DF <- read.csv("../data/intentoDF.csv")
+LATTICE_DF <- read.csv("../data/intentoDF.csv") #este es para correrlo desde la termunal
+#LATTICE_DF <- read.csv("archivosTrabajandose/toyModelHarvest/data/intentoDF.csv", header = TRUE)
+
+LATTICE_DF$Total <- 1
+
+N_PLANTS <- max(LATTICE_DF$ID)+1
+
+LATTICE_RES <- LATTICE_DF %>%
+  group_by(Jump, Rep, Time, Rust)%>%
+  summarise(Total_Sum = sum(Total)/N_PLANTS)
 
 
 
@@ -26,24 +35,20 @@ for(t in unique(LATTICE_DF$Time)){
     ggtitle("")+
     scale_color_manual(values = mycols3c)+
     theme_bw()
-   # theme(legend.position="none")
   
   ggsave(FIG_RUST,filename=paste("../output/figurasLattice/",n,"contactModel",t,".png",sep="")) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
   n= n+1
-  # jpg(file=mypath)
-  # mytitle = paste("contactModel", i)
-  # plot(x,y, main = mytitle)
-  # dev.off()
 }
 
 
-# FIG_RUST <- LATTICE_DF %>%
-#   ggplot()+
-#   geom_point(aes(x=X , y= Y, color= as.character(Rust)), size= 2)+
-#   ggtitle("")+
-#   scale_color_manual(values = mycols3c)+
-#   facet_wrap( ~ Time, nrow=2)+
-#   theme_bw()+
-#   theme(legend.position="none")
-# 
-# ggsave("../output/figuraLattice.png", path= "../output/", width= 8, height = 8)
+FIG_SLI_time <- LATTICE_RES %>%
+  ggplot()+
+  geom_line(aes(x=Time , y= Total_Sum, group= as.character(Rust)), color= "black")+ 
+  geom_point(aes(x=Time , y= Total_Sum, color= as.character(Rust)), size= 2)+
+  ggtitle("")+
+  scale_color_manual(values = mycols3c)+
+  theme_bw()
+
+ggsave(FIG_SLI_time,filename="../output/graficas/SLI_time.png") # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+

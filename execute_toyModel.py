@@ -11,9 +11,9 @@ from functions_toyModel import *  #this works from terminal. I am gonna pause it
 #initial conditions
 
 Tmax = 5
-dimIni = [40, 40]
+dimIni = [100, 100]
 iniInf = [0.8, 0.1, 0.1]
-numPlants = 200  #para el intento
+numPlants = 3500  #para el intento
 modeArr = "random"
 numWorkers = 3
 modeWorkers = "random"
@@ -24,6 +24,7 @@ harvest = False
 dicLattice = {"dim_Ini": dimIni, "ini_Inf": iniInf, "mode_Arr": modeArr, "num_Plants": numPlants}
 dicWorkers = {"num_Workers": numWorkers, "mode_Workers": modeWorkers}
 dicSimulation = {"jumps_": saltos, "rep_":rep, "har_vest":harvest, "Tmax": Tmax, "contactDistance":contactoDis}
+
 
 intento = generalDynamic(dicLattice, dicSimulation, dicWorkers)  
 
