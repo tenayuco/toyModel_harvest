@@ -11,9 +11,9 @@ from functions_toyModel import *  #this works from terminal. I am gonna pause it
 #initial conditions
 
 Tmax = 5
-dimIni = [20, 20]
+dimIni = [40, 40]
 iniInf = [0.8, 0.1, 0.1]
-numPlants = 50  #para el intento
+numPlants = 200  #para el intento
 modeArr = "random"
 numWorkers = 3
 modeWorkers = "random"
