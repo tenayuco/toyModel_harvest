@@ -13,24 +13,23 @@ import math as m
 
 
 def setScenario(dic_Lattice, dic_Simulation):
-    if dic_Lattice["mode_Arr"] == "random":
+    if dic_Lattice["mode_Arr"] == "random":  #so if the model is random
+        Jump = np.repeat(dic_Simulation["jumps_"], dic_Lattice["num_Plants"])#add initial value of jump for each ID of the plant
+        Rep = np.repeat(dic_Simulation["rep_"], dic_Lattice["num_Plants"]) #add initial value of rep for each ID of the plant
         
-        Jump = np.repeat(dic_Simulation["jumps_"], dic_Lattice["num_Plants"])
-        Rep = np.repeat(dic_Simulation["rep_"], dic_Lattice["num_Plants"])
-        
-        IDplants = np.arange(0, dic_Lattice["num_Plants"], 1)
-        X = np.random.randint(dic_Lattice["dim_Ini"][0], size= dic_Lattice["num_Plants"])
+        IDplants = np.arange(0, dic_Lattice["num_Plants"], 1)  #add each ID 
+        X = np.random.randint(dic_Lattice["dim_Ini"][0], size= dic_Lattice["num_Plants"])  #add random coordinates
         Y = np.random.randint(dic_Lattice["dim_Ini"][1], size= dic_Lattice["num_Plants"])
-        Harvest = np.repeat(0, dic_Lattice["num_Plants"])
+        Harvest = np.repeat(0, dic_Lattice["num_Plants"])  #add value of harvest = 0 [lets change this..]
         
-        iniInfected = [i*dic_Lattice["num_Plants"] for i in dic_Lattice["ini_Inf"]]
-        S = np.repeat(0, iniInfected[0])
+        iniInfected = [round(i*dic_Lattice["num_Plants"]) for i in dic_Lattice["ini_Inf"]] #add the number of infected plants we round it up, so sometime we can have an aditional plant per situation of infection. But, that is why is better to put values of 10.
         L = np.repeat(0.5, iniInfected[1])
         I = np.repeat(1, iniInfected[2])
+        numS = dic_Lattice["num_Plants"]- iniInfected[1] - iniInfected[2]
+        S = np.repeat(0, numS) #so, depending on the initial value, we can have 2 S less plants, beacuse L and I wre reounded up to the unit
         Rust = np.concatenate((S, L, I), axis= None)
        # Tcero= np.repeat(0, dic_Lattice["num_Plants"])  #esto es solo para crear la columna, se va a reemplrazar
-        
-        
+        print("S", numS)
         initialLattice = pd.DataFrame({"Jump": Jump, "Rep": Rep, "ID": IDplants, "X": X, "Y": Y, "Harvest":Harvest, "Rust": Rust})
     else:
         pass
@@ -93,31 +92,31 @@ def contactModel(old_DF, dic_Simulation): #r_h is ruested trees durign harvest
     tempDF.loc[tempDF["Rust"] ==0.5, "Rust"] = 0.75 #this will save these data separately before infection 
     
      #now for the local infection
-    RT = tempDF.loc[tempDF["Rust"] == 1]#this is a view
+    IT = tempDF.loc[tempDF["Rust"] == 1]#this is a view
     ST = tempDF.loc[tempDF["Rust"] == 0] #this is a view
     maxDistance = dic_Simulation["contactDistance"]**2 #lo pongo así para no usar raices cuadrasd
-    RC_total = pd.DataFrame(columns= ["Jump", "Rep", "ID", "X", "Y", "Harvest", "Rust", "T"]) #dataFRramevacio
+    LC_total = pd.DataFrame(columns= ["Jump", "Rep", "ID", "X", "Y", "Harvest", "Rust", "T"]) #dataFRramevacio
     
-    for row in range(1, len(RT)):
+    for row in range(1, len(IT)):
         
-        RC = ST.copy()  #this takes the susceptibles at the moment and makes copy (rusted by contact)
-        RC["Distance"] = (RC["X"] - RT.iloc[row]["X"])**2  + (RC["Y"] - RT.iloc[row]["Y"])**2 #this calculat distance between the each infected plants and all suceptibles
-        RC = RC.loc[RC["Distance"]<maxDistance] #tis filters only the neighburs
+        LC = ST.copy()  #this takes the susceptibles at the moment and makes copy (rusted by contact)
+        LC["Distance"] = (LC["X"] - IT.iloc[row]["X"])**2  + (LC["Y"] - IT.iloc[row]["Y"])**2 #this calculat distance between the each infected plants and all suceptibles
+        LC = LC.loc[LC["Distance"]<maxDistance] #tis filters only the neighburs
         #print(RC)
-        if len(RC) >0:
-            RC.drop(columns= ["Distance"]) #quitarla para no tener una de más
+        if len(LC) >0:
+            LC.drop(columns= ["Distance"]) #quitarla para no tener una de más
             #print(RC)
-            RC_total = pd.concat([RC_total, RC])
+            LC_total = pd.concat([LC_total, LC])
         else:
             pass
 
-        RC_total.loc[RC_total["Rust"] ==0, "Rust"] = 0.5        
+        LC_total.loc[LC_total["Rust"] ==0, "Rust"] = 0.5        
         
     #now the general actualization (this sets should no overlpa)
     
     #print("tempDF", tempDF)
     #print("ID_new_rusted", RC_total["ID"])
-    tempDF.loc[tempDF.ID.isin(RC_total.ID), ["Rust"]] = 0.5 #esta se puede traslapar con la de arriba, pero no hay pedp
+    tempDF.loc[tempDF.ID.isin(LC_total.ID), ["Rust"]] = 0.5 #esta se puede traslapar con la de arriba, pero no hay pedp
     
     
     tempDF.loc[tempDF["Rust"] ==0.25, "Rust"] = 0.5 #rusted during harvest
@@ -128,7 +127,10 @@ def contactModel(old_DF, dic_Simulation): #r_h is ruested trees durign harvest
     return(tempDF)
 
     
-#def harvestingModel*
+
+#def harvestingModel(old_DF, haresDI*):
+ #   tempDF = old_DF 
+    
         
         
 #################################
