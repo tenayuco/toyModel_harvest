@@ -14,29 +14,41 @@ import math as m
 
 def setScenario(dic_Lattice, dic_Simulation, dic_Harvest):
     if dic_Lattice["mode_Arr"] == "random":  #so if the model is random
+        
+    #harvesting conditions (will be filled or modified during simulation)
         HarvestModel = np.repeat(0, dic_Lattice["num_Plants"])
-        #Jump = np.repeat(dic_Simulation["jumps_"], dic_Lattice["num_Plants"])#add initial value of jump for each ID of the plant
+        WorkerID = np.repeat(0, dic_Lattice["num_Plants"])
+        HarvestStep = np.repeat(0, dic_Lattice["num_Plants"])
+        HarvestEvent = np.repeat(0, dic_Lattice["num_Plants"])
+        TotalHarvest = np.repeat(0, dic_Lattice["num_Plants"])
+        
+    #fruit load (will change in simulation)
+        hlPlants = dic_Harvest["hl_Plants"]
+        llPlants = dic_Lattice["num_Plants"]- hlPlants
+        F2 = np.repeat(2, hlPlants)
+        F1 = np.repeat(1, llPlants)
+        FruitLoad = np.concatenate((F2, F1), axis= None)
+        
+#simulation        
         Rep = np.repeat(dic_Simulation["rep_"], dic_Lattice["num_Plants"]) #add initial value of rep for each ID of the plant
         
+     # plants and coordinae   
         IDplants = np.arange(0, dic_Lattice["num_Plants"], 1)  #add each ID 
         X = np.random.randint(dic_Lattice["dim_Ini"][0], size= dic_Lattice["num_Plants"])  #add random coordinates
         Y = np.random.randint(dic_Lattice["dim_Ini"][1], size= dic_Lattice["num_Plants"])
         
-        hlPlants = dic_Harvest["hl_Plants"]
-        llPlants = dic_Lattice["num_Plants"]- hlPlants
-        H2 = np.repeat(2, hlPlants)
-        H1 = np.repeat(1, llPlants)
-        Harvest = np.concatenate((H2, H1), axis= None)
-        random.shuffle(Harvest) #important to randomize 
+    #initial infection
         iniInfected = [round(i*dic_Lattice["num_Plants"]) for i in dic_Lattice["ini_Inf"]] #add the number of infected plants we round it up, so sometime we can have an aditional plant per situation of infection. But, that is why is better to put values of 10.
         L = np.repeat(0.5, iniInfected[1])
         I = np.repeat(1, iniInfected[2])
         numS = dic_Lattice["num_Plants"]- iniInfected[1] - iniInfected[2]
         S = np.repeat(0, numS) #so, depending on the initial value, we can have 2 S less plants, beacuse L and I wre reounded up to the unit
         Rust = np.concatenate((S, L, I), axis= None)
-       # Tcero= np.repeat(0, dic_Lattice["num_Plants"])  #esto es solo para crear la columna, se va a reemplrazar
-        print("S", numS)
-        initialLattice = pd.DataFrame({"HarvestModel": HarvestModel, "Rep": Rep, "ID": IDplants, "X": X, "Y": Y, "Harvest":Harvest, "Rust": Rust})
+        random.shuffle(Rust)
+
+## y se junta todo, loque no es temporal, ya veremos si es necesario juntar el modelo desde aqui o desde fuera
+        
+        initialLattice = pd.DataFrame({"HarvestModel": HarvestModel, "Rep": Rep, "ID": IDplants, "X": X, "Y": Y,"Rust": Rust, "WorkerID": WorkerID, "HarvestStep":HarvestStep, "HarvestEvent": HarvestEvent, "FruitLoad":FruitLoad, "TotalHarvest": TotalHarvest})
     else:
         pass
     
@@ -49,16 +61,18 @@ This function generates all the dynamic
 
 def generalDynamic(dic_Lattice, dic_Simulation, dic_Harvest):
     
-    generalDF = pd.DataFrame(columns= ["Jump", "Rep", "ID", "X", "Y", "Harvest", "Rust", "Time"]) #we create a general data frame thatwill store the whole dynamic
+    generalDF = pd.DataFrame(columns= ["HarvestModel", "Rep", "ID", "X", "Y", "Rust", "Time", "WorkerID, HarvestStep", "HarvestEvent","FruitLoad", "TotalHarvest"]) #we create a general data frame thatwill store the whole dynamic
     T = 0 #we set time to 0
     
     initialDF= setScenario(dic_Lattice, dic_Simulation, dic_Harvest) #this creates the first sectio of the data frame
-    print("initial", initialDF)
+    print("initialDrame \n", initialDF)
     temporalDF= initialDF.copy() #we copy it before including the Time (we willuse it dinamically)
     
     #we inclue the first T and add it to the general DF
     Ti = np.repeat(T, dic_Lattice["num_Plants"])
-    initialDF["Time"] =Ti
+    initialDF["Time"] =Ti  #we add it 
+    print("afterT \n", initialDF)
+    
     generalDF= pd.concat([generalDF, initialDF])
     
     #now w add a empty dataframe or infected plants during harvest just to fill it later
@@ -71,7 +85,14 @@ def generalDynamic(dic_Lattice, dic_Simulation, dic_Harvest):
         while tau<1:
         
             if dic_Simulation["har_vest"] == True:
-                pass #por lo pront 
+                if T== 2:
+                    print("entreaamos \n", temporalDF)
+                    newDF= HM_closeness(temporalDF, dic_Harvest)
+                    temporalDF= newDF.copy()
+                    print("dep \n", temporalDF)
+                    #NO AGREGA T
+                else:
+                    pass
                 # se regresa aqui u R_Hno vacio debe regresar un temporal con la asignacion 0.25 para lo contagiado durante cosecha
             else:
                 pass
@@ -102,7 +123,7 @@ def contactModel(old_DF, dic_Simulation): #r_h is ruested trees durign harvest
     IT = tempDF.loc[tempDF["Rust"] == 1]#this is a view
     ST = tempDF.loc[tempDF["Rust"] == 0] #this is a view
     maxDistance = dic_Simulation["contactDistance"]**2 #lo pongo así para no usar raices cuadrasd
-    LC_total = pd.DataFrame(columns= ["Jump", "Rep", "ID", "X", "Y", "Harvest", "Rust", "T"]) #dataFRramevacio
+    LC_total = pd.DataFrame(columns= ["HarvestModel", "Rep", "ID", "X", "Y", "Rust", "Time", "WorkerID, HarvestStep", "HarvestEvent", "FruitLoad", "TotalHarvest"]) #dataFRramevacio
     
     for row in range(1, len(IT)):
         
@@ -120,9 +141,7 @@ def contactModel(old_DF, dic_Simulation): #r_h is ruested trees durign harvest
         LC_total.loc[LC_total["Rust"] ==0, "Rust"] = 0.5        
         
     #now the general actualization (this sets should no overlpa)
-    
-    #print("tempDF", tempDF)
-    #print("ID_new_rusted", RC_total["ID"])
+   
     tempDF.loc[tempDF.ID.isin(LC_total.ID), ["Rust"]] = 0.5 #esta se puede traslapar con la de arriba, pero no hay pedp
     
     
@@ -133,9 +152,25 @@ def contactModel(old_DF, dic_Simulation): #r_h is ruested trees durign harvest
     
     return(tempDF)
 
+def HM_closeness(old_DF, dic_Harvest):
     
-# def HM_closeness(old_DF, dic_Harvest):
-#     tempDF = old_DF
+    tempDF = old_DF
+    hSteps= dic_Harvest["harvest_Steps"]
+    numW = dic_Harvest["num_Workers"]
+    
+    UN_HARV = tempDF.loc[tempDF["FruitLoad"] != 0]#this is a view
+       
+    initialPlants = random.sample(list(UN_HARV["ID"]), numW)
+    dicHarWork = {}
+    
+    for w in np.arange(0,numW,1):
+        tempDF.loc[tempDF["ID"] == initialPlants[w], "TotalHarvest"] = tempDF.loc[tempDF["ID"] == initialPlants[w], "TotalHarvest"] + tempDF.loc[tempDF["ID"] == initialPlants[w], "FruitLoad"]
+        tempDF.loc[tempDF["ID"] == initialPlants[w], "FruitLoad"] = 0
+        tempDF.loc[tempDF["ID"] == initialPlants[w], "WorkerID"] = "W_%d" % (w)
+        
+    
+    return(tempDF)
+    
     
 
 # def HM_maxPro(old_DF, haresDI*):
