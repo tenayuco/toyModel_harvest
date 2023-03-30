@@ -65,13 +65,11 @@ def generalDynamic(dic_Lattice, dic_Simulation, dic_Harvest):
     T = 0 #we set time to 0
     
     initialDF= setScenario(dic_Lattice, dic_Simulation, dic_Harvest) #this creates the first sectio of the data frame
-    print("initialDrame \n", initialDF)
     temporalDF= initialDF.copy() #we copy it before including the Time (we willuse it dinamically)
     
     #we inclue the first T and add it to the general DF
     Ti = np.repeat(T, dic_Lattice["num_Plants"])
     initialDF["Time"] =Ti  #we add it 
-    print("afterT \n", initialDF)
     
     generalDF= pd.concat([generalDF, initialDF])
     
@@ -161,26 +159,51 @@ def HM_closeness(old_DF, dic_Harvest):
     UN_HARV = tempDF.loc[tempDF["FruitLoad"] != 0]#this is a view
        
     initialPlants = random.sample(list(UN_HARV["ID"]), numW)
-    dicHarWork = {}
+    
+    liWorkers = []
     
     for w in np.arange(0,numW,1):
+        liWorkers.append("W_%d" % (w))
         tempDF.loc[tempDF["ID"] == initialPlants[w], "TotalHarvest"] = tempDF.loc[tempDF["ID"] == initialPlants[w], "TotalHarvest"] + tempDF.loc[tempDF["ID"] == initialPlants[w], "FruitLoad"]
         tempDF.loc[tempDF["ID"] == initialPlants[w], "FruitLoad"] = 0
         tempDF.loc[tempDF["ID"] == initialPlants[w], "WorkerID"] = "W_%d" % (w)
+        tempDF.loc[tempDF["ID"] == initialPlants[w], "HarvestStep"] = 1
         
+    conteo = 1
+    
+    while conteo<hSteps:
+        for w in np.arange(0, numW,1):
+            
+            LAST_W = tempDF.loc[(tempDF["HarvestStep"] == conteo) & (tempDF["WorkerID"] == liWorkers[w])] #esto filtra solo los ultimos pasos, que deben tener 3 trabajadores
+            
+            print("lastw \n", LAST_W)
+            
+
+            conteo = conteo +1
+            
+            #UH_DIN = tempDF.loc[tempDF["FruitLoad"] != 0].copy#this is a copy
+            #UH_DIN["Distance"] = (UH_DIN["X"] - LAST.iloc[w]["X"])**2  + (UH_DIN["Y"] - LAST.iloc[w]["Y"])**2
+        
+        
+       # LC = ST.copy()  #this takes the susceptibles at the moment and makes copy (rusted by contact)
+        #LC["Distance"] = (LC["X"] - IT.iloc[row]["X"])**2  + (LC["Y"] - IT.iloc[row]["Y"])**2 #this calculat distance between the each infected plants and all suceptibles
+        #LC = LC.loc[LC["Distance"]<maxDistance] #tis filters only the neighburs
+        #print(RC)
+        #if len(LC) >0:
+         #   LC.drop(columns= ["Distance"]) #quitarla para no tener una de más
+            #print(RC)
+          #  LC_total = pd.concat([LC_total, LC])
+        #else:
+         #   pass
+
+        
+        
+  #  steps in np.arange(1, conteo, 1):
+        
+        
+   #     conteo = conteo-1
+    
     
     return(tempDF)
     
     
-
-# def HM_maxPro(old_DF, haresDI*):
-#  #   tempDF = old_DF 
-    
-        
-        
-#################################
-
-
-    
-
-#if __name__ == "__main__": 
