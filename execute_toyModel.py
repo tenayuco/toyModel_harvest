@@ -10,14 +10,16 @@ from functions_toyModel import *  #this works from terminal. I am gonna pause it
 
 #initial conditions
 
+import pandas as pd
+
 Tmax = 5
-dimIni = [10, 10]
+dimIni = [100, 100]
 iniInf = [0.8, 0.1, 0.1]
-numPlants = 25  #add multiple of 10 or 100 to have exact percentages, but ir does not change much. 
+numPlants = 2000  #add multiple of 10 or 100 to have exact percentages, but ir does not change much. 
 modeArr = "random"
 
 contactoDis = 1.5 #meters
-rep = 7 # esta se van a controlar externas en el patung 
+#rep = 7 # esta se van a controlar externas en el patung 
 
 harvest = True
 numWorkers = 3
@@ -28,10 +30,17 @@ print("harvestStep", harvestSteps)
 
 dicLattice = {"dim_Ini": dimIni, "ini_Inf": iniInf, "mode_Arr": modeArr, "num_Plants": numPlants}
 dicHarvest = {"num_Workers": numWorkers, "harvest_Steps": harvestSteps, "hl_Plants":hlPlants}
-dicSimulation = {"rep_":rep, "har_vest":harvest, "Tmax": Tmax, "contactDistance":contactoDis}
 
+super_GeneralDF = pd.DataFrame(columns= ["HarvestModel", "Rep", "ID", "X", "Y", "Rust", "Time", "WorkerID", "HarvestStep", "HarvestEvent","FruitLoad", "TotalHarvest"]) #we create a general data frame thatwill store the whole dynamic
 
-intento = generalDynamic(dicLattice, dicSimulation, dicHarvest)  
+for rep in range(10):
+    print("REP", rep)
+    dicSimulation = {"rep_":rep, "har_vest":harvest, "Tmax": Tmax, "contactDistance":contactoDis}
+    intento = generalDynamic(dicLattice, dicSimulation, dicHarvest)  
+    
+    super_GeneralDF= pd.concat([super_GeneralDF, intento])
 
-intento.to_csv("../data/intentoDF.csv")   
+super_GeneralDF.to_csv("../data/intentoDF.csv")
+    
+    
     

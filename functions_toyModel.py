@@ -82,16 +82,19 @@ def generalDynamic(dic_Lattice, dic_Simulation, dic_Harvest):
     
     #whole loop simlation
     while T< dic_Simulation["Tmax"]:
+        print("Time", T)
         tau = 0
         while tau<1:
         
             if dic_Simulation["har_vest"] == True:
                 if T > 1:
                     if T ==2 :
+                        print("H1")
                         newDF= HM_closeness(temporalDF, dic_Harvest, "H1")
                         temporalDF= newDF.copy()
                         
                     elif T ==3: 
+                        print("H2")
                         newDF= actualizeHarvest(temporalDF)
                         temporalDF= newDF.copy()
                         
@@ -121,7 +124,6 @@ def generalDynamic(dic_Lattice, dic_Simulation, dic_Harvest):
 
 def contactModel(old_DF, dic_Simulation): #r_h is ruested trees durign harvest
     tempDF = old_DF 
-    #print("tempDF",tempDF)
     
     tempDF.loc[tempDF["Rust"] ==0.5, "Rust"] = 0.75 #this will save these data separately before infection 
     
@@ -136,7 +138,6 @@ def contactModel(old_DF, dic_Simulation): #r_h is ruested trees durign harvest
         LC = ST.copy()  #this takes the susceptibles at the moment and makes copy (rusted by contact)
         LC["Distance"] = (LC["X"] - IT.iloc[row]["X"])**2  + (LC["Y"] - IT.iloc[row]["Y"])**2 #this calculat distance between the each infected plants and all suceptibles
         LC = LC.loc[LC["Distance"]<maxDistance] #tis filters only the neighburs
-        #print(RC)
         if len(LC) >0:
             LC.drop(columns= ["Distance"]) #quitarla para no tener una de más
             #print(RC)
@@ -180,8 +181,8 @@ def HM_closeness(old_DF, dic_Harvest, h_event):
 
         
     conteo = 0  #CUANDO CA;BIP ESTO NO FUCNIONA
-    print("tempDF \n", tempDF)
     while conteo<hSteps:
+        print("contadorPersonas", conteo)
         conteo= conteo +1
         for w in np.arange(0, numW,1):
             
@@ -190,7 +191,7 @@ def HM_closeness(old_DF, dic_Harvest, h_event):
             
             royaOrigen = LAST_W.iloc[0]["Rust"]
             
-            print("lastw \n", LAST_W)
+           # print("lastw \n", LAST_W)
             
             
             UH_DIN = tempDF.loc[tempDF["FruitLoad"] != 0].copy()#this is a copy dentro de lo no cosechado
@@ -198,9 +199,7 @@ def HM_closeness(old_DF, dic_Harvest, h_event):
             UH_DIN= UH_DIN.loc[UH_DIN["Distance"] == min(UH_DIN["Distance"])]
 
             royaDestino = UH_DIN.iloc[0]["Rust"]
-           #UH_DIN.drop(columns= ["Distance"])  ##quitala
-            #UH_DIN= UH_DIN.loc[0]
-            print("w", w, "UHDIN \n", UH_DIN)
+ #           print("w", w, "UHDIN \n", UH_DIN)
 
             conteoTemp = conteoTemp+1
     
@@ -220,7 +219,7 @@ def HM_closeness(old_DF, dic_Harvest, h_event):
                 pass
                 
              #    tempDF.loc[te
-            print(tempDF)  #NO FUNCOMAAAA
+           # print(tempDF)  #NO FUNCOMAAAA
             
  
     
@@ -228,8 +227,12 @@ def HM_closeness(old_DF, dic_Harvest, h_event):
     
 def actualizeHarvest(old_DF):
     tempDF = old_DF
-    tempDF.loc[tempDF["FruitLoad"] == 1, "FruitLoad"] = 2
-    tempDF.loc[tempDF["FruitLoad"] == 2, "FruitLoad"] = 1
+    tempDF.loc[tempDF["FruitLoad"] == 1, "FruitLoad"] = 11 #truqiito para que no se sobreesciban
+    tempDF.loc[tempDF["FruitLoad"] == 2, "FruitLoad"] = 1  
+    tempDF.loc[tempDF["FruitLoad"] == 11, "FruitLoad"] = 2
+    
+    
+    
     
     return(tempDF)
 
