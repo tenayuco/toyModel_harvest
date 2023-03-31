@@ -34,8 +34,11 @@ def setScenario(dic_Lattice, dic_Simulation, dic_Harvest):
         
      # plants and coordinae   
         IDplants = np.arange(0, dic_Lattice["num_Plants"], 1)  #add each ID 
-        X = np.random.randint(dic_Lattice["dim_Ini"][0], size= dic_Lattice["num_Plants"])  #add random coordinates
-        Y = np.random.randint(dic_Lattice["dim_Ini"][1], size= dic_Lattice["num_Plants"])
+    
+        X = np.random.random_sample(dic_Lattice["num_Plants"])*dic_Lattice["dim_Ini"][0]
+        Y = np.random.random_sample(dic_Lattice["num_Plants"])*dic_Lattice["dim_Ini"][1]
+
+        
         
     #initial infection
         iniInfected = [round(i*dic_Lattice["num_Plants"]) for i in dic_Lattice["ini_Inf"]] #add the number of infected plants we round it up, so sometime we can have an aditional plant per situation of infection. But, that is why is better to put values of 10.
@@ -164,27 +167,48 @@ def HM_closeness(old_DF, dic_Harvest):
     
     for w in np.arange(0,numW,1):
         liWorkers.append("W_%d" % (w))
-        tempDF.loc[tempDF["ID"] == initialPlants[w], "TotalHarvest"] = tempDF.loc[tempDF["ID"] == initialPlants[w], "TotalHarvest"] + tempDF.loc[tempDF["ID"] == initialPlants[w], "FruitLoad"]
+        tempDF.loc[tempDF["ID"] == initialPlants[w], "TotalHarvest"] = tempDF.loc[tempDF["ID"] == initialPlants[w], "FruitLoad"]
         tempDF.loc[tempDF["ID"] == initialPlants[w], "FruitLoad"] = 0
         tempDF.loc[tempDF["ID"] == initialPlants[w], "WorkerID"] = "W_%d" % (w)
         tempDF.loc[tempDF["ID"] == initialPlants[w], "HarvestStep"] = 1
         
-    conteo = 1
-    
+    conteo = 0  #CUANDO CA;BIP ESTO NO FUCNIONA
+    print("tempDF \n", tempDF)
     while conteo<hSteps:
+        conteo= conteo +1
         for w in np.arange(0, numW,1):
             
+            conteoTemp = conteo
             LAST_W = tempDF.loc[(tempDF["HarvestStep"] == conteo) & (tempDF["WorkerID"] == liWorkers[w])] #esto filtra solo los ultimos pasos, que deben tener 3 trabajadores
             
             print("lastw \n", LAST_W)
             
-
-            conteo = conteo +1
             
-            #UH_DIN = tempDF.loc[tempDF["FruitLoad"] != 0].copy#this is a copy
-            #UH_DIN["Distance"] = (UH_DIN["X"] - LAST.iloc[w]["X"])**2  + (UH_DIN["Y"] - LAST.iloc[w]["Y"])**2
-        
-        
+            UH_DIN = tempDF.loc[tempDF["FruitLoad"] != 0].copy()#this is a copy dentro de lo no cosechado
+            UH_DIN["Distance"] = (UH_DIN["X"] -LAST_W.iloc[0]["X"])**2  + (UH_DIN["Y"] - LAST_W.iloc[0]["Y"])**2
+            UH_DIN= UH_DIN.loc[UH_DIN["Distance"] == min(UH_DIN["Distance"])]
+
+           #UH_DIN.drop(columns= ["Distance"])  ##quitala
+            #UH_DIN= UH_DIN.loc[0]
+            print("w", w, "UHDIN \n", UH_DIN)
+
+            conteoTemp = conteoTemp+1
+    
+                        
+            tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["TotalHarvest"]] = UH_DIN.iloc[0]["FruitLoad"]  
+            tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["FruitLoad"]] = 0
+            tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["WorkerID"]] = "W_%d" % (w)  
+            tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["HarvestStep"]] = conteoTemp 
+
+            
+            print(tempDF)  #NO FUNCOMAAAA
+            
+            
+            
+           # if tempDF.iloc[0][tempDF["HarvestStep"] == conteo-1,"Rust"] == 1:
+            #    tempDF.loc[tempDF.ID.isin(UH_DIN), ["Rust"]] = 0.25                      
+            
+            
        # LC = ST.copy()  #this takes the susceptibles at the moment and makes copy (rusted by contact)
         #LC["Distance"] = (LC["X"] - IT.iloc[row]["X"])**2  + (LC["Y"] - IT.iloc[row]["Y"])**2 #this calculat distance between the each infected plants and all suceptibles
         #LC = LC.loc[LC["Distance"]<maxDistance] #tis filters only the neighburs

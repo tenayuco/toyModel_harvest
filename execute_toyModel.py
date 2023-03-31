@@ -13,7 +13,7 @@ from functions_toyModel import *  #this works from terminal. I am gonna pause it
 Tmax = 5
 dimIni = [10, 10]
 iniInf = [0.8, 0.1, 0.1]
-numPlants = 50  #add multiple of 10 or 100 to have exact percentages, but ir does not change much. 
+numPlants = 25  #add multiple of 10 or 100 to have exact percentages, but ir does not change much. 
 modeArr = "random"
 
 contactoDis = 1.5 #meters
