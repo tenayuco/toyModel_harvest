@@ -10,8 +10,8 @@ mycols3b <-c("#1b4a64", "#fdb81c", "#759580")
 mycols3c <- c("#759580", "#1b4a64","#fdb81c")
 
 
-LATTICE_DF <- read.csv("../data/intentoDF.csv") #este es para correrlo desde la termunal
-#LATTICE_DF <- read.csv("archivosTrabajandose/toyModelHarvest/data/intentoDF.csv", header = TRUE)
+#LATTICE_DF <- read.csv("../data/intentoDF.csv") #este es para correrlo desde la termunal
+LATTICE_DF <- read.csv("archivosTrabajandose/toyModelHarvest/data/intentoDF.csv", header = TRUE)
 
 LATTICE_DF$Total <- 1
 
@@ -48,6 +48,19 @@ FIG_SLI_time <- LATTICE_RES %>%
   ggtitle("")+
   scale_color_manual(values = mycols3c)+
   theme_bw()
+
+FIG_PATH<- LATTICE_DF %>% 
+  filter(Time == 5)%>% 
+  filter(HarvestEvent !=0)%>% 
+  rowwise() %>% 
+  ggplot(aes(x= X, y = Y)) +
+  geom_path(aes(col= WorkerID),size=1)+
+  geom_point(size=1)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
+ # scale_color_viridis_c()+
+  facet_wrap(~HarvestEvent, ncol=2)+
+  theme(panel.spacing = unit(0.8, "lines"), text = element_text(size = 15))+
+  theme_bw()+
+  labs(x= "X_norm", y= "Y_norm", col= "Minutes")
 
 ggsave(FIG_SLI_time,filename="../output/graficas/SLI_time.png") # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
