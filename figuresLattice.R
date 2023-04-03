@@ -10,63 +10,70 @@ mycols3b <-c("#1b4a64", "#fdb81c", "#759580")
 mycols3c <- c("#759580", "#1b4a64","#fdb81c")
 
 
-#LATTICE_DF <- read.csv("../data/intentoDF.csv") #este es para correrlo desde la termunal
-LATTICE_DF <- read.csv("archivosTrabajandose/toyModelHarvest/data/intentoDF.csv", header = TRUE)
+LATTICE_DF <- read.csv("../data/intentoDF.csv") #este es para correrlo desde la termunal
+#LATTICE_DF <- read.csv("archivosTrabajandose/toyModelHarvest/data/intentoDF.csv", header = TRUE)
 
 LATTICE_DF$Total <- 1
 
+LATTICE_DF$HarvestTime[LATTICE_DF$HarvestModel == "Control"] <- 0 
+
 N_PLANTS <- max(LATTICE_DF$ID)+1
 
-LATTICE_RES <- LATTICE_DF %>%
+
+LATTICE_RES_SPA <- LATTICE_DF %>%  #esta nos da un dataframe qyue promedia sobre el espacio
   group_by(HarvestModel, HarvestTime, numWorkers, Rep, Time, Rust)%>%
   summarise(Total_Sum = sum(Total)/N_PLANTS)
 
-LATTICE_RUST <- LATTICE_DF %>%
-  filter(Time==5)%>%
-  filter(Rust==1)%>%
-  group_by(HarvestModel, HarvestTime, numWorkers, Rep, Time)%>%
-  summarise(Total_Rust = sum(Total)/N_PLANTS)
-
-LATTICE_HAR <- LATTICE_DF %>%
+LATTICE_HAR <- LATTICE_DF %>% #esta agarra solo la cosecha por trabajador
   filter(Time==5)%>%
   filter(WorkerID !=0)%>%
-  group_by(HarvestModel, Rep, WorkerID, HarvestTime, numWorkers)%>%
-  summarise(CosechaTotal = sum(TotalHarvest))
+  filter(HarvestModel == "True")%>%
+  group_by(HarvestModel, HarvestTime, numWorkers, Rep, WorkerID)%>%  
+  summarise(CosechaTotalWorker = sum(TotalHarvest))
+
+LATTICE_HAR$CosechaTotal <- LATTICE_HAR$CosechaTotalWorker*LATTICE_HAR$numWorkers  #pensar si esto tiene sentido
+
+LATTICE_RES_SPA_AVE <- LATTICE_RES_SPA %>%
+  group_by(HarvestModel, HarvestTime, numWorkers, Time, Rust)%>%
+  summarise(AverageRust = mean(Total_Sum), SD_Rust = sd(Total_Sum))
 
 ###########Plo
 
-FIG_SLI_time <- LATTICE_RES %>%
+FIG_SLI_time <- LATTICE_RES_SPA_AVE %>%  ##FATLA POMERLA EL SD
   filter(Rust == 1) %>%
   ggplot()+
-  geom_line(aes(x=Time , y= Total_Sum, group= interaction(Rep, HarvestModel)), color="black")+ 
-  geom_point(aes(x=Time , y= Total_Sum, color= as.character(HarvestModel)), size= 2)+
+  geom_line(aes(x=Time , y= AverageRust, group= interaction(HarvestTime)), color="black")+ 
+  geom_point(aes(x=Time , y= AverageRust, color= interaction(HarvestTime)), size= 2)+
   ggtitle("")+
-  facet_wrap(~HarvestTime * numWorkers, ncol=2)+
-  scale_color_manual(values = mycols3a)+
+  facet_wrap(~numWorkers, ncol=2)+
+  scale_color_manual(values = mycols)+
   theme_bw()
 
 ggsave(FIG_SLI_time,filename="../output/graficas/SLI_time.png",  height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
-FIG_HAR_W <- LATTICE_HAR%>%
+FIG_HAR_W <- LATTICE_HAR %>%
   ggplot()+
-  geom_boxplot(aes(x= as.character(HarvestTime), y= CosechaTotal, color= as.character(HarvestTime)))+ 
+  geom_boxplot(aes(x= as.character(HarvestTime), y= CosechaTotal, color= as.character(numWorkers), group= interaction(numWorkers, HarvestTime)))+
   ggtitle("")+
-  facet_wrap(~numWorkers, ncol=2, scales = "free")+
+  #facet_wrap(~numWorkers, ncol=2, scales = "free")+
   scale_color_manual(values = mycols3a)+
   theme_bw()
 
 ggsave(FIG_HAR_W,filename="../output/graficas/HAR_W.png", height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
-FIG_RUST <- LATTICE_RUST%>%
+FIG_RUST <- LATTICE_RES_SPA%>%
+  filter(Rust == 1)%>%
+  filter(Time == 5)%>%
   ggplot()+
-  geom_boxplot(aes(x= as.character(HarvestTime), y= Total_Rust, color= as.character(HarvestModel)))+ 
+  geom_boxplot(aes(x= as.character(HarvestTime), y= Total_Sum, color= as.character(numWorkers), group= interaction(numWorkers, HarvestTime)))+ 
   ggtitle("")+
-  facet_wrap(~numWorkers, ncol=2, scales = "free")+
+  #facet_wrap(~numWorkers, ncol=2, scales = "free")+
   scale_color_manual(values = mycols3a)+
   theme_bw()
 
+ggsave(FIG_RUST,filename="../output/graficas/RUST_W_Htime.png", height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 

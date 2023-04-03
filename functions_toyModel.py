@@ -79,7 +79,7 @@ def generalDynamic(dic_Lattice, dic_Simulation, dic_Harvest):
     tiempoCosecha = dic_Harvest["time_Harvest"]
     
     #whole loop simlation
-    while T< dic_Simulation["Tmax"]:
+    while T< dic_Simulation["T_max"]:
         print("Time", T)
         tau = 0
         while tau<1:
