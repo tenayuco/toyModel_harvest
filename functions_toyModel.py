@@ -16,10 +16,10 @@ def setScenario(dic_Lattice, dic_Simulation, dic_Harvest):
     if dic_Lattice["mode_Arr"] == "random":  #so if the model is random
         
     #harvesting conditions (will be filled or modified during simulation)
-        HarvestModel = np.repeat(0, dic_Lattice["num_Plants"])
+        #HarvestModel = np.repeat(0, dic_Lattice["num_Plants"])
         WorkerID = np.repeat(0, dic_Lattice["num_Plants"])
         HarvestStep = np.repeat(0, dic_Lattice["num_Plants"])
-        HarvestEvent = np.repeat(0, dic_Lattice["num_Plants"])
+       # HarvestEvent = np.repeat(0, dic_Lattice["num_Plants"])
         TotalHarvest = np.repeat(0, dic_Lattice["num_Plants"])
         
     #fruit load (will change in simulation)
@@ -30,7 +30,7 @@ def setScenario(dic_Lattice, dic_Simulation, dic_Harvest):
         FruitLoad = np.concatenate((F2, F1), axis= None)
         
 #simulation        
-        Rep = np.repeat(dic_Simulation["rep_"], dic_Lattice["num_Plants"]) #add initial value of rep for each ID of the plant
+       # Rep = np.repeat(dic_Simulation["rep_"], dic_Lattice["num_Plants"]) #add initial value of rep for each ID of the plant
         
      # plants and coordinae   
         IDplants = np.arange(0, dic_Lattice["num_Plants"], 1)  #add each ID 
@@ -51,7 +51,7 @@ def setScenario(dic_Lattice, dic_Simulation, dic_Harvest):
 
 ## y se junta todo, loque no es temporal, ya veremos si es necesario juntar el modelo desde aqui o desde fuera
         
-        initialLattice = pd.DataFrame({"HarvestModel": HarvestModel, "Rep": Rep, "ID": IDplants, "X": X, "Y": Y,"Rust": Rust, "WorkerID": WorkerID, "HarvestStep":HarvestStep, "HarvestEvent": HarvestEvent, "FruitLoad":FruitLoad, "TotalHarvest": TotalHarvest})
+        initialLattice = pd.DataFrame({"ID": IDplants, "X": X, "Y": Y,"Rust": Rust, "WorkerID": WorkerID, "HarvestStep":HarvestStep, "FruitLoad":FruitLoad, "TotalHarvest": TotalHarvest})
     else:
         pass
     
@@ -64,8 +64,8 @@ This function generates all the dynamic
 
 def generalDynamic(dic_Lattice, dic_Simulation, dic_Harvest):
     
-    generalDF = pd.DataFrame(columns= ["HarvestModel", "Rep", "ID", "X", "Y", "Rust", "Time", "WorkerID", "HarvestStep", "HarvestEvent","FruitLoad", "TotalHarvest"]) #we create a general data frame thatwill store the whole dynamic
-    T = 0 #we set time to 0
+    generalDF = pd.DataFrame(columns= ["ID", "X", "Y", "Rust", "WorkerID", "HarvestStep","FruitLoad", "TotalHarvest", "Time"]) #we create a general data frame thatwill store the whole dynamic. Here we have the time colu
+    T = 0 #we set time to 0  
     
     initialDF= setScenario(dic_Lattice, dic_Simulation, dic_Harvest) #this creates the first sectio of the data frame
     temporalDF= initialDF.copy() #we copy it before including the Time (we willuse it dinamically)
@@ -76,9 +76,7 @@ def generalDynamic(dic_Lattice, dic_Simulation, dic_Harvest):
     
     generalDF= pd.concat([generalDF, initialDF])
     
-    #now w add a empty dataframe or infected plants during harvest just to fill it later
-    #RH = pd.DataFrame(columns= ["Jump", "Rep", "ID", "X", "Y", "Harvest", "Rust"]) #dataFRramevacio
-    
+    tiempoCosecha = dic_Harvest["time_Harvest"]
     
     #whole loop simlation
     while T< dic_Simulation["Tmax"]:
@@ -87,21 +85,12 @@ def generalDynamic(dic_Lattice, dic_Simulation, dic_Harvest):
         while tau<1:
         
             if dic_Simulation["har_vest"] == True:
-                if T > 1:
-                    if T ==2 :
-                        print("H1")
-                        newDF= HM_closeness(temporalDF, dic_Harvest, "H1")
-                        temporalDF= newDF.copy()
-                        
-                    elif T ==3: 
-                        print("H2")
-                        newDF= actualizeHarvest(temporalDF)
-                        temporalDF= newDF.copy()
-                        
-                        newDF= HM_closeness(temporalDF, dic_Harvest, "H2")
-                        temporalDF= newDF.copy()
-                    else:
-                        pass
+                if T == tiempoCosecha:
+                    #tiempoC = "H%d"%(T)
+                   # print(tiempoC)
+                    newDF= HM_closeness(temporalDF, dic_Harvest)
+                    temporalDF= newDF.copy()
+    
                 # se regresa aqui u R_Hno vacio debe regresar un temporal con la asignacion 0.25 para lo contagiado durante cosecha
             else:
                 pass
@@ -131,7 +120,7 @@ def contactModel(old_DF, dic_Simulation): #r_h is ruested trees durign harvest
     IT = tempDF.loc[tempDF["Rust"] == 1]#this is a view
     ST = tempDF.loc[tempDF["Rust"] == 0] #this is a view
     maxDistance = dic_Simulation["contactDistance"]**2 #lo pongo así para no usar raices cuadrasd
-    LC_total = pd.DataFrame(columns= ["HarvestModel", "Rep", "ID", "X", "Y", "Rust", "Time", "WorkerID, HarvestStep", "HarvestEvent", "FruitLoad", "TotalHarvest"]) #dataFRramevacio
+    LC_total = pd.DataFrame(columns= ["ID", "X", "Y", "Rust", "WorkerID", "HarvestStep", "FruitLoad", "TotalHarvest"]) #dataFRramevacio
     
     for row in range(1, len(IT)):
         
@@ -159,7 +148,8 @@ def contactModel(old_DF, dic_Simulation): #r_h is ruested trees durign harvest
     
     return(tempDF)
 
-def HM_closeness(old_DF, dic_Harvest, h_event):
+
+def HM_closeness(old_DF, dic_Harvest):
     
     tempDF = old_DF
     hSteps= dic_Harvest["harvest_Steps"]-1 #hago el -1 para que sean n pasos contando el 0
@@ -170,19 +160,19 @@ def HM_closeness(old_DF, dic_Harvest, h_event):
     initialPlants = random.sample(list(UN_HARV["ID"]), numW)
     
     liWorkers = []
-    
+        
     for w in np.arange(0,numW,1):
         liWorkers.append("W_%d" % (w))
         tempDF.loc[tempDF["ID"] == initialPlants[w], "TotalHarvest"] = tempDF.loc[tempDF["ID"] == initialPlants[w], "FruitLoad"]
         tempDF.loc[tempDF["ID"] == initialPlants[w], "FruitLoad"] = 0
         tempDF.loc[tempDF["ID"] == initialPlants[w], "WorkerID"] = "W_%d" % (w)
         tempDF.loc[tempDF["ID"] == initialPlants[w], "HarvestStep"] = 1
-        tempDF.loc[tempDF["ID"] == initialPlants[w], "HarvestEvent"] = h_event
 
         
     conteo = 0  #CUANDO CA;BIP ESTO NO FUCNIONA
+    print ("hSteps", hSteps)
     while conteo<hSteps:
-        print("contadorPersonas", conteo)
+        #print("contadorPersonas", conteo)
         conteo= conteo +1
         for w in np.arange(0, numW,1):
             
@@ -208,7 +198,6 @@ def HM_closeness(old_DF, dic_Harvest, h_event):
             tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["FruitLoad"]] = 0
             tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["WorkerID"]] = "W_%d" % (w)  
             tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["HarvestStep"]] = conteoTemp 
-            tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["HarvestEvent"]] = h_event 
 
             if royaDestino == 0:  #esto para asegurar que no fuera una planta infectada (0.75 o 1 o 0.5)
                 if royaOrigen == 1:
@@ -217,10 +206,7 @@ def HM_closeness(old_DF, dic_Harvest, h_event):
                     pass
             else:
                 pass
-                
-             #    tempDF.loc[te
-           # print(tempDF)  #NO FUNCOMAAAA
-            
+             
  
     
     return(tempDF)
@@ -230,9 +216,6 @@ def actualizeHarvest(old_DF):
     tempDF.loc[tempDF["FruitLoad"] == 1, "FruitLoad"] = 11 #truqiito para que no se sobreesciban
     tempDF.loc[tempDF["FruitLoad"] == 2, "FruitLoad"] = 1  
     tempDF.loc[tempDF["FruitLoad"] == 11, "FruitLoad"] = 2
-    
-    
-    
     
     return(tempDF)
 
