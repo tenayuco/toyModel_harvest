@@ -16,7 +16,7 @@ import numpy as np
 Tmax = 5
 dimIni = [100, 100]
 iniInf = [0.8, 0.1, 0.1]
-numPlants = 200  #add multiple of 10 or 100 to have exact percentages, but ir does not change much. 
+numPlants = 2000  #add multiple of 10 or 100 to have exact percentages, but ir does not change much. 
 modeArr = "random"
 listHarvest = 3
 #harvest = True

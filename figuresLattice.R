@@ -57,7 +57,7 @@ FIG_HAR_W <- LATTICE_HAR %>%
   geom_boxplot(aes(x= as.character(HarvestTime), y= CosechaTotal, color= as.character(numWorkers), group= interaction(numWorkers, HarvestTime)))+
   ggtitle("")+
   #facet_wrap(~numWorkers, ncol=2, scales = "free")+
-  scale_color_manual(values = mycols3a)+
+  scale_color_manual(values = mycols)+
   theme_bw()
 
 ggsave(FIG_HAR_W,filename="../output/graficas/HAR_W.png", height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
@@ -70,7 +70,7 @@ FIG_RUST <- LATTICE_RES_SPA%>%
   geom_boxplot(aes(x= as.character(HarvestTime), y= Total_Sum, color= as.character(numWorkers), group= interaction(numWorkers, HarvestTime)))+ 
   ggtitle("")+
   #facet_wrap(~numWorkers, ncol=2, scales = "free")+
-  scale_color_manual(values = mycols3a)+
+  scale_color_manual(values = mycols)+
   theme_bw()
 
 ggsave(FIG_RUST,filename="../output/graficas/RUST_W_Htime.png", height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
