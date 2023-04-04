@@ -10,78 +10,101 @@ mycols3b <-c("#1b4a64", "#fdb81c", "#759580")
 mycols3c <- c("#759580", "#1b4a64","#fdb81c")
 
 
-LATTICE_DF <- read.csv("../data/intentoDF.csv") #este es para correrlo desde la termunal
-#LATTICE_DF <- read.csv("archivosTrabajandose/toyModelHarvest/data/intentoDF.csv", header = TRUE)
+DF <- read.csv("../data/intentoDF.csv") #este es para correrlo desde la termunal
+#DF <- read.csv("archivosTrabajandose/toyModelHarvest/data/intentoDF.csv", header = TRUE)
 
-LATTICE_DF$Total <- 1
+DF$Total <- 1
 
-LATTICE_DF$HarvestTime[LATTICE_DF$HarvestModel == "Control"] <- 0 
+DF$HarvestTime[DF$HarvestModel == "Control"] <- " No_Har" 
 
-N_PLANTS <- max(LATTICE_DF$ID)+1
+N_PLANTS <- max(DF$ID)+1
 
-
-LATTICE_RES_SPA <- LATTICE_DF %>%  #esta nos da un dataframe qyue promedia sobre el espacio
+RES_SPA <- DF %>%  #esta nos da un dataframe qyue promedia sobre el espacio
   group_by(HarvestModel, HarvestTime, numWorkers, Rep, Time, Rust)%>%
   summarise(Total_Sum = sum(Total)/N_PLANTS)
 
-LATTICE_HAR <- LATTICE_DF %>% #esta agarra solo la cosecha por trabajador
+
+
+#procedimiento en donde duplicamos el control para tenerlo como si fuera un "escenario", pero realmente son los mismos datos
+#desues de jacer el resumen h
+RES_CON_1 <- RES_SPA %>% filter (HarvestTime == " No_Har")
+RES_CON_2 <- RES_CON_1 
+RES_CON_1$HarvestModel <-"closeness" #esto es falso, no pertenecen ahi, pero es solo para graficar
+RES_CON_2$HarvestModel <-"productivity"
+
+PART_RES_CON <- rbind(RES_CON_1,RES_CON_2)
+RES_SPA_MOD <- RES_SPA %>% 
+  filter(HarvestTime != " No_Har" )
+RES_SPA_MOD <- rbind(RES_SPA_MOD, PART_RES_CON)  ## y esta es la que se va a usar. 
+
+rm("RES_CON_1", "RES_CON_2", "PART_RES_CON")  
+
+RES_SPA_MOD_AVE <- RES_SPA_MOD %>%  
+  group_by(HarvestModel, HarvestTime, numWorkers, Time, Rust)%>%
+  summarise(AverageRust = mean(Total_Sum), SD_Rust = sd(Total_Sum))
+#################################3
+
+HAR <- DF %>% #esta agarra solo la cosecha por trabajador
   filter(Time==5)%>%
   filter(WorkerID !=0)%>%
-  filter(HarvestModel == "True")%>%
+  filter(HarvestModel != "Control")%>%
   group_by(HarvestModel, HarvestTime, numWorkers, Rep, WorkerID)%>%  
   summarise(CosechaTotalWorker = sum(TotalHarvest))
 
-LATTICE_HAR$CosechaTotal <- LATTICE_HAR$CosechaTotalWorker*LATTICE_HAR$numWorkers  #pensar si esto tiene sentido
+HAR$CosechaTotal <- HAR$CosechaTotalWorker*HAR$numWorkers  #pensar si esto tiene sentido
 
-LATTICE_RES_SPA_AVE <- LATTICE_RES_SPA %>%
-  group_by(HarvestModel, HarvestTime, numWorkers, Time, Rust)%>%
-  summarise(AverageRust = mean(Total_Sum), SD_Rust = sd(Total_Sum))
 
 ###########Plo
 
-FIG_SLI_time <- LATTICE_RES_SPA_AVE %>%  ##FATLA POMERLA EL SD
+FIG_SLI_time <- RES_SPA_MOD_AVE %>%  ##FATLA POMERLA EL SD
   filter(Rust == 1) %>%
-  ggplot()+
-  geom_line(aes(x=Time , y= AverageRust, group= interaction(HarvestTime)), color="black")+ 
-  geom_point(aes(x=Time , y= AverageRust, color= interaction(HarvestTime)), size= 2)+
+  filter(numWorkers ==5 | is.na(numWorkers))%>%  #da igial
+  ggplot(aes(x= Time))+
+  geom_line(aes(y= AverageRust, color= as.character(HarvestTime)))+ 
+  geom_point(aes(y= AverageRust, color= as.character(HarvestTime)), size= 2)+
+  geom_errorbar(aes(ymin=AverageRust-SD_Rust, ymax=AverageRust+SD_Rust, color= as.character(HarvestTime)), width=.2,
+                position=position_dodge(0.05)) +
   ggtitle("")+
-  facet_wrap(~numWorkers, ncol=2)+
+  facet_wrap(~HarvestModel, ncol=2)+
   scale_color_manual(values = mycols)+
-  theme_bw()
+  theme_bw()+
+  labs(x= "Time", y= "Average Rust", col= "Time of Harvest")
 
-ggsave(FIG_SLI_time,filename="../output/graficas/SLI_time.png",  height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_SLI_time,filename="../output/graficas/SLI_time.png",  height = 6, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
-FIG_HAR_W <- LATTICE_HAR %>%
+FIG_HAR_W <- HAR %>%
   ggplot()+
-  geom_boxplot(aes(x= as.character(HarvestTime), y= CosechaTotal, color= as.character(numWorkers), group= interaction(numWorkers, HarvestTime)))+
+  geom_boxplot(aes(x= as.character(HarvestTime), y= CosechaTotalWorker, color= as.character(numWorkers), group= interaction(numWorkers, HarvestTime)))+
   ggtitle("")+
-  #facet_wrap(~numWorkers, ncol=2, scales = "free")+
+  facet_wrap(~HarvestModel, ncol=2)+
   scale_color_manual(values = mycols)+
-  theme_bw()
+  theme_bw()+
+  labs(x= "Time of Harvest", y= "Average Harvest per Worker", col= "Number of Workers")
 
-ggsave(FIG_HAR_W,filename="../output/graficas/HAR_W.png", height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_HAR_W,filename="../output/graficas/HAR_W.png", height = 6, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
-FIG_RUST <- LATTICE_RES_SPA%>%
+FIG_RUST <- RES_SPA_MOD%>%
   filter(Rust == 1)%>%
   filter(Time == 5)%>%
   ggplot()+
-  geom_boxplot(aes(x= as.character(HarvestTime), y= Total_Sum, color= as.character(numWorkers), group= interaction(numWorkers, HarvestTime)))+ 
+  geom_boxplot(aes(x= as.character(HarvestTime), y= Total_Sum, fill= as.character(numWorkers), group= interaction(numWorkers, HarvestTime)))+ 
   ggtitle("")+
-  #facet_wrap(~numWorkers, ncol=2, scales = "free")+
-  scale_color_manual(values = mycols)+
-  theme_bw()
+  facet_wrap(~HarvestModel, ncol=2)+
+  scale_fill_manual(values = mycols)+
+  theme_bw() +
+  labs(x= "Time of Harvest", y= "Average Rust", col= "Number of Workers")
 
-ggsave(FIG_RUST,filename="../output/graficas/RUST_W_Htime.png", height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_RUST,filename="../output/graficas/RUST_W_Htime.png", height = 6, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
-
-FIG_PATH<- LATTICE_DF %>% 
+FIG_PATH<- DF %>% 
   filter(Time == 5)%>% 
   filter(Rep == 0)%>% #solo un ejepmplo
   filter(HarvestTime ==1)%>%  #da igial
-  filter(HarvestModel == "True")%>% 
+  filter(numWorkers ==1 | numWorkers ==5)%>%  #da igial
+  filter(HarvestModel != "Control")%>% 
   filter(WorkerID != 0)%>% 
   arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
   rowwise() %>% 
@@ -90,12 +113,12 @@ FIG_PATH<- LATTICE_DF %>%
   geom_point(size=1)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
   #scale_color_viridis_c()+
   scale_color_manual(values = mycols)+
-  facet_wrap(~numWorkers, ncol=2)+
+  facet_wrap(~numWorkers*HarvestModel, ncol=2)+
   theme(panel.spacing = unit(0.8, "lines"), text = element_text(size = 15))+
   theme_bw()+
-  labs(x= "X_norm", y= "Y_norm", col= "Minutes")
+  labs(x= "X_norm", y= "Y_norm", col= "Worker")
 
-ggsave(FIG_PATH,filename="../output/graficas/PATH.png",  height = 8, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_PATH,filename="../output/graficas/PATH.png",  height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 
@@ -103,8 +126,8 @@ wholePlot <- 0
 
 n= 0
 if (wholePlot ==1){
-for(t in unique(LATTICE_DF$Time)){
-  FIG_RUST <- LATTICE_DF %>%
+for(t in unique(DF$Time)){
+  FIG_RUST <- DF %>%
     filter(Rep ==0)%>%
     filter(Time == t) %>%
     add_row(HarvestModel = 0,  Rep= 0,   ID= 999999,  X= NA,  Y=NA , Rust= 0)%>% ##ESte es un truquito para que siempre hayan 3 colores en cada graficas, porque le 0.5 siempre desaprece

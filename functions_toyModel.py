@@ -84,16 +84,16 @@ def generalDynamic(dic_Lattice, dic_Simulation, dic_Harvest):
         tau = 0
         while tau<1:
         
-            if dic_Simulation["har_vest"] == True:
-                if T == tiempoCosecha:
-                    #tiempoC = "H%d"%(T)
-                   # print(tiempoC)
-                    newDF= HM_closeness(temporalDF, dic_Harvest)
-                    temporalDF= newDF.copy()
-    
-                # se regresa aqui u R_Hno vacio debe regresar un temporal con la asignacion 0.25 para lo contagiado durante cosecha
-            else:
+            
+            if dic_Harvest["har_vest"] == "control":
                 pass
+            else:
+                if T == tiempoCosecha:
+                    newDF= HM_general(temporalDF, dic_Harvest)
+                    temporalDF= newDF.copy()
+                else:
+                    pass
+
         
         #aplica el modulo contact
             
@@ -210,6 +210,82 @@ def HM_closeness(old_DF, dic_Harvest):
  
     
     return(tempDF)
+
+
+
+def HM_general(old_DF, dic_Harvest):
+    
+    tempDF = old_DF
+    hSteps= dic_Harvest["harvest_Steps"]-1 #hago el -1 para que sean n pasos contando el 0
+    numW = dic_Harvest["num_Workers"]
+    
+    if dic_Harvest["har_vest"] == "closeness":
+        UN_HARV = tempDF.loc[tempDF["FruitLoad"] != 0]#this is a view
+    elif dic_Harvest["har_vest"] == "productivity":
+        UN_HARV = tempDF.loc[tempDF["FruitLoad"] ==2]#this is a view
+        
+       
+    initialPlants = random.sample(list(UN_HARV["ID"]), numW)
+    
+    liWorkers = []
+        
+    for w in np.arange(0,numW,1):
+        liWorkers.append("W_%d" % (w))
+        tempDF.loc[tempDF["ID"] == initialPlants[w], "TotalHarvest"] = tempDF.loc[tempDF["ID"] == initialPlants[w], "FruitLoad"]
+        tempDF.loc[tempDF["ID"] == initialPlants[w], "FruitLoad"] = 0
+        tempDF.loc[tempDF["ID"] == initialPlants[w], "WorkerID"] = "W_%d" % (w)
+        tempDF.loc[tempDF["ID"] == initialPlants[w], "HarvestStep"] = 1
+
+        
+    conteo = 0  #CUANDO CA;BIP ESTO NO FUCNIONA
+    print ("hSteps", hSteps)
+    while conteo<hSteps:
+        #print("contadorPersonas", conteo)
+        conteo= conteo +1
+        for w in np.arange(0, numW,1):
+            
+            conteoTemp = conteo
+            LAST_W = tempDF.loc[(tempDF["HarvestStep"] == conteo) & (tempDF["WorkerID"] == liWorkers[w])] #esto filtra solo los ultimos pasos, que deben tener 3 trabajadores
+            
+            royaOrigen = LAST_W.iloc[0]["Rust"]
+            
+           # print("lastw \n", LAST_W)
+            
+            if dic_Harvest["har_vest"] == "closeness":
+                UH_DIN = tempDF.loc[tempDF["FruitLoad"] != 0].copy()#this is a cooy
+            elif dic_Harvest["har_vest"] == "productivity":
+                UH_DIN = tempDF.loc[tempDF["FruitLoad"] == 2].copy() #this is a copy
+            
+            UH_DIN["Distance"] = (UH_DIN["X"] -LAST_W.iloc[0]["X"])**2  + (UH_DIN["Y"] - LAST_W.iloc[0]["Y"])**2
+            UH_DIN= UH_DIN.loc[UH_DIN["Distance"] == min(UH_DIN["Distance"])]
+
+            royaDestino = UH_DIN.iloc[0]["Rust"]
+ #           print("w", w, "UHDIN \n", UH_DIN)
+
+            conteoTemp = conteoTemp+1
+    
+                        
+            tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["TotalHarvest"]] = UH_DIN.iloc[0]["FruitLoad"]  
+            tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["FruitLoad"]] = 0
+            tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["WorkerID"]] = "W_%d" % (w)  
+            tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["HarvestStep"]] = conteoTemp 
+
+            if royaDestino == 0:  #esto para asegurar que no fuera una planta infectada (0.75 o 1 o 0.5)
+                if royaOrigen == 1:
+                    tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["Rust"]] = 0.25 
+                else:
+                    pass
+            else:
+                pass
+             
+    return(tempDF)
+
+    
+
+
+
+
+
     
 def actualizeHarvest(old_DF):
     tempDF = old_DF
