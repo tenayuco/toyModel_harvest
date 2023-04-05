@@ -9,6 +9,7 @@ be used to create the submit_file
 """
 
 import argparse
+import os
 from os import path
 #from sh import mkdir
 import pickle
@@ -34,10 +35,10 @@ Then we define the different values for m, g, io and the patterns
 """
 
 
-repetition = range(10)
-numPlants = [1000, 2000, 3000]
-tiemposHarvest= [1,2,3,4,5] 
-workers = [1,3,5,7]  #articulo ESteli, pero mejor buscar los extremos.
+repetition = range(5)
+numberPlants = [200, 400]
+tiemposHarvest= [1,2] 
+workers = [1,3]  #articulo ESteli, pero mejor buscar los extremos.
 modelSwitch = ["control", "closeness", "productivity"]
 
 
@@ -57,54 +58,57 @@ Here we run the general loop
 
 linea = []
 
-patungDirectory = '/srv/home/emilio/toyModel_harvest'  #this changes depending the computer
+patungDirectory = '/srv/home/emilio/toyModelHarvest'  #this changes depending the computer
 
 
 
 ##################AQUI VOY
 
+controlNumW = 0
+controlTimeHar = "NoH"
 
-
-
-
-
-sim = 0
-
-for g in valoresG:
-    for m in valoresM:
-        for ini in valoresIni:
-            for pat in valoresPatrones:
+for rep in repetition:
+    for numPlants in numberPlants:
+        for harvest in modelSwitch:
+            if harvest == "control":
+                #print("CONTROL", "rep", rep)
                 
-                if pat == "random":
-                    sim = sim +1
+                linea.append(rep)
+                linea.append(numPlants)
+                linea.append(harvest)
+                linea.append(controlNumW)
+                linea.append(controlTimeHar)
+                
+                liga = patungDirectory+ "/initialConditions"
+                os.makedirs(liga, exist_ok= True)
+
+                with open(path.join(liga, "CI_%s_%s_%s_%s_%s" %(rep, numPlants, harvest, controlNumW, controlTimeHar)), "wb") as output:
+                    pickle.dump(linea, output)
+     #output.write(lista)
+                linea= []
+
+    
+            else:        
+    
+                for numWorkers in workers:
+                    for timeHarvest in tiemposHarvest:
+                        #print("HAR", harvest, "Nworkers", numWorkers,"H", timeHarvest,"REP", rep)
+                        linea.append(rep)
+                        linea.append(numPlants)
+                        linea.append(harvest)
+                        linea.append(numWorkers)
+                        linea.append(timeHarvest)
                     
-                else:
-                    sim = 1
-                
-                for r in valoresR:
-                    for b1 in valoresB1:
-                        for b2 in valoresB2:
-                            for a in valoresA:
-                                for mu in valoresMU:
-                                    for size in sizeEuler:
-                                        linea.append(g)
-                                        linea.append(m)
-                                        linea.append(ini)
-                                        linea.append(pat)
-                                        linea.append(sim)
-                                        linea.append(r)
-                                        linea.append(b1)
-                                        linea.append(b2)
-                                        linea.append(a)
-                                        linea.append(mu)
-                                        linea.append(size)
-                
-                        
-                                        liga = patungDirectory+ "/initialConditions"
-                                        os.makedirs(liga, exist_ok= True)
-                        
-                                        with open(path.join(liga, "CI_%s_%s_%s_%s_%s_%s_%s_%s_%s_%s_%s.txt" %(g,m, ini, pat, sim, r, b1, b2, a, mu, size)), "wb") as output:
-                                            pickle.dump(linea, output)
-                                 #output.write(lista)
-                                        linea= []
+                        liga = patungDirectory+ "/initialConditions"
+                        os.makedirs(liga, exist_ok= True)
+    
+                        with open(path.join(liga, "CI_%s_%s_%s_%s_%s" %(rep, numPlants, harvest, numWorkers, timeHarvest)), "wb") as output:
+                            pickle.dump(linea, output)
+             #output.write(lista)
+                        linea= []
+        
+    
+
+
+
 

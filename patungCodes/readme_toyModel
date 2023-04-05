@@ -1,3 +1,18 @@
+0. Enter to the terminal in your computer and push the codes from your directories to the supercomputer:
+
+"PATH/subidaPatung_fullLattice" is the path to the directory in your computer where you keep the script.
+"sim_fullLattice" is the file in the supercomputer where you will arrange all the files. 
+
+scp -r /home/emilio/archivosTrabajandose/toyModelHarvest/src/patungCodes/ emilio@patung.lancis.ecologia.unam.mx:/srv/home/emilio/toyModelHarvest/
+
+scp -r emilio@patung.lancis.ecologia.unam.mx:/srv/home/emilio/toyModelHarvest/salida archivosTrabandose/toyModelHarvest/dataPatung_descargado
+
+
+
+
+
+
+
 Comandos para hacer la carpeta de Patung
 
 Create all the files and subfiles before entering the supercomputer
@@ -68,5 +83,23 @@ scp -r /PATH/subidaPatung_fullLattice emilio@patung.lancis.ecologia.unam.mx:/srv
 [This will ask you your superComputer accout password]
 
 ----------------------------------------------------------
+6. Run the submit file in the condor computer
+
+condor_submit submit_file_fullLattice.sub
+
+The bitacora directory keeps track of the possible errors and messages. To see how the jobs are beeing submitted check:
+
+condor_q
+
+If everything runs correctly the dfOnePlant, matrizOnePlant should have the final files that will be used in order to plot the different figures. The bicatora directory keeps track of the different problems or messages during the simulations (.out, .log and .err) 
+
+--------------------------------------------------
+
+7. Exit the superComputer and from your terminal, download produced files in "salida" to your computer, to produce the different figures. 
+
+NOTE: In the case of the sensibility analysis or the size Step analysis reported in the supplementary 1, we ran different times the same simulation changing the creator_CI_patung.py and downloaded the results in different directories:
+
+For the main figures:
+scp -r emilio@patung.lancis.ecologia.unam.mx:/srv/home/emilio/sim_fullLattice/salida "PATH"/FiguresCodes/bajadaPatung/
 
 
