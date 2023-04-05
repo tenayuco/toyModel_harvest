@@ -64,7 +64,7 @@ patungDirectory = '/srv/home/emilio/toyModelHarvest'  #this changes depending th
 
 ##################AQUI VOY
 
-controlNumW = 0
+controlNumW = 999
 controlTimeHar = "NoH"
 
 for rep in repetition:
