@@ -1,0 +1,72 @@
+Comandos para hacer la carpeta de Patung
+
+Create all the files and subfiles before entering the supercomputer
+
+1. Inital folder (**)
+
+- InitialConditions_Creator.py
+- SubmitFile_Creator.py
+- runAll.py 
+__init__.py (este debe ser copia del modelo que tengo en GIT, en functions.py)
+
+2. Functions and directories
+
+2.1 Directories: bitacora, salida and initialConditions
+
+mkdir bitacora salida initialConditions
+cd salida/
+mkdir df_Full df_T_Final
+
+2.2. Fill the initialConditions directory with the different initial conditions
+python3 creator_CI_patung.py
+
+
+2.3. List all the files inside the initialConditions in order to have a text file only with the names:
+dir initialConditions/  > listCI.txt
+
+2.4. Create the .nwg directory and move the __init__.py inside it
+
+mkdir nwg
+mv __init__.py ./nwg/
+
+III. Create the submit file
+python3 creator_SubmitFile.py
+
+3. Change mode of runAll
+chmod +x runAll.py 
+
+-------------------------------------------------------------
+Your directory now should contain the following directories an files:
+
+codeMatrizSim.py (activated)
+creator_CI_patung.py
+creator_SubmitFile.py
+__init__.py 
+bitacora
+salida
+salida/dfPromedios
+salida/dfPicos
+salida/matricesGenerales
+initialConditions
+listCI.txt
+submit_file_fullLattice.sub
+.nwg
+.nwg/__init__.py
+--------------------------
+
+----------------------------------------------------------
+PUSH EVERYTHING
+
+0. Enter to the terminal in your computer and push the codes from your directories to the supercomputer:
+
+"PATH/subidaPatung_fullLattice" is the path to the directory in your computer where you keep the script.
+"sim_fullLattice" is the file in the supercomputer where you will arrange all the files. 
+
+scp -r /PATH/subidaPatung_fullLattice emilio@patung.lancis.ecologia.unam.mx:/srv/home/emilio/sim_fullLattice/
+
+
+[This will ask you your superComputer accout password]
+
+----------------------------------------------------------
+
+

@@ -1,55 +1,129 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# coding: utf-8
 """
+This codes instantiates the functions defined in __init_py (kept in the .nwg file) using the different values defined in the submitfile, 
 Created on Tue Mar 21 09:27:57 2023
 
 @author: emilio
 """
 
-from functions_toyModel import *  #this works from terminal. I am gonna pause it. 
-
-#initial conditions
-
+import argparse
+from os import path
+#from sh import mkdir
+import pickle
 import pandas as pd
 import numpy as np
+
+
+
+from nwg import *  # here we import the __init__.py script
+
+""" 
+We first import the values of the initial conditions in the submitfile
+"""
+
+
+parser = argparse.ArgumentParser(description = "arguments that have to be read by the code")
+parser.add_argument('--code', help = 'initial matrix', required= True)
+parser.add_argument('--subdir', help= 'subdirectory', required= True)
+args = parser.parse_args()
+
+
+with open(path.join(args.subdir, args.code), "rb") as out:
+	condiciones = pickle.load(out)
+
+print (condiciones)
+
+        
+"""
+Fixed parameters
+"""
+
+
 
 Tmax = 5
 dimIni = [100, 100]
 iniInf = [0.8, 0.1, 0.1]
-numPlants = 200  #add multiple of 10 or 100 to have exact percentages, but ir does not change much. 
 modeArr = "random"
-listHarvest = 3
 #harvest = True
-hlPlants = round(numPlants/2)
-
-
 contactoDis = 1.5 #meters
 
 
-#harvesgin conditions (deinfed in the loop)
+"""
+Here we used the changing parameters, according to the submit file
 
-#numWorkers = 3
-#timeHarvest = 1
-#harvestSteps = int(hlPlants/numWorkers)
+It is very important to keep track on the placement of the args
+in condiciones 
+"""
 
-
-#rep = 3
-
-
- ##*Entero hace que nunca hagas mas de la mitad. Tendria que sobrar 1 planta
- #see full documentation, in each step, 25 trees per worker
-
-#dicLattice = {"dim_Ini": dimIni, "ini_Inf": iniInf, "mode_Arr": modeArr, "num_Plants": numPlants}
-#dicHarvest = {"har_vest":harvest, "num_Workers": numWorkers, "harvest_Steps": harvestSteps, "hl_Plants":hlPlants, "list_Harvest":listHarvest}
-
-super_GeneralDF = pd.DataFrame(columns= ["ID", "X", "Y", "Rust", "Time", "WorkerID", "HarvestStep" ,"FruitLoad", "TotalHarvest", "HarvestModel", "HarvestTime", "numWorkers", "Rep"]) #we create a general data frame thatwill store the whole dynamic
+rep = condiciones[0]
+numPlants = condiciones[1]
+harvest = condiciones[2]
+numWorkers = condiciones[3]
+timeHarvest = condiciones[4]
 
 
+###
+hlPlants = round(numPlants/2)
+harvestSteps = int(hlPlants/numWorkers) ##*Entero hace que nunca hagas mas de la mitad. Tendria que sobrar 1 planta
+#see full documentation, in each step, 25 trees per worker
 
-repetition = range(10)
-tiemposHarvest= [1,2,3,4] 
-workers = [1,3,5,7]  #articulo ESteli, pero mejor buscar los extremos.
-modelSwitch = ["control", "closeness", "productivity"]
+dicLattice = {"dim_Ini": dimIni, "ini_Inf": iniInf, "mode_Arr": modeArr, "num_Plants": numPlants}
+dicHarvest = {"har_vest": harvest, "num_Workers": numWorkers, "harvest_Steps": harvestSteps, "hl_Plants":hlPlants, "time_Harvest":timeHarvest}
+dicSimulation = {"rep_":rep, "T_max": Tmax, "contactDistance":contactoDis}
+
+
+"""
+General dynamics. This chunk runs the general dynamics and keep the full matrix in the matricesGenerales file
+"""   
+
+DF = generalDynamic(dic_Lattice= dicLattice, dic_Simulation=dicSimulation, dic_Harvest= dicHarvest)
+largoDF = len(DF)
+
+#esto se agrega al final
+DF["HarvestModel"] =np.repeat("Control", largoDF)
+DF["numWorkers"] =np.repeat("NA", largoDF)
+DF["HarvestTime"] =np.repeat("NA", largoDF)
+DF["Rep"] =np.repeat(rep, largoDF)
+
+
+"""
+General matrices
+"""
+
+patungDirectory = '/srv/home/emilio/toyModel_harvest'  #this is the general directory of the superComputer. 
+
+"""
+General matrices
+"""
+liga = patungDirectory + "/salida/DF_full"  #mkdir salida/matricesGenerales before running inside the directory
+DF.to_csv(liga+ "DF_full_%s.csv" %(args.code)) #average matrix
+
+    
+"""
+poner aqui el filtro de DF FALTA!*!
+"""
+
+#dfPromedio= creadorDF_MaPromedio(matrizGeneral, dicODE, dicLattice, dicMigration, sim, marcadoresHechos, Dc)
+
+liga2 = patungDirectory + "/salida/df_finalTime/"    #mkdir salida/dfPromedios before running inside the directory
+DF_finalTime.to_csv(liga2+"df_finalTime_%s.csv"%(args.code)) #average matrix
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 for rep in repetition:
     for harvest in modelSwitch:

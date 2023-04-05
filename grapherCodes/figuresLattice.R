@@ -10,7 +10,7 @@ mycols3b <-c("#1b4a64", "#fdb81c", "#759580")
 mycols3c <- c("#759580", "#1b4a64","#fdb81c")
 
 
-DF <- read.csv("../data/intentoDF.csv") #este es para correrlo desde la termunal
+DF <- read.csv("../../data/intentoDF.csv") #este es para correrlo desde la termunal
 #DF <- read.csv("archivosTrabajandose/toyModelHarvest/data/intentoDF.csv", header = TRUE)
 
 DF$Total <- 1
@@ -70,7 +70,7 @@ FIG_SLI_time <- RES_SPA_MOD_AVE %>%  ##FATLA POMERLA EL SD
   theme_bw()+
   labs(x= "Time", y= "Average Rust", col= "Time of Harvest")
 
-ggsave(FIG_SLI_time,filename="../output/graficas/SLI_time.png",  height = 6, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_SLI_time,filename="../../output/graficas/SLI_time.png",  height = 6, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 FIG_HAR_W <- HAR %>%
@@ -82,7 +82,7 @@ FIG_HAR_W <- HAR %>%
   theme_bw()+
   labs(x= "Time of Harvest", y= "Average Harvest per Worker", col= "Number of Workers")
 
-ggsave(FIG_HAR_W,filename="../output/graficas/HAR_W.png", height = 6, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_HAR_W,filename="../../output/graficas/HAR_W.png", height = 6, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 FIG_RUST <- RES_SPA_MOD%>%
@@ -96,7 +96,7 @@ FIG_RUST <- RES_SPA_MOD%>%
   theme_bw() +
   labs(x= "Time of Harvest", y= "Average Rust", col= "Number of Workers")
 
-ggsave(FIG_RUST,filename="../output/graficas/RUST_W_Htime.png", height = 6, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_RUST,filename="../../output/graficas/RUST_W_Htime.png", height = 6, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 FIG_PATH<- DF %>% 
@@ -118,7 +118,7 @@ FIG_PATH<- DF %>%
   theme_bw()+
   labs(x= "X_norm", y= "Y_norm", col= "Worker")
 
-ggsave(FIG_PATH,filename="../output/graficas/PATH.png",  height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_PATH,filename="../../output/graficas/PATH.png",  height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 
@@ -139,7 +139,7 @@ for(t in unique(DF$Time)){
     scale_color_manual(values = mycols3c)+
     theme_bw()
   
-  ggsave(FIG_RUST,filename=paste("../output/figurasLattice/",n,"contactModel",t,".png",sep="")) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+  ggsave(FIG_RUST,filename=paste("../../output/figurasLattice/",n,"contactModel",t,".png",sep="")) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
   n= n+1
 }
 }
