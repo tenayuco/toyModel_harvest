@@ -35,10 +35,10 @@ Then we define the different values for m, g, io and the patterns
 """
 
 
-repetition = range(5)
-numberPlants = [200, 400]
-tiemposHarvest= [1,2] 
-workers = [1,3]  #articulo ESteli, pero mejor buscar los extremos.
+repetition = range(30)
+numberPlants = [500, 1000, 1500, 2500, 3000, 3500, 4000]
+tiemposHarvest= [0,1,2,3,4] 
+workers = [1,5, 8]  #articulo ESteli, pero mejor buscar los extremos.  #toca ir hasta el 8!!!!
 modelSwitch = ["control", "closeness", "productivity"]
 
 

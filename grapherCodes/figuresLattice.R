@@ -12,8 +12,8 @@ mycols3c <- c("#759580", "#1b4a64","#fdb81c")
 
 
 #this is the one to use first
-DF <- read.csv("../../data/DF_total_complete.csv") #este es para correrlo desde la termunal
-#DF <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_total_complete.csv", header = TRUE)
+DF <- read.csv("../../data/DF_finalTime_complete.csv") #este es para correrlo desde la termunal
+#DF <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_finalTime_complete.csv", header = TRUE)
 
 #DF_finalTime <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_finalTime_complete.csv", header = TRUE)
 
@@ -43,9 +43,12 @@ RES_SPA_MOD <- rbind(RES_SPA_MOD, PART_RES_CON)  ## y esta es la que se va a usa
 
 rm("RES_CON_1", "RES_CON_2", "PART_RES_CON")  
 
+for(nP in unique(DF$numPlants)){
 FIG_RUST <- RES_SPA_MOD%>%
+  filter(HarvestTime != 5)%>%
   filter(Time == 5)%>%
   filter(Rust == 1)%>%
+  filter(numPlants == nP)%>%
   ggplot()+
   geom_boxplot(aes(x= as.character(HarvestTime), y= Total_Sum, fill= as.character(numWorkers), group= interaction(numWorkers, HarvestTime)))+ 
   ggtitle("")+
@@ -54,30 +57,10 @@ FIG_RUST <- RES_SPA_MOD%>%
   theme_bw() +
   labs(x= "Time of Harvest", y= "Average Rust", col= "Number of Workers")
 
-ggsave(FIG_RUST,filename="../../output/graficas/RUST_W_Htime.png", height = 6, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_RUST,filename=paste("../../output/graficas/RUST/", "rust_plants_", nP, ".png", sep=""),  height = 8, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+}
 
 #####################3
-
-RES_SPA_MOD_AVE <- RES_SPA_MOD %>%  
-  group_by(HarvestModel, HarvestTime, numWorkers, numPlants, Time, Rust)%>%
-  summarise(AverageRust = mean(Total_Sum), SD_Rust = sd(Total_Sum))
-
-
-FIG_SLI_time <- RES_SPA_MOD_AVE %>%  ##FATLA POMERLA EL SD
-  filter(Rust == 1) %>%
-  filter(numWorkers ==3 | is.na(numWorkers))%>%  #da igial
-  ggplot(aes(x= Time))+
-  geom_line(aes(y= AverageRust, color= as.character(HarvestTime)))+ 
-  geom_point(aes(y= AverageRust, color= as.character(HarvestTime)), size= 2)+
-  geom_errorbar(aes(ymin=AverageRust-SD_Rust, ymax=AverageRust+SD_Rust, color= as.character(HarvestTime)), width=.2,
-                position=position_dodge(0.05)) +
-  ggtitle("")+
-  facet_wrap(~HarvestModel*numPlants, ncol=2)+
-  scale_color_manual(values = mycols)+
-  theme_bw()+
-  labs(x= "Time", y= "Average Rust", col= "Time of Harvest")
-
-ggsave(FIG_SLI_time,filename="../../output/graficas/SLI_time.png",  height = 6, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 
@@ -87,14 +70,16 @@ ggsave(FIG_SLI_time,filename="../../output/graficas/SLI_time.png",  height = 6, 
 
 HAR <- DF %>% #esta agarra solo la cosecha por trabajador
   filter(Time ==5) %>%
+  filter(HarvestTime != 5)%>%  ##Esto ya no existe en la nueva simulacion
   filter(WorkerID !=0)%>%
   filter(HarvestModel != "Control")%>%
   group_by(HarvestModel, HarvestTime, numWorkers, Rep, numPlants, WorkerID)%>%  
   summarise(CosechaTotalWorker = sum(TotalHarvest))
 
 #HAR$CosechaTotal <- HAR$CosechaTotalWorker*HAR$numWorkers  #pensar si esto tiene sentido
-
+for(nP in unique(DF$numPlants)){
 FIG_HAR_W <- HAR %>%
+  filter(numPlants == nP)%>%
   ggplot()+
   geom_boxplot(aes(x= as.character(HarvestTime), y= CosechaTotalWorker, color= as.character(numWorkers), group= interaction(numWorkers, HarvestTime)))+
   ggtitle("")+
@@ -103,7 +88,9 @@ FIG_HAR_W <- HAR %>%
   theme_bw()+
   labs(x= "Time of Harvest", y= "Average Harvest per Worker", col= "Number of Workers")
 
-ggsave(FIG_HAR_W,filename="../../output/graficas/HAR_W.png", height = 6, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_HAR_W,filename=paste("../../output/graficas/HAR/", "harv_plants_", nP, ".png", sep=""),  height = 8, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+}
 
 
 ###########Plo
@@ -115,7 +102,7 @@ FIG_PATH<- DF %>%
   filter(Rep == 0)%>% #solo un ejepmplo
   filter(numPlants == nP)%>% #solo un ejepmplo
   filter(HarvestTime ==1)%>%  #da igial
-  filter(numWorkers ==1 | numWorkers ==3)%>%  #da igial
+  filter(numWorkers ==1 | numWorkers ==5)%>%  #da igial
   filter(HarvestModel != "Control")%>% 
   filter(WorkerID != 0)%>% 
   arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
@@ -130,7 +117,7 @@ FIG_PATH<- DF %>%
   theme_bw()+
   labs(x= "X_norm", y= "Y_norm", col= "Worker")
 
-ggsave(FIG_PATH,filename=paste("../../output/graficas/PATH/", "path_plants_", nP, ".png", sep=""),  height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_PATH,filename=paste("../../output/graficas/PATH/", "path_plants_", nP, ".png", sep=""),  height = 10, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 }
 
@@ -153,7 +140,7 @@ wholePlot <- 0
 n= 0
 if (wholePlot ==1){
 for(t in unique(DF$Time)){
-  FIG_RUST <- DF %>%
+  FIG_RUST_2 <- DF %>%
     filter(Rep ==0)%>%
     filter(Time == t) %>%
     add_row(HarvestModel = 0,  Rep= 0,   ID= 999999,  X= NA,  Y=NA , Rust= 0)%>% ##ESte es un truquito para que siempre hayan 3 colores en cada graficas, porque le 0.5 siempre desaprece
@@ -172,3 +159,24 @@ for(t in unique(DF$Time)){
 
 
 
+# RES_SPA_MOD_AVE <- RES_SPA_MOD %>%  
+#   group_by(HarvestModel, HarvestTime, numWorkers, numPlants, Time, Rust)%>%
+#   summarise(AverageRust = mean(Total_Sum), SD_Rust = sd(Total_Sum))
+# 
+# 
+# FIG_SLI_time <- RES_SPA_MOD_AVE %>%  ##FATLA POMERLA EL SD
+#   filter(Rust == 1) %>%
+#   filter(numWorkers ==3 | is.na(numWorkers))%>%  #da igial
+#   ggplot(aes(x= Time))+
+#   geom_line(aes(y= AverageRust, color= as.character(HarvestTime)))+ 
+#   geom_point(aes(y= AverageRust, color= as.character(HarvestTime)), size= 2)+
+#   geom_errorbar(aes(ymin=AverageRust-SD_Rust, ymax=AverageRust+SD_Rust, color= as.character(HarvestTime)), width=.2,
+#                 position=position_dodge(0.05)) +
+#   ggtitle("")+
+#   facet_wrap(~HarvestModel*numPlants, ncol=2)+
+#   scale_color_manual(values = mycols)+
+#   theme_bw()+
+#   labs(x= "Time", y= "Average Rust", col= "Time of Harvest")
+# 
+# ggsave(FIG_SLI_time,filename="../../output/graficas/SLI_time.png",  height = 6, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+# 

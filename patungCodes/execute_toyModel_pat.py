@@ -89,27 +89,47 @@ DF["HarvestTime"] =np.repeat(timeHarvest, largoDF)
 
 
 """
+General matrices. voy a hacer un cambio, para no tener toda la base de datos
+
+"""
+"""
 General matrices
 """
+
+"""
+Filtramos solo una rep, un ejemplo, pero completo
+"""
+
+
 
 patungDirectory = '/srv/home/emilio/toyModelHarvest'  #this is the general directory of the superComputer. 
 
-"""
-General matrices
-"""
-liga = patungDirectory + "/salida/DF_total/"  #mkdir salida/matricesGenerales before running inside the directory
-DF.to_csv(liga+ "DF_total_%s.csv" %(args.code)) #average matrix
 
-    
-"""
-poner aqui el filtro de DF FALTA!*!
-"""
-DF_finalTime = DF.loc[DF["Time"] == 5].copy()#this is a view
+########
 
-#dfPromedio= creadorDF_MaPromedio(matrizGeneral, dicODE, dicLattice, dicMigration, sim, marcadoresHechos, Dc)
+DF_spatialAverage = DF.groupby(["Rep", "numPlants", "numWorkers", "HarvestModel", "HarvestTime"])[['Rust', 'TotalHarvest']].mean()
 
-liga2 = patungDirectory + "/salida/DF_finalTime/"    #mkdir salida/dfPromedios before running inside the directory
-DF_finalTime.to_csv(liga2+"DF_finalTime_%s.csv"%(args.code)) #average matrix
+liga0 = patungDirectory + "/salida/DF_spatialAverage/"  #mkdir salida/matricesGenerales before running inside the directory
+DF_spatialAverage.to_csv(liga0+ "DF_spatialAverage_%s.csv" %(args.code)) #average matrix
+
+
+
+liga1 = patungDirectory + "/salida/DF_muestrasPath/"  #mkdir salida/matricesGenerales before running inside the directory
+
+if rep ==3:
+    if harvest != "control":
+        if (numWorkers == 1 | numWorkers ==5):
+            if timeHarvest == 2:
+                DF.to_csv(liga1+ "DF_muestrasPath_%s.csv" %(args.code)) #average matrix
+                
+            
+#liga = patungDirectory + "/salida/DF_total/"  #mkdir salida/matricesGenerales before running inside the directory
+#DF.to_csv(liga+ "DF_total_%s.csv" %(args.code)) #average matrix
+###NO BAJAR Todosolo un ejemplo!!!
+
+
+
+
 
 
     

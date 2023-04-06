@@ -1,4 +1,14 @@
+graciaspatung en nahuaaa
+
+cd sim_Espacio
+source myenv/bin/activate
+cd ..
+cd toyModelHarvest
+
+--------------------
 Sube y baja codigos
+
+desde tu compu:
 
 scp -r /home/emilio/archivosTrabajandose/toyModelHarvest/src/patungCodes/* emilio@patung.lancis.ecologia.unam.mx:/srv/home/emilio/toyModelHarvest/
 
@@ -10,7 +20,7 @@ scp -r emilio@patung.lancis.ecologia.unam.mx:/srv/home/emilio/toyModelHarvest/sa
 
 Create all the files and subfiles within the supercomputer
 
-chmod +x execute_toyModel_pat.py; mkdir bitacora salida initialConditions nwg; cd salida/ ; mkdir DF_total DF_finalTime ; cd ..;  mv __init__.py ./nwg/ 
+chmod +x execute_toyModel_pat.py; mkdir bitacora salida initialConditions nwg; cd salida/ ; mkdir DF_total DF_spatialAverage DF_muestrasPath ; cd ..;  mv __init__.py ./nwg/ 
 
 python3 creator_CI_patung.py; cd initialConditions/ ; ls -R > ../listCI.txt ; cd .. ; sed -i '1d' listCI.txt; python3 creator_SubmitFile.py  
 
