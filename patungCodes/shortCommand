@@ -12,6 +12,7 @@ desde tu compu:
 
 scp -r /home/emilio/archivosTrabajandose/toyModelHarvest/src/patungCodes/* emilio@patung.lancis.ecologia.unam.mx:/srv/home/emilio/toyModelHarvest/
 
+(desde el home)
 
 scp -r emilio@patung.lancis.ecologia.unam.mx:/srv/home/emilio/toyModelHarvest/salida /home/emilio/archivosTrabajandose/toyModelHarvest/dataPatung_descargado
 

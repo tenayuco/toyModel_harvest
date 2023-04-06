@@ -1,0 +1,58 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Explanation: This code uses the superComputer's output and transforms it to a general dataBase *DF_total_complete.csv* and *DF_finalTime_complete.csv*. It is not necessary to run it if one starts from those csv. It only works if we have downloaded the output of the superComputer in the **DF_total** and **DF_finalTime** directories.
+
+1. Procedure to reduce the number of steps for visualization. Run only once. 
+
+
+2. Merge all data frames to a big data frame for visualizations
+
+
+```{r}
+#enter the file with all the new reduced data frames and merge them 
+
+setwd("../../dataPatung_descargado/salida/DF_spatialAverage/")
+library(plyr)
+DF_spatial <- ldply(list.files(), read.csv, header=TRUE)
+# it is important to detach plyr for dplyr to be used
+detach(package:plyr)
+```
+```{r}
+write.csv(DF_spatial, "../../data/DF_spatialAverage_complete.csv", row.names = FALSE)
+```
+
+
+```{r}
+#enter the file with all the new reduced data frames and merge them 
+
+setwd("../../dataPatung_descargado/salida/DF_muestrasPath/")
+library(plyr)
+DF_sample <- ldply(list.files(), read.csv, header=TRUE)
+# it is important to detach plyr for dplyr to be used
+detach(package:plyr)
+```
+```{r}
+write.csv(DF_sample, "../../data/DF_muestrasPath_complete.csv", row.names = FALSE)
+```
+
+
+
+```{r}
+#enter the file with all the new reduced data frames and merge them 
+
+#setwd("./DF_total/")
+#library(plyr)
+#DF_total_complete <- ldply(list.files(), read.csv, header=TRUE)
+# it is important to detach plyr for dplyr to be used
+#detach(package:plyr)
+```
+```{r}
+#write.csv(DF_total_complete, "../../data/DF_total_complete.csv", row.names = FALSE)
+```
+
+
+
+
