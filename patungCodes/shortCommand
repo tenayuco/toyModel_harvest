@@ -1,6 +1,6 @@
 graciaspatung en nahuaaa
 
-cd sim_Espacio
+cd sim_Espacio 
 source myenv/bin/activate
 cd ..
 cd toyModelHarvest
@@ -31,7 +31,7 @@ condor_submit submit_file_toyModel.sub
 condor_q
 
 ----------
-rm -r bitacora/ initialConditions/ nwg/ salida/
+rm -r bitacora/ initialConditions/ nwg/ salida/ 
 
 rm creator_CI_patung.py shortCommand creator_SubmitFile.py readme_toyModel execute_toyModel_pat.py submit_file_toyModel.sub listCI.txt
 

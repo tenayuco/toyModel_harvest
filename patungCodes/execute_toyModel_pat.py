@@ -116,7 +116,7 @@ DF_spatialAverage.to_csv(liga0+ "DF_spatialAverage_%s.csv" %(args.code)) #averag
 
 liga1 = patungDirectory + "/salida/DF_muestrasPath/"  #mkdir salida/matricesGenerales before running inside the directory
 
-if rep ==3:
+if rep ==0 or rep ==1:
     if harvest != "control":
         if numWorkers == 1 or numWorkers ==5:
             if timeHarvest == 2:

@@ -15,6 +15,9 @@ import math as m
 def setScenario(dic_Lattice, dic_Simulation, dic_Harvest):
     if dic_Lattice["mode_Arr"] == "random":  #so if the model is random
         
+    
+        rstate = np.random.RandomState(dic_Simulation["rep_"])  #para cada repeticion mismo seed
+        
     #harvesting conditions (will be filled or modified during simulation)
         #HarvestModel = np.repeat(0, dic_Lattice["num_Plants"])
         WorkerID = np.repeat(0, dic_Lattice["num_Plants"])
@@ -35,8 +38,8 @@ def setScenario(dic_Lattice, dic_Simulation, dic_Harvest):
      # plants and coordinae   
         IDplants = np.arange(0, dic_Lattice["num_Plants"], 1)  #add each ID 
     
-        X = np.random.random_sample(dic_Lattice["num_Plants"])*dic_Lattice["dim_Ini"][0]
-        Y = np.random.random_sample(dic_Lattice["num_Plants"])*dic_Lattice["dim_Ini"][1]
+        X = rstate.random_sample(dic_Lattice["num_Plants"])*dic_Lattice["dim_Ini"][0]
+        Y = rstate.random_sample(dic_Lattice["num_Plants"])*dic_Lattice["dim_Ini"][1]
 
         
         
@@ -47,7 +50,7 @@ def setScenario(dic_Lattice, dic_Simulation, dic_Harvest):
         numS = dic_Lattice["num_Plants"]- iniInfected[1] - iniInfected[2]
         S = np.repeat(0, numS) #so, depending on the initial value, we can have 2 S less plants, beacuse L and I wre reounded up to the unit
         Rust = np.concatenate((S, L, I), axis= None)
-        random.shuffle(Rust)
+       # random.shuffle(Rust) creo que es inece
 
 ## y se junta todo, loque no es temporal, ya veremos si es necesario juntar el modelo desde aqui o desde fuera
         
@@ -89,7 +92,7 @@ def generalDynamic(dic_Lattice, dic_Simulation, dic_Harvest):
                 pass
             else:
                 if T == tiempoCosecha:
-                    newDF= HM_general(temporalDF, dic_Harvest)
+                    newDF= HM_general(temporalDF, dic_Harvest, dic_Simulation)
                     temporalDF= newDF.copy()
                 else:
                     pass
@@ -213,19 +216,26 @@ def HM_closeness(old_DF, dic_Harvest):
 
 
 
-def HM_general(old_DF, dic_Harvest):
+def HM_general(old_DF, dic_Harvest, dic_Simulation):
     
     tempDF = old_DF
     hSteps= dic_Harvest["harvest_Steps"]-1 #hago el -1 para que sean n pasos contando el 0
     numW = dic_Harvest["num_Workers"]
     
-    if dic_Harvest["har_vest"] == "closeness":
-        UN_HARV = tempDF.loc[tempDF["FruitLoad"] != 0]#this is a view
-    elif dic_Harvest["har_vest"] == "productivity":
-        UN_HARV = tempDF.loc[tempDF["FruitLoad"] ==2]#this is a view
+    
+    UN_HARV = tempDF.loc[tempDF["FruitLoad"] != 0]  ##IN both scenario, we star at a random plant, to have the same random stat
+    
+    #if dic_Harvest["har_vest"] == "closeness":
+     #   UN_HARV = tempDF.loc[tempDF["FruitLoad"] != 0]#this is a view
+    #elif dic_Harvest["har_vest"] == "productivity":
+     #   UN_HARV = tempDF.loc[tempDF["FruitLoad"] ==2]#this is a view
         
-       
-    initialPlants = random.sample(list(UN_HARV["ID"]), numW)
+    
+    rstate = np.random.RandomState(dic_Simulation["rep_"])  #para cada repeticion mismo seed
+
+    initialPlants = rstate.choice(list(UN_HARV["ID"]), numW)
+    #initialPlants = random.sample(list(UN_HARV["ID"]), numW)
+    
     
     liWorkers = []
         
