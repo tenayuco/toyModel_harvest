@@ -5,7 +5,7 @@ library(dplyr)
 library(tidyverse)
 library(reshape2)
 mycols <- c("#021128","#1b4a64", "#3585a0", "#759580", "#c78f34", "#fd9706","#fdb81c","#fbdb30")
-mycols3a <-c("#021128", "#fd9706", "#3585a0")
+mycols3a <-c("#021128", "#fd9706", "#1b4a64", "#759580")
 mycols3b <-c("#1b4a64", "#fdb81c", "#759580")
 mycols3c <- c("#759580", "#1b4a64","#fdb81c")
 
@@ -54,7 +54,7 @@ FIG_RUST <- DF_AV_MOD%>%
   geom_boxplot(aes(x= as.character(HarvestTime), y= Rust, fill= as.character(numWorkers), group= interaction(numWorkers, HarvestTime)))+ 
   ggtitle("")+
   facet_wrap(~HarvestModel*numPlants, ncol=2)+
-  scale_fill_manual(values = mycols3b)+
+  scale_fill_manual(values = mycols3a)+
   theme_bw() +
   labs(x= "Time of Harvest", y= "Average Rust", col= "Number of Workers")
 
