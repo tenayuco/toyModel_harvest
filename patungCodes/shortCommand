@@ -1,3 +1,14 @@
+ssh emilio@patung.lancis.ecologia.unam.mx
+
+----------
+rm -r bitacora/ initialConditions/ nwg/ salida/ 
+
+rm creator_CI_patung.py shortCommand creator_SubmitFile.py readme_toyModel execute_toyModel_pat.py submit_file_toyModel.sub listCI.txt
+
+(remove code if necessary)
+-------------
+
+
 graciaspatung en nahuaaa
 
 cd sim_Espacio 
@@ -12,7 +23,7 @@ desde tu compu:
 
 scp -r /home/emilio/archivosTrabajandose/toyModelHarvest/src/patungCodes/* emilio@patung.lancis.ecologia.unam.mx:/srv/home/emilio/toyModelHarvest/
 
-(desde el home)
+bajar:
 
 scp -r emilio@patung.lancis.ecologia.unam.mx:/srv/home/emilio/toyModelHarvest/salida /home/emilio/archivosTrabajandose/toyModelHarvest/dataPatung_descargado
 
@@ -30,12 +41,6 @@ python3 creator_CI_patung.py; cd initialConditions/ ; ls -R > ../listCI.txt ; cd
 condor_submit submit_file_toyModel.sub
 condor_q
 
-----------
-rm -r bitacora/ initialConditions/ nwg/ salida/ 
-
-rm creator_CI_patung.py shortCommand creator_SubmitFile.py readme_toyModel execute_toyModel_pat.py submit_file_toyModel.sub listCI.txt
-
-(remove code if necessary)
 
 
 
