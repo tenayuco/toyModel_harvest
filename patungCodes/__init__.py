@@ -67,7 +67,7 @@ This function generates all the dynamic
 
 def generalDynamic(dic_Lattice, dic_Simulation, dic_Harvest):
     
-    generalDF = pd.DataFrame(columns= ["ID", "X", "Y", "Rust", "WorkerID", "HarvestStep","FruitLoad", "TotalHarvest", "Time"]) #we create a general data frame thatwill store the whole dynamic. Here we have the time colu
+    generalDF = pd.DataFrame(columns= ["ID", "X", "Y", "Rust", "WorkerID", "HarvestStep","FruitLoad", "TotalHarvest", "DistanceW", "Time"]) #we create a general data frame thatwill store the whole dynamic. Here we have the time colu
     T = 0 #we set time to 0  
     
     initialDF= setScenario(dic_Lattice, dic_Simulation, dic_Harvest) #this creates the first sectio of the data frame
@@ -123,7 +123,7 @@ def contactModel(old_DF, dic_Simulation): #r_h is ruested trees durign harvest
     IT = tempDF.loc[tempDF["Rust"] == 1]#this is a view
     ST = tempDF.loc[tempDF["Rust"] == 0] #this is a view
     maxDistance = dic_Simulation["contactDistance"]**2 #lo pongo así para no usar raices cuadrasd
-    LC_total = pd.DataFrame(columns= ["ID", "X", "Y", "Rust", "WorkerID", "HarvestStep", "FruitLoad", "TotalHarvest"]) #dataFRramevacio
+    LC_total = pd.DataFrame(columns= ["ID", "X", "Y", "Rust", "WorkerID", "HarvestStep", "FruitLoad", "TotalHarvest", "DistanceW"]) #dataFRramevacio
     
     for row in range(1, len(IT)):
         
@@ -245,6 +245,9 @@ def HM_general(old_DF, dic_Harvest, dic_Simulation):
         tempDF.loc[tempDF["ID"] == initialPlants[w], "FruitLoad"] = 0
         tempDF.loc[tempDF["ID"] == initialPlants[w], "WorkerID"] = "W_%d" % (w)
         tempDF.loc[tempDF["ID"] == initialPlants[w], "HarvestStep"] = 1
+        tempDF.loc[tempDF["ID"] == initialPlants[w], "DistanceW"] = 0
+        
+        
 
         
     conteo = 0  #CUANDO CA;BIP ESTO NO FUCNIONA
@@ -279,6 +282,8 @@ def HM_general(old_DF, dic_Harvest, dic_Simulation):
             tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["FruitLoad"]] = 0
             tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["WorkerID"]] = "W_%d" % (w)  
             tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["HarvestStep"]] = conteoTemp 
+            tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["DistanceW"]] = UH_DIN.iloc[0]["Distance"]  
+            
 
             if royaDestino == 0:  #esto para asegurar que no fuera una planta infectada (0.75 o 1 o 0.5)
                 if royaOrigen == 1:

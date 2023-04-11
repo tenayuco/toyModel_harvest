@@ -1,5 +1,7 @@
 ssh emilio@patung.lancis.ecologia.unam.mx
 
+condor_rm emilio para quitar los jobs
+
 ----------
 rm -r bitacora/ initialConditions/ nwg/ salida/ 
 
@@ -11,10 +13,7 @@ rm creator_CI_patung.py shortCommand creator_SubmitFile.py readme_toyModel execu
 
 graciaspatung en nahuaaa
 
-cd sim_Espacio 
-source myenv/bin/activate
-cd ..
-cd toyModelHarvest
+cd sim_Espacio ; source myenv/bin/activate ; cd ..; cd toyModelHarvest
 
 --------------------
 Sube y baja codigos

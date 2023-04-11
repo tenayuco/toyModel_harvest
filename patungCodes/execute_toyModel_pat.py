@@ -107,7 +107,7 @@ patungDirectory = '/srv/home/emilio/toyModelHarvest'  #this is the general direc
 
 ########
 
-DF_spatialAverage = DF.groupby(["Rep", "numPlants", "numWorkers", "HarvestModel", "HarvestTime", "Time"])[['Rust', 'TotalHarvest']].mean()
+DF_spatialAverage = DF.groupby(["Rep", "numPlants", "numWorkers", "HarvestModel", "HarvestTime", "Time", "DistanceW"])[['Rust']].mean()
 
 liga0 = patungDirectory + "/salida/DF_spatialAverage/"  #mkdir salida/matricesGenerales before running inside the directory
 DF_spatialAverage.to_csv(liga0+ "DF_spatialAverage_%s.csv" %(args.code)) #average matrix
@@ -116,14 +116,24 @@ DF_spatialAverage.to_csv(liga0+ "DF_spatialAverage_%s.csv" %(args.code)) #averag
 
 liga1 = patungDirectory + "/salida/DF_muestrasPath/"  #mkdir salida/matricesGenerales before running inside the directory
 
-if rep ==0 or rep ==1:
+if rep ==0:
     if harvest != "control":
         if numWorkers == 1 or numWorkers ==5:
             if timeHarvest == 2:
-                DF.to_csv(liga1+ "DF_muestrasPath_%s.csv" %(args.code)) #average matrix
+                DF.to_csv(liga1+ "DF_muestrasPath_%s.csv" %(args.code)) #these are for the path examples
                 
             
-#liga = patungDirectory + "/salida/DF_total/"  #mkdir salida/matricesGenerales before running inside the directory
+liga3 = patungDirectory + "/salida/DF_total/"
+
+
+DF_final = DF.loc[DF["Time"] == Tmax].copy()
+
+if harvest != "control":
+    DF_final.to_csv(liga3+ "DF_distanceW_%s.csv" %(args.code)) #average matrix
+
+
+
+
 #DF.to_csv(liga+ "DF_total_%s.csv" %(args.code)) #average matrix
 ###NO BAJAR Todosolo un ejemplo!!!
 

@@ -28,7 +28,7 @@ output = bitacora/toyModel_$(Process).out
 error = bitacora/toyModel_$(Process).err
 log = bitacora/toyModel_$(Process).log
 
-request_cpus = 4
+request_cpus = 5
 
 """
 
