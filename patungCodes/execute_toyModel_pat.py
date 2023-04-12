@@ -107,7 +107,7 @@ patungDirectory = '/srv/home/emilio/toyModelHarvest'  #this is the general direc
 
 ########
 
-DF_spatialAverage = DF.groupby(["Rep", "numPlants", "numWorkers", "HarvestModel", "HarvestTime", "Time", "DistanceW"])[['Rust']].mean()
+DF_spatialAverage = DF.groupby(["Rep", "numPlants", "numWorkers", "HarvestModel", "HarvestTime", "Time"])[['Rust']].mean()
 
 liga0 = patungDirectory + "/salida/DF_spatialAverage/"  #mkdir salida/matricesGenerales before running inside the directory
 DF_spatialAverage.to_csv(liga0+ "DF_spatialAverage_%s.csv" %(args.code)) #average matrix

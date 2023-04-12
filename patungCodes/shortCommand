@@ -13,7 +13,9 @@ rm creator_CI_patung.py shortCommand creator_SubmitFile.py readme_toyModel execu
 
 graciaspatung en nahuaaa
 
-cd sim_Espacio ; source myenv/bin/activate ; cd ..; cd toyModelHarvest
+
+
+source em_env/bin/activate 
 
 --------------------
 Sube y baja codigos
