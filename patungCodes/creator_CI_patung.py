@@ -8,12 +8,10 @@ be used to create the submit_file
 @author: emilio
 """
 
-import argparse
 import os
 from os import path
 #from sh import mkdir
 import pickle
-import pandas as pd
 import numpy as np
 
 #!/usr/bin/env python3
@@ -71,7 +69,10 @@ patungDirectory = '/srv/home/emilio/toyModelHarvest'  #this changes depending th
 controlNumW = 999
 controlTimeHar = "NoH"
 
+
+
 for rep in repetition:
+    simID = 0
     for numPlants in numberPlants:
         for harvest in modelSwitch:
             if harvest == "control":
@@ -83,12 +84,15 @@ for rep in repetition:
                 linea.append(controlNumW)
                 linea.append(controlTimeHar)
                 
+                linea.append(simID)
+                
                 liga = patungDirectory+ "/initialConditions"
                 os.makedirs(liga, exist_ok= True)
 
-                with open(path.join(liga, "CI_%s_%s_%s_%s_%s" %(rep, numPlants, harvest, controlNumW, controlTimeHar)), "wb") as output:
+                with open(path.join(liga, "CI_%s_%s_%s_%s_%s_%s" %(rep, numPlants, harvest, controlNumW, controlTimeHar, simID)), "wb") as output:
                     pickle.dump(linea, output)
      #output.write(lista)
+                simID = simID+1
                 linea= []
 
     
@@ -102,13 +106,15 @@ for rep in repetition:
                         linea.append(harvest)
                         linea.append(numWorkers)
                         linea.append(timeHarvest)
-                    
+                        linea.append(simID)
+                        
                         liga = patungDirectory+ "/initialConditions"
                         os.makedirs(liga, exist_ok= True)
     
-                        with open(path.join(liga, "CI_%s_%s_%s_%s_%s" %(rep, numPlants, harvest, numWorkers, timeHarvest)), "wb") as output:
+                        with open(path.join(liga, "CI_%s_%s_%s_%s_%s_%s" %(rep, numPlants, harvest, numWorkers, timeHarvest, simID)), "wb") as output:
                             pickle.dump(linea, output)
              #output.write(lista)
+                        simID = simID+1  #en principio este debe guardar cada combinacion para cada grupo de repeticiones. en el MISMO orden
                         linea= []
         
     

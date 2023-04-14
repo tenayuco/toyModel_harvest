@@ -60,6 +60,7 @@ numPlants = condiciones[1]
 harvest = condiciones[2]
 numWorkers = condiciones[3]
 timeHarvest = condiciones[4]
+simID = condiciones[5]
 
 
 ###
@@ -85,6 +86,7 @@ DF["numPlants"] =np.repeat(numPlants, largoDF)
 DF["HarvestModel"] =np.repeat(harvest, largoDF)
 DF["numWorkers"] =np.repeat(numWorkers, largoDF)
 DF["HarvestTime"] =np.repeat(timeHarvest, largoDF)
+DF["SimID"] =np.repeat(simID, largoDF)
 
 
 
@@ -107,7 +109,7 @@ patungDirectory = '/srv/home/emilio/toyModelHarvest'  #this is the general direc
 
 ########
 
-DF_spatialAverage = DF.groupby(["Rep", "numPlants", "numWorkers", "HarvestModel", "HarvestTime", "Time"])[['Rust']].mean()
+DF_spatialAverage = DF.groupby(["Rep", "numPlants", "numWorkers", "HarvestModel", "HarvestTime", "Time", "SimID"])[['Rust']].mean()
 
 liga0 = patungDirectory + "/salida/DF_spatialAverage/"  #mkdir salida/matricesGenerales before running inside the directory
 DF_spatialAverage.to_csv(liga0+ "DF_spatialAverage_%s.csv" %(args.code)) #average matrix

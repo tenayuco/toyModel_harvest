@@ -42,6 +42,10 @@ python3 creator_CI_patung.py; cd initialConditions/ ; ls -R > ../listCI.txt ; cd
 condor_submit submit_file_toyModel.sub
 condor_q
 
+----
+
+exit
+
 
 
 

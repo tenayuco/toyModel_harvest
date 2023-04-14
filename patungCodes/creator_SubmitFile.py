@@ -22,7 +22,7 @@ subdir = "initialConditions"
 
 
 head = """
-getenv = true
+getenv = True
 executable = execute_toyModel_pat.py
 output = bitacora/toyModel_$(Process).out
 error = bitacora/toyModel_$(Process).err

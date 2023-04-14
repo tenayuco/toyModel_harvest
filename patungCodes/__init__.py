@@ -251,13 +251,14 @@ def HM_general(old_DF, dic_Harvest, dic_Simulation):
 
         
     conteo = 0  #CUANDO CA;BIP ESTO NO FUCNIONA
-    print ("hSteps", hSteps)
+    #print ("hSteps", hSteps)
     while conteo<hSteps:
         #print("contadorPersonas", conteo)
         conteo= conteo +1
         for w in np.arange(0, numW,1):
             
             conteoTemp = conteo
+            
             LAST_W = tempDF.loc[(tempDF["HarvestStep"] == conteo) & (tempDF["WorkerID"] == liWorkers[w])] #esto filtra solo los ultimos pasos, que deben tener 3 trabajadores
             
             royaOrigen = LAST_W.iloc[0]["Rust"]
@@ -272,6 +273,10 @@ def HM_general(old_DF, dic_Harvest, dic_Simulation):
             UH_DIN["Distance"] = (UH_DIN["X"] -LAST_W.iloc[0]["X"])**2  + (UH_DIN["Y"] - LAST_W.iloc[0]["Y"])**2
             UH_DIN= UH_DIN.loc[UH_DIN["Distance"] == min(UH_DIN["Distance"])]
 
+            #print("UHDIN", UH_DIN)
+           # print("UHDINiloc", UH_DIN.iloc[0])
+           # print("UHDINilocDisn", UH_DIN.iloc[0]["Distance"])
+            
             royaDestino = UH_DIN.iloc[0]["Rust"]
  #           print("w", w, "UHDIN \n", UH_DIN)
 
