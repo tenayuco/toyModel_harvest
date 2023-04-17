@@ -128,10 +128,10 @@ if rep ==0:
 liga3 = patungDirectory + "/salida/DF_total/"
 
 
-DF_final = DF.loc[DF["Time"] == Tmax].copy()
+DF_harvest = DF.loc[DF["Time"] == timeHarvest+0.5].copy()
 
 if harvest != "control":
-    DF_final.to_csv(liga3+ "DF_distanceW_%s.csv" %(args.code)) #average matrix
+    DF_harvest.to_csv(liga3+ "DF_distanceW_%s.csv" %(args.code)) #average matrix
 
 
 

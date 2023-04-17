@@ -34,7 +34,7 @@ Then we define the different values for m, g, io and the patterns
 
 
 #repetition = range(30)
-repetition = range(2)
+repetition = range(10)
 #numberPlants = [500, 1000, 3000, 5000]
 numberPlants = [1000, 3000]
 #tiemposHarvest= [0,1,2,3,4] 

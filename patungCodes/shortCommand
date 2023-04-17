@@ -14,8 +14,9 @@ rm creator_CI_patung.py shortCommand creator_SubmitFile.py readme_toyModel execu
 graciaspatung en nahuaaa
 
 
-
+source venv3/bin/activate  #ver si este es el bueno
 source em_env/bin/activate 
+
 
 --------------------
 Sube y baja codigos
