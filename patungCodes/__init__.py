@@ -31,6 +31,9 @@ def setScenario(dic_Lattice, dic_Simulation, dic_Harvest):
         F2 = np.repeat(2, hlPlants)
         F1 = np.repeat(1, llPlants)
         FruitLoad = np.concatenate((F2, F1), axis= None)
+        rstate.shuffle(FruitLoad)
+        
+       # print(FruitLoad)
         
 #simulation        
        # Rep = np.repeat(dic_Simulation["rep_"], dic_Lattice["num_Plants"]) #add initial value of rep for each ID of the plant

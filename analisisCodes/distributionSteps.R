@@ -20,6 +20,8 @@ DF_TOTAL <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_total_TF.csv"
 DF_TOTAL$DistanceW <- round(DF_TOTAL$DistanceW, 0) 
 DF_TOTAL$Conteo <- 1
 
+
+
 DF_TOTAL_AG <- DF_TOTAL %>%
   group_by(HarvestModel, numPlants, numWorkers, SimID, HarvestTime, Rust, DistanceW) %>%
   summarise(Frec =  sum(Conteo))
@@ -27,6 +29,7 @@ DF_TOTAL_AG <- DF_TOTAL %>%
 DF_TOTAL_AG$DistanceW <- sqrt(DF_TOTAL_AG$DistanceW)
 DF_TOTAL_AG$logDistanceW <- log(DF_TOTAL_AG$DistanceW)
 DF_TOTAL_AG$logFrec <- log(DF_TOTAL_AG$Frec)
+
 
 
 #library(scales)
@@ -45,12 +48,14 @@ FIG_PASOS <- DF_TOTAL_AG %>%
 FIG_PASOS_LOG <- DF_TOTAL_AG %>%
   filter(!is.na(DistanceW))%>%
   filter(DistanceW != 0)%>%
-  #filter(numPlants== 3000)%>%
+  filter(HarvestModel == "productivity")%>%
+  #filter(Rust== 0.5)%>%
   ggplot(aes(x= logDistanceW, y = logFrec, color= as.character(Rust))) +
   geom_point()+
   #  geom_line()+
   scale_color_manual(values = mycols3c)+
-  facet_wrap(~HarvestModel*numPlants)
+  facet_wrap(~numPlants*HarvestTime)
+
 
 ###########ahora sacamosss solo los saltos efectivos######333
 
@@ -100,6 +105,12 @@ FIG_K_R <- DF_RES %>%
   geom_point(size=3, pch=21, aes(shape= as.character(HarvestTime), fill= as.character(HarvestModel)))+
   scale_fill_manual(values = mycolsBW)+
   theme_bw()
+
+
+
+############
+
+library("poweRlaw")
 
 ###############ahora vmaos aintetar compararlo con RUST
 
