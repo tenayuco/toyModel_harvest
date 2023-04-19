@@ -28,6 +28,7 @@ write.csv(DF_spatial, "../../data/DF_spatialAverage_complete.csv", row.names = F
 ```{r}
 #enter the file with all the new reduced data frames and merge them 
 
+
 setwd("../../dataPatung_descargado/salida/DF_muestrasPath/")
 library(plyr)
 DF_sample <- ldply(list.files(), read.csv, header=TRUE)
@@ -40,12 +41,17 @@ write.csv(DF_sample, "../../data/DF_muestrasPath_complete.csv", row.names = FALS
 
 ```{r}
 #enter the file with all the new reduced data frames and merge them 
+library(dplyr)
+library(tidyverse)
 
 setwd("../../dataPatung_descargado/salida/DF_total/")
 library(plyr)
 DF_total <- ldply(list.files(), read.csv, header=TRUE)
 # it is important to detach plyr for dplyr to be used
 detach(package:plyr)
+
+DF_total <- DF_total %>%
+  filter(Rep %in% c(0,1,2,3,4,5))
 ```
 ```{r}
 write.csv(DF_total, "../../data/DF_total_TF.csv", row.names = FALSE)

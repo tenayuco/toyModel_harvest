@@ -13,18 +13,15 @@ mycols3c <- c("#759580", "#1b4a64","#fdb81c")
 
 #this is the one to use first
 
+#We take the full data frame of spatial average rust per condition. This average was the compounded average of each plant, In this sense,
+# We have to run all this code from the terminal. If not, change the directory to an absolute path
+
 #DF_AV <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_spatialAverage_complete.csv", header = TRUE)
 DF_AV <- read.csv("../../data/DF_spatialAverage_complete.csv", header = TRUE)
 
-
-#DF_AV$Total <- 1
+#we change control model to "no har"
 DF_AV$HarvestTime[DF_AV$HarvestModel == "control"] <- " No_Har" 
 DF_AV$numWorkers[DF_AV$numWorkers == 999] <- " No_Har" 
-
-
-#RES_SPA <- DF %>%  #esta nos da un dataframe qyue promedia sobre el espacio
- # group_by(HarvestModel, HarvestTime, numWorkers, Rep, numPlants, Time, Rust)%>%
-  #summarise(Total_Sum = sum(Total)/N_PLANTS)
 
 #procedimiento en donde duplicamos el control para tenerlo como si fuera un "escenario", pero realmente son los mismos datos
 #desues de jacer el resumen h
@@ -37,7 +34,8 @@ RES_CON_2$HarvestModel <-"productivity"
 PART_RES_CON <- rbind(RES_CON_1,RES_CON_2)
 DF_AV_MOD <- DF_AV %>% 
   filter(HarvestTime != " No_Har" )
-DF_AV_MOD <- rbind(DF_AV_MOD, PART_RES_CON)  ## y esta es la que se va a usar. 
+
+DF_AV_MOD <- rbind(DF_AV_MOD, PART_RES_CON)  ## so this framework adds a cnotrol conditions
 
 rm("RES_CON_1", "RES_CON_2", "PART_RES_CON")  
 
@@ -64,10 +62,9 @@ ggsave(FIG_RUST,filename=paste("../../output/graficas/RUST/", "rust_plants_", nP
 
 
 
-#################################3
+##################PATHS###############3
 
 DF_SAM <- read.csv("../../data/DF_muestrasPath_complete.csv", header = TRUE)
-
 
 ###########Plo
 
@@ -95,52 +92,56 @@ ggsave(FIG_PATH,filename=paste("../../output/graficas/PATH/", "path_plants_", nP
 }
 
 
-##################################Vamos a hacer la diferencia aqui ##########33
+##################################VNOW, WE ARE GOING TO USE THE NORMLA DF TO HAVE THE DIFFERENCE BETWEEN MODELS, OF THE SAME REPETITION ##########33
 
 densidades = length(unique(DF_AV$numPlants))
 
 DF_MODELS <- DF_AV %>%
-  filter(HarvestModel != "control")%>%
+  filter(HarvestModel != "control")%>%  #we remove the contorl, we do not need it. 
   filter(Time == 5)%>%
-  group_by(Rep, numPlants, numWorkers, HarvestTime) %>%
-  summarise(DifRust = diff(Rust))
+  group_by(Rep, numPlants, numWorkers, HarvestTime) %>%  #we add all the variables we dont add the ID, we remove it
+  summarise(DifRust = diff(Rust), PercIncrease = 100*diff(Rust)/Rust[HarvestModel=="closeness"])
 
 FIG_DIF_MODELS <- DF_MODELS%>%
-    ggplot(aes(x= as.character(HarvestTime), y= DifRust))+
+    filter(numPlants ==3000) %>%  #CAHNGE THIS FOR THE AVERAGE!!!
+    ggplot(aes(x= as.character(HarvestTime), y= PercIncrease))+
     geom_boxplot(aes(fill= as.character(numWorkers), group= interaction(numWorkers, HarvestTime)))+ 
     ggtitle("")+
-    facet_wrap(~numPlants, nrow=1)+
-    #scale_fill_brewer(palette="Dark2") +
+    #facet_wrap(~numPlants, nrow=1)+
     scale_fill_manual(values = mycols3a)+
-    geom_segment(aes(x=0, y=0, xend= 6, yend=0), linewidth = 0.2, color= "DarkRed")+
+    #geom_segment(aes(x=0, y=0, xend= 6, yend=0), linewidth = 0.2, color= "DarkRed")+
     theme_bw() +
-    labs(x= "Time of Harvest", y= "Average Rust (Prod-Close)", fill= "Number of Workers")
+    labs(x= "Time of Harvest", y= "% Increase (Prod-Close/Close)", fill= "Number of Workers")
   
 ggsave(FIG_DIF_MODELS,filename="../../output/graficas/DIF_RUST/dif_rust.png",  height = 8, width = densidades* 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 ##############y aqui control vs tipos de cosecha (promediando todo el interior dentro de cada rep)
 
-DF_AV_TOTAL <- DF_AV %>%
-  filter(Time == 5)%>%
-  group_by(Rep, numPlants, HarvestModel) %>%
-  summarise(AV_Rust = mean(Rust))
+#DF_AV_TOTAL <- DF_AV %>%
+ # filter(Time == 5)%>%
+#  group_by(Rep, numPlants, HarvestModel) %>%
+#  summarise(AV_Rust = mean(Rust))
 
-DF_DIF_MOD_CON <- DF_AV_TOTAL %>%
-  group_by(Rep, numPlants)%>%
-  summarise(DifCo_Rust = AV_Rust - AV_Rust[HarvestModel=="control"],
+DF_MODvsCON <- DF_AV %>%
+  filter(Time == 5)%>% 
+  filter(HarvestTime == 2 | HarvestTime == " No_Har") %>%
+  filter(numWorkers ==5 | numWorkers== " No_Har")%>%
+  #esto es para tener la maxima diferencia, pero tambien porque es aqui en donde pasa la cosecha
+  group_by(Rep, numPlants)%>% #son las vairables que quedan y sobre esos escenarios, vamos a hacer las diferencias entre modelos
+  summarise(ModCo_Rust = 100*((Rust - Rust[HarvestModel=="control"])/Rust[HarvestModel=="control"]),
             HarvestModel = HarvestModel)  # esto es solo para que despues de leer por condicion, regrese...?
 
 
-FIG_DIF_CONTROL <- DF_DIF_MOD_CON %>%
+FIG_DIF_CONTROL <- DF_MODvsCON %>%
   filter(HarvestModel != "control")%>%
-  ggplot(aes(x= as.character(HarvestModel), y= DifCo_Rust))+
+  ggplot(aes(x= HarvestModel, y= ModCo_Rust))+
   geom_boxplot(aes(fill= as.character(HarvestModel)))+ 
   ggtitle("")+
   facet_wrap(~numPlants, nrow=1)+
   scale_fill_brewer(palette="Dark2") +
   #scale_fill_manual(values = mycols)+
   theme_bw() +
-  labs(x= "Harvest Model", y= "Average Rust (Model-Control)", fill= "Harvest Model")
+  labs(x= "Harvest Model", y= "Average Rust (Model-Control)/control)", fill= "Harvest Model")
 
 ggsave(FIG_DIF_CONTROL,filename="../../output/graficas/DIF_RUST/dif_ModelvsControl.png",  height = 8, width = densidades* 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 

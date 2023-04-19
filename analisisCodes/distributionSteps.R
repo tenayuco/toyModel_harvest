@@ -14,19 +14,33 @@ mycolsBW <- c("#000000", "#999999", "#FFFFFF")
 
 #this is the one to use first
 
-DF_TOTAL <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_total_TF.csv", header = TRUE)
+DF_BASE <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_total_TF.csv", header = TRUE)
 #DF_TOTAL <- read.csv("../../data/DF_total_TF.csv", header = TRUE)
 
+
+limiteSalto = 100
+DF_TOTAL = DF_BASE
+
+
+
+DF_TOTAL$DistanceW <- sqrt(DF_TOTAL$DistanceW)
 DF_TOTAL$DistanceW <- round(DF_TOTAL$DistanceW, 0) 
 DF_TOTAL$Conteo <- 1
 
+##Aqui vamos a intentar filtrar los pasos chicos
+
+#lo qur vamos a hacer es sacar todas las figuras y ver cuales tienen correl
+
+
+DF_TOTAL <- DF_TOTAL %>% filter(DistanceW < limiteSalto) 
+DF_TOTAL <- DF_TOTAL %>% filter(DistanceW > 1)  ##ESTO ES TRAMPA, perp vamos a ver
 
 
 DF_TOTAL_AG <- DF_TOTAL %>%
   group_by(HarvestModel, numPlants, numWorkers, SimID, HarvestTime, Rust, DistanceW) %>%
   summarise(Frec =  sum(Conteo))
 
-DF_TOTAL_AG$DistanceW <- sqrt(DF_TOTAL_AG$DistanceW)
+
 DF_TOTAL_AG$logDistanceW <- log(DF_TOTAL_AG$DistanceW)
 DF_TOTAL_AG$logFrec <- log(DF_TOTAL_AG$Frec)
 
@@ -37,24 +51,27 @@ DF_TOTAL_AG$logFrec <- log(DF_TOTAL_AG$Frec)
 FIG_PASOS <- DF_TOTAL_AG %>%
   filter(!is.na(DistanceW))%>%
   filter(DistanceW != 0)%>%
+  #filter(HarvestModel == "productivity")%>%
   filter(numPlants== 3000)%>%
+  #filter(Rust== 0.5)%>%
   ggplot(aes(x= DistanceW, y = Frec, color= as.character(Rust))) +
   geom_point()+
   #  geom_line()+
   scale_color_manual(values = mycols3c)+
-  facet_wrap(~HarvestModel*numWorkers)
+  facet_wrap(~HarvestModel*HarvestTime, nrow = 2)
 
 
 FIG_PASOS_LOG <- DF_TOTAL_AG %>%
   filter(!is.na(DistanceW))%>%
   filter(DistanceW != 0)%>%
-  filter(HarvestModel == "productivity")%>%
+  #filter(HarvestModel == "productivity")%>%
+  filter(numPlants== 3000)%>%
   #filter(Rust== 0.5)%>%
   ggplot(aes(x= logDistanceW, y = logFrec, color= as.character(Rust))) +
   geom_point()+
   #  geom_line()+
   scale_color_manual(values = mycols3c)+
-  facet_wrap(~numPlants*HarvestTime)
+  facet_wrap(~HarvestModel*HarvestTime, nrow = 2)
 
 
 ###########ahora sacamosss solo los saltos efectivos######333
@@ -62,9 +79,13 @@ FIG_PASOS_LOG <- DF_TOTAL_AG %>%
 DF_TOTAL_AG_EF <- DF_TOTAL_AG %>%
   filter(!(is.na(DistanceW)))%>%
   filter(DistanceW != 0) %>%
+  filter(numPlants== 3000)%>%
   filter(Rust ==0.5)#A VER SI ESTO TIENE SENTD
 
-DF_RES <- DF_TOTAL_AG %>%
+
+
+
+DF_RES <- DF_TOTAL_AG_EF %>%
   group_by(HarvestModel, numPlants, numWorkers, SimID, HarvestTime)%>%
   summarise(DistanceW_Mean = mean(DistanceW, na.rm = TRUE))
 
@@ -74,9 +95,10 @@ DF_RES$PValue <- 0
 DF_RES$CorP <- 0
 
 
-for (sim in unique(DF_TOTAL_AG$SimID)){
-  DF_TEMP <- DF_TOTAL_AG_EF %>% 
+for (sim in unique(DF_TOTAL_AG_EF$SimID)){
+  DF_TEMP <- DF_TOTAL_AG_EF %>%
     filter(SimID== sim)
+
     lm1<- lm(logFrec ~ logDistanceW, data = DF_TEMP)
     summarylm1 <- summary(lm1)
     K <- lm1$coefficients[["logDistanceW"]]
@@ -118,6 +140,7 @@ DF_RUST <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_spatialAverage
 
 DF_RUST <- DF_RUST %>%
   filter(Time ==5)%>%
+  filter(numPlants ==3000)%>%
   filter(HarvestModel != "control") %>%
   group_by(SimID)%>%
   summarise(MeanRust = mean(Rust))
@@ -131,3 +154,9 @@ FIG_Rust_K <- DF_RES %>%
   scale_fill_manual(values = mycolsBW)+
   facet_wrap(~numPlants) +
   theme_bw()
+
+ggsave(FIG_Rust_K,filename=paste("archivosTrabajandose/toyModelHarvest/output/saltosEfectivos/", "rust_Slope", limiteSalto, ".png",sep=""), height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+
+lmRust_Jump<-  lm(MeanRust ~ Pendiente, data = DF_RES)
+
