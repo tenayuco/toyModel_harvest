@@ -23,9 +23,11 @@ DF_BASE <- read.csv("../../data/DF_total_TF.csv", header = TRUE)
 #lo qur vamos a hacer es sacar todas las figuras y ver cuales tienen correl
 
 DF_BASE$DistanceW <- sqrt(DF_BASE$DistanceW)
-DF_BASE$DistanceW <- round(DF_BASE$DistanceW, 0) 
 
-secuencia <- seq(5, max(DF_BASE$DistanceW, na.rm = TRUE), 5)
+#secuencia <- seq(5, max(DF_BASE$DistanceW, na.rm = TRUE), 5)
+
+secuencia <- c(5, 10, 20, 40, 60, 80, 100)
+
 simulaciones <- length(secuencia)
 DF_COR <- data.frame("SEC" = secuencia)
 DF_COR$COR <-0 
@@ -39,8 +41,9 @@ for (limiteSalto in secuencia){
   #DF_PRUEBA <- DF_TOTAL %>% filter(SimID == 1 & Rep == 0)  #solopara ver
   DF_TOTAL$Conteo <- 1
   DF_TOTAL <- DF_TOTAL %>% filter(DistanceW <= limiteSalto) 
-  DF_TOTAL <- DF_TOTAL %>% filter(DistanceW > 1)  ##ESTO ES TRAMPA, perp vamos a ver
-
+  DF_TOTAL <- DF_TOTAL %>% filter(DistanceW > 1.5)  ##ESTO ES TRAMPA, perp vamos a ver
+  DF_TOTAL$DistanceW <- round(DF_TOTAL$DistanceW,1) 
+  
   DF_TOTAL_AG <- DF_TOTAL %>%
     group_by(HarvestModel, numPlants, numWorkers, Rust, DistanceW, Rep, HarvestTime, SimID) %>%
     summarise( FrecAbs =sum(Conteo))
@@ -67,6 +70,7 @@ for (limiteSalto in secuencia){
     scale_color_manual(values = mycolsBW)+
     facet_wrap(~HarvestModel*HarvestTime, nrow = 2) +
     theme_bw() +
+    theme(text = element_text(size = 20))+
     labs(x= "Distance Step", y= "Proportion of Rust Effective Steps", title = paste("maxDistance", limiteSalto))
   
   
@@ -85,6 +89,7 @@ ggsave(FIG_PASOS,filename=paste("../../output/saltosEfectivos/", "Fig_pasos/","F
     scale_color_manual(values = mycolsBW)+
     facet_wrap(~HarvestModel*HarvestTime, nrow = 2) +
     theme_bw()+
+    theme(text = element_text(size = 20))+
     labs(x= "log(Distance Step)", y= "log(Proportion of Rust Effective Steps)", title = paste("maxDistance", limiteSalto))
   
 
@@ -134,6 +139,7 @@ ggsave(FIG_PASOS,filename=paste("../../output/saltosEfectivos/", "Fig_pasos/","F
     scale_color_manual(values = mycols)+
     ylim(0.5, 1)+
     theme_bw() +
+    theme(text = element_text(size = 20))+
     labs(x= "Slope (proportionEfe/distanceStep", y= "Rsquared", title = paste("maxDistance", limiteSalto))
   
  ggsave(FIG_K_R,filename=paste("../../output/saltosEfectivos/", "Fig_KR/","Fig_KR",  limiteSalto, ".png", sep=""),  height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
@@ -161,6 +167,7 @@ ggsave(FIG_PASOS,filename=paste("../../output/saltosEfectivos/", "Fig_pasos/","F
     scale_color_manual(values = mycols)+
     facet_wrap(~numPlants) +
     theme_bw() +
+    theme(text = element_text(size = 20))+
     labs(x= "Slope (proportionEfe/distanceStep", y= "MainRust", title = paste("maxDistance", limiteSalto))
   
   
@@ -178,10 +185,11 @@ ggsave(FIG_PASOS,filename=paste("../../output/saltosEfectivos/", "Fig_pasos/","F
 
 FIG_FINALE <- DF_COR %>%
   ggplot(aes(x= SEC, y = COR)) +
-  geom_point(size=3, pch=21, aes(fill = "darkblue"))+
+  geom_point(size= 4, color = "darkblue")+
   geom_errorbar(aes(ymin= COR_MIN, ymax= COR_MAX))+
   ylim(0,1)+
   theme_bw() +
+  theme(text = element_text(size = 20))+
   labs(x= "limitMaxStep", y= "Cor (mainRust, Slope)")
 
 

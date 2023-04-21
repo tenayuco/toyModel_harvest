@@ -51,6 +51,7 @@ FIG_RUST <- DF_AV_MOD%>%
   facet_wrap(~HarvestModel*numPlants, ncol=2)+
   scale_fill_manual(values = mycols3a)+
   theme_bw() +
+  theme(text = element_text(size = 20))+
   ylim(0,1)+
   labs(x= "Time of Harvest", y= "Average Rust", col= "Number of Workers")
 
@@ -85,6 +86,7 @@ FIG_PATH<- DF_SAM %>%
   facet_wrap(~numWorkers*HarvestModel, ncol=2)+
   theme(panel.spacing = unit(0.8, "lines"), text = element_text(size = 15))+
   theme_bw()+
+  theme(text = element_text(size = 20))+
   labs(x= "X_norm", y= "Y_norm", col= "Worker")
 
 ggsave(FIG_PATH,filename=paste("../../output/graficas/PATH/", "path_plants_", nP, ".png", sep=""),  height = 10, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
@@ -109,11 +111,12 @@ FIG_DIF_MODELS <- DF_MODELS%>%
     ggtitle("")+
     #facet_wrap(~numPlants, nrow=1)+
     scale_fill_manual(values = mycols3a)+
-    #geom_segment(aes(x=0, y=0, xend= 6, yend=0), linewidth = 0.2, color= "DarkRed")+
+    geom_segment(aes(x=0, y=0, xend= 6, yend=0), linewidth = 0.2, color= "DarkRed")+
     theme_bw() +
-    labs(x= "Time of Harvest", y= "% Increase (Prod-Close/Close)", fill= "Number of Workers")
+   theme(text = element_text(size = 20))+
+    labs(x= "Time of Harvest", y= "% Increase (Prod-Close)/Close", fill= "Number of Workers")
   
-ggsave(FIG_DIF_MODELS,filename="../../output/graficas/DIF_RUST/dif_rust.png",  height = 8, width = densidades* 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_DIF_MODELS,filename="../../output/graficas/DIF_RUST/dif_rust.png",  height = 8, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 ##############y aqui control vs tipos de cosecha (promediando todo el interior dentro de cada rep)
 
@@ -137,10 +140,12 @@ FIG_DIF_CONTROL <- DF_MODvsCON %>%
   ggplot(aes(x= HarvestModel, y= ModCo_Rust))+
   geom_boxplot(aes(fill= as.character(HarvestModel)))+ 
   ggtitle("")+
+  theme(text = element_text(size = 20))+
   facet_wrap(~numPlants, nrow=1)+
   scale_fill_brewer(palette="Dark2") +
   #scale_fill_manual(values = mycols)+
   theme_bw() +
+  theme(text = element_text(size = 20))+
   labs(x= "Harvest Model", y= "Average Rust (Model-Control)/control)", fill= "Harvest Model")
 
 ggsave(FIG_DIF_CONTROL,filename="../../output/graficas/DIF_RUST/dif_ModelvsControl.png",  height = 8, width = densidades* 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
@@ -171,6 +176,7 @@ for(nP in unique(DF_SAM$numPlants)){
     ggtitle("")+
     facet_wrap(~HarvestModel, ncol=2)+
     scale_color_manual(values = mycols3c)+
+      theme(text = element_text(size = 20))+
     theme_bw()
   
   
