@@ -25,11 +25,11 @@ def setScenario(dic_Lattice, dic_Simulation, dic_Harvest):
        # HarvestEvent = np.repeat(0, dic_Lattice["num_Plants"])
         TotalHarvest = np.repeat(0, dic_Lattice["num_Plants"])
         
-    #fruit load (will change in simulation)
+    #fruit load (will change in simulation)  #THIS IS DIFFERENTE
         hlPlants = dic_Harvest["hl_Plants"]
-        llPlants = dic_Lattice["num_Plants"]- hlPlants
-        F2 = np.repeat(2, hlPlants)
-        F1 = np.repeat(1, llPlants)
+        nlPlants = dic_Lattice["num_Plants"]- hlPlants
+        F2 = np.repeat(1, hlPlants)  #NO HAY 2, no hay productivity odel 
+        F1 = np.repeat(0, nlPlants)
         FruitLoad = np.concatenate((F2, F1), axis= None)
         rstate.shuffle(FruitLoad)
         
@@ -256,17 +256,20 @@ def HM_general(old_DF, dic_Harvest, dic_Simulation):
     conteo = 0  #CUANDO CA;BIP ESTO NO FUCNIONA
     #print ("hSteps", hSteps)
     while conteo<hSteps:
-        #print("contadorPersonas", conteo)
+       # print("contadorPersonas", conteo)
         conteo= conteo +1
         for w in np.arange(0, numW,1):
+        #    print("Worker", w)
             
             conteoTemp = conteo
+            
             
             LAST_W = tempDF.loc[(tempDF["HarvestStep"] == conteo) & (tempDF["WorkerID"] == liWorkers[w])] #esto filtra solo los ultimos pasos, que deben tener 3 trabajadores
             
             royaOrigen = LAST_W.iloc[0]["Rust"]
             
-           # print("lastw \n", LAST_W)
+         #   print("lastw \n", LAST_W)
+            #print("royaOrigen \n", royaOrigen)
             
             if dic_Harvest["har_vest"] == "closeness":
                 UH_DIN = tempDF.loc[tempDF["FruitLoad"] != 0].copy()#this is a cooy
@@ -276,7 +279,7 @@ def HM_general(old_DF, dic_Harvest, dic_Simulation):
             UH_DIN["Distance"] = (UH_DIN["X"] -LAST_W.iloc[0]["X"])**2  + (UH_DIN["Y"] - LAST_W.iloc[0]["Y"])**2
             UH_DIN= UH_DIN.loc[UH_DIN["Distance"] == min(UH_DIN["Distance"])]
 
-            #print("UHDIN", UH_DIN)
+          #  print("UHDIN", UH_DIN)
            # print("UHDINiloc", UH_DIN.iloc[0])
            # print("UHDINilocDisn", UH_DIN.iloc[0]["Distance"])
             

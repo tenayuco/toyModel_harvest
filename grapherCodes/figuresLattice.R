@@ -20,26 +20,39 @@ mycols3c <- c("#759580", "#1b4a64","#fdb81c")
 DF_AV <- read.csv("../../data/DF_spatialAverage_complete.csv", header = TRUE)
 
 #we change control model to "no har"
-DF_AV$HarvestTime[DF_AV$HarvestModel == "control"] <- " No_Har" 
-DF_AV$numWorkers[DF_AV$numWorkers == 999] <- " No_Har" 
+DF_AV$porcionCosecha[DF_AV$HarvestModel =="control"] <- "control"
+
+#DF_AV$HarvestTime[DF_AV$HarvestModel == "control"] <- " No_Har" 
+DF_AV$numWorkers[DF_AV$HarvestModel =="control"] <- "NoH" 
+
+DF_AV$porcionCosecha[DF_AV$porcionCosecha =="0.5"] <- "Asynchronic"
+DF_AV$porcionCosecha[DF_AV$porcionCosecha =="1"] <- "Synchronic" 
+
 
 #procedimiento en donde duplicamos el control para tenerlo como si fuera un "escenario", pero realmente son los mismos datos
 #desues de jacer el resumen h
 
-RES_CON_1 <-  DF_AV %>% filter (HarvestTime == " No_Har")
+RES_CON_1 <-  DF_AV %>% filter (HarvestModel == "control")
 RES_CON_2 <- RES_CON_1 
-RES_CON_1$HarvestModel <-"closeness" #esto es falso, no pertenecen ahi, pero es solo para graficar
-RES_CON_2$HarvestModel <-"productivity"
+RES_CON_1$porcionCosecha <-"Asynchronic" #esto es falso, no pertenecen ahi, pero es solo para graficar
+RES_CON_2$porcionCosecha <-"Synchronic"
 
 PART_RES_CON <- rbind(RES_CON_1,RES_CON_2)
+
 DF_AV_MOD <- DF_AV %>% 
-  filter(HarvestTime != " No_Har" )
+  filter(HarvestModel != "control" )
 
 DF_AV_MOD <- rbind(DF_AV_MOD, PART_RES_CON)  ## so this framework adds a cnotrol conditions
 
 rm("RES_CON_1", "RES_CON_2", "PART_RES_CON")  
 
+
+
 for(nP in unique(DF_AV_MOD$numPlants)){
+
+  
+  
+  
 FIG_RUST <- DF_AV_MOD%>%
   filter(HarvestTime != 5)%>%
   filter(Time == 5)%>%
@@ -48,7 +61,7 @@ FIG_RUST <- DF_AV_MOD%>%
   ggplot(aes(x= as.character(HarvestTime), y= Rust))+
   geom_boxplot(aes(fill= as.character(numWorkers), group= interaction(numWorkers, HarvestTime)))+ 
   ggtitle("")+
-  facet_wrap(~HarvestModel*numPlants, ncol=2)+
+  facet_wrap(~porcionCosecha, nrow=1)+
   scale_fill_manual(values = mycols3a)+
   theme_bw() +
   theme(text = element_text(size = 20))+
@@ -67,9 +80,19 @@ ggsave(FIG_RUST,filename=paste("../../output/graficas/RUST/", "rust_plants_", nP
 
 DF_SAM <- read.csv("../../data/DF_muestrasPath_complete.csv", header = TRUE)
 
+#DF_SAM <-read.csv("archivosTrabajandose/toyModelHarvest/data/DF_muestrasPath_complete.csv")
+#nP <- 3000
 ###########Plo
 
+DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="0.5"] <- "Asynchronic"
+DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="1"] <- "Synchronic" 
+DF_SAM$numWorkers[DF_SAM$numWorkers =="1"] <- "1 worker" 
+DF_SAM$numWorkers[DF_SAM$numWorkers =="5"] <- "5 workers" 
+
+
+
 for(nP in unique(DF_SAM$numPlants)){
+  
   
 FIG_PATH<- DF_SAM %>% 
   filter(Time == 5)%>% 
@@ -83,11 +106,11 @@ FIG_PATH<- DF_SAM %>%
   geom_point(size=1)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
   #scale_color_viridis_c()+
   scale_color_manual(values = mycols)+
-  facet_wrap(~numWorkers*HarvestModel, ncol=2)+
+  facet_wrap(~numWorkers*porcionCosecha, ncol=2)+
   theme(panel.spacing = unit(0.8, "lines"), text = element_text(size = 15))+
   theme_bw()+
   theme(text = element_text(size = 20))+
-  labs(x= "X_norm", y= "Y_norm", col= "Worker")
+  labs(x= "X", y= "Y", col= "Worker")
 
 ggsave(FIG_PATH,filename=paste("../../output/graficas/PATH/", "path_plants_", nP, ".png", sep=""),  height = 10, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
@@ -102,7 +125,7 @@ DF_MODELS <- DF_AV %>%
   filter(HarvestModel != "control")%>%  #we remove the contorl, we do not need it. 
   filter(Time == 5)%>%
   group_by(Rep, numPlants, numWorkers, HarvestTime) %>%  #we add all the variables we dont add the ID, we remove it
-  summarise(DifRust = diff(Rust), PercIncrease = 100*diff(Rust)/Rust[HarvestModel=="closeness"])
+  summarise(DifRust = diff(Rust)*(-1), PercIncrease = (-1)* 100*diff(Rust)/Rust[porcionCosecha=="Synchronic"])
 
 FIG_DIF_MODELS <- DF_MODELS%>%
     filter(numPlants ==3000) %>%  #CAHNGE THIS FOR THE AVERAGE!!!
@@ -114,7 +137,7 @@ FIG_DIF_MODELS <- DF_MODELS%>%
     geom_segment(aes(x=0, y=0, xend= 6, yend=0), linewidth = 0.2, color= "DarkRed")+
     theme_bw() +
    theme(text = element_text(size = 20))+
-    labs(x= "Time of Harvest", y= "% Increase (Prod-Close)/Close", fill= "Number of Workers")
+    labs(x= "Time of Harvest", y= "% Increase (A-S)/S", fill= "Number of Workers")
   
 ggsave(FIG_DIF_MODELS,filename="../../output/graficas/DIF_RUST/dif_rust.png",  height = 8, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
@@ -127,18 +150,18 @@ ggsave(FIG_DIF_MODELS,filename="../../output/graficas/DIF_RUST/dif_rust.png",  h
 
 DF_MODvsCON <- DF_AV %>%
   filter(Time == 5)%>% 
-  filter(HarvestTime == 2 | HarvestTime == " No_Har") %>%
-  filter(numWorkers ==5 | numWorkers== " No_Har")%>%
+  filter(HarvestTime == 2 | HarvestTime == "NoH") %>%
+  filter(numWorkers ==5 | numWorkers== "NoH")%>%
   #esto es para tener la maxima diferencia, pero tambien porque es aqui en donde pasa la cosecha
   group_by(Rep, numPlants)%>% #son las vairables que quedan y sobre esos escenarios, vamos a hacer las diferencias entre modelos
   summarise(ModCo_Rust = 100*((Rust - Rust[HarvestModel=="control"])/Rust[HarvestModel=="control"]),
-            HarvestModel = HarvestModel)  # esto es solo para que despues de leer por condicion, regrese...?
+            porcionCosecha = porcionCosecha)  # esto es solo para que despues de leer por condicion, regrese...?
 
 
 FIG_DIF_CONTROL <- DF_MODvsCON %>%
-  filter(HarvestModel != "control")%>%
-  ggplot(aes(x= HarvestModel, y= ModCo_Rust))+
-  geom_boxplot(aes(fill= as.character(HarvestModel)))+ 
+  filter(porcionCosecha != "control")%>%
+  ggplot(aes(x= porcionCosecha, y= ModCo_Rust))+
+  geom_boxplot(aes(fill= as.character(porcionCosecha)))+ 
   ggtitle("")+
   theme(text = element_text(size = 20))+
   facet_wrap(~numPlants, nrow=1)+
@@ -146,7 +169,7 @@ FIG_DIF_CONTROL <- DF_MODvsCON %>%
   #scale_fill_manual(values = mycols)+
   theme_bw() +
   theme(text = element_text(size = 20))+
-  labs(x= "Harvest Model", y= "Average Rust (Model-Control)/control)", fill= "Harvest Model")
+  labs(x= "Harvest Model", y= "% Rust (Scenario-Control)/Control)", fill= "Coffee maturation")
 
 ggsave(FIG_DIF_CONTROL,filename="../../output/graficas/DIF_RUST/dif_ModelvsControl.png",  height = 8, width = densidades* 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 

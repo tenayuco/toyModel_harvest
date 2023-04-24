@@ -44,7 +44,7 @@ Tmax = 5
 dimIni = [100, 100]
 iniInf = [0.8, 0.1, 0.1]
 modeArr = "random"
-#harvest = True
+#harvest = "closeness"
 contactoDis = 1.5 #meters
 
 
@@ -57,16 +57,21 @@ in condiciones
 
 rep = condiciones[0]
 numPlants = condiciones[1]
-harvest = condiciones[2]
+harvest = condiciones[2] 
 numWorkers = condiciones[3]
 timeHarvest = condiciones[4]
-simID = condiciones[5]
 
 
 ###
-hlPlants = round(numPlants/2)
-harvestSteps = int(hlPlants/numWorkers) ##*Entero hace que nunca hagas mas de la mitad. Tendria que sobrar 1 planta
+harvestSteps = int(round(numPlants/2)/numWorkers) ##*Entero hace que nunca hagas mas de la mitad. Tendria que sobrar 1 planta
 #see full documentation, in each step, 25 trees per worker
+
+
+hlPlants = round(numPlants*condiciones[5])  #es decir, condiciones 6, es sea 1, sea 2. 
+
+simID = condiciones[6]
+
+
 
 dicLattice = {"dim_Ini": dimIni, "ini_Inf": iniInf, "mode_Arr": modeArr, "num_Plants": numPlants}
 dicHarvest = {"har_vest": harvest, "num_Workers": numWorkers, "harvest_Steps": harvestSteps, "hl_Plants":hlPlants, "time_Harvest":timeHarvest}
@@ -86,6 +91,7 @@ DF["numPlants"] =np.repeat(numPlants, largoDF)
 DF["HarvestModel"] =np.repeat(harvest, largoDF)
 DF["numWorkers"] =np.repeat(numWorkers, largoDF)
 DF["HarvestTime"] =np.repeat(timeHarvest, largoDF)
+DF["porcionCosecha"]= np.repeat(condiciones[5], largoDF)
 DF["SimID"] =np.repeat(simID, largoDF)
 
 
@@ -109,7 +115,7 @@ patungDirectory = '/srv/home/emilio/toyModelHarvest'  #this is the general direc
 
 ########
 
-DF_spatialAverage = DF.groupby(["Rep", "numPlants", "numWorkers", "HarvestModel", "HarvestTime", "Time", "SimID"])[['Rust']].mean()
+DF_spatialAverage = DF.groupby(["Rep", "numPlants", "numWorkers", "HarvestModel", "HarvestTime", "porcionCosecha", "Time", "SimID"])[['Rust']].mean()
 
 liga0 = patungDirectory + "/salida/DF_spatialAverage/"  #mkdir salida/matricesGenerales before running inside the directory
 DF_spatialAverage.to_csv(liga0+ "DF_spatialAverage_%s.csv" %(args.code)) #average matrix
@@ -128,9 +134,9 @@ if rep ==0:
 liga3 = patungDirectory + "/salida/DF_total/"
 
 
-DF_harvest = DF.loc[DF["Time"] == timeHarvest+0.5].copy()
 
 if harvest != "control":
+    DF_harvest = DF.loc[DF["Time"] == timeHarvest+0.5].copy()
     DF_harvest.to_csv(liga3+ "DF_distanceW_%s.csv" %(args.code)) #average matrix
 
 

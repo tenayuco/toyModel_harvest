@@ -35,13 +35,14 @@ Then we define the different values for m, g, io and the patterns
 
 repetition = range(30)
 #repetition = range(2)
-numberPlants = [500, 1000, 3000, 5000]
+numberPlants = [500, 1000, 2000, 3000, 5000]
 #numberPlants = [1000, 3000]
 tiemposHarvest= [0,1,2,3,4] 
 #tiemposHarvest= [0,1,2] 
-workers = [1,5,8]
-#workers = [1, 5]  #articulo ESteli, pero mejor buscar los extremos.  #toca ir hasta el 8!!!!
-modelSwitch = ["control", "closeness", "productivity"]
+#workers = [1,5,8]
+workers = [1, 5]  #articulo ESteli, pero mejor buscar los extremos.  #toca ir hasta el 8!!!!
+modelSwitch = ["control", "closeness"]
+porcionCosecha = [0.5,1]
 
 
 """
@@ -66,8 +67,9 @@ patungDirectory = '/srv/home/emilio/toyModelHarvest'  #this changes depending th
 
 ##################AQUI VOY
 
-controlNumW = 999
+controlNumW = 999 #ESTO valores no impor
 controlTimeHar = "NoH"
+controlPorcion = 1 ##este si improt, hay que dejarlo en 1
 
 
 
@@ -83,39 +85,41 @@ for rep in repetition:
                 linea.append(harvest)
                 linea.append(controlNumW)
                 linea.append(controlTimeHar)
+                linea.append(controlPorcion)
                 
                 linea.append(simID)
                 
                 liga = patungDirectory+ "/initialConditions"
                 os.makedirs(liga, exist_ok= True)
 
-                with open(path.join(liga, "CI_%s_%s_%s_%s_%s_%s" %(rep, numPlants, harvest, controlNumW, controlTimeHar, simID)), "wb") as output:
+                with open(path.join(liga, "CI_%s_%s_%s_%s_%s_%s_%s" %(rep, numPlants, harvest, controlNumW, controlTimeHar, controlPorcion, simID)), "wb") as output:
                     pickle.dump(linea, output)
      #output.write(lista)
                 simID = simID+1
                 linea= []
 
     
-            else:        
-    
+            else:
                 for numWorkers in workers:
                     for timeHarvest in tiemposHarvest:
-                        #print("HAR", harvest, "Nworkers", numWorkers,"H", timeHarvest,"REP", rep)
-                        linea.append(rep)
-                        linea.append(numPlants)
-                        linea.append(harvest)
-                        linea.append(numWorkers)
-                        linea.append(timeHarvest)
-                        linea.append(simID)
+                        for porcion in porcionCosecha:
+                            #print("HAR", harvest, "Nworkers", numWorkers,"H", timeHarvest,"REP", rep)
+                            linea.append(rep)
+                            linea.append(numPlants)
+                            linea.append(harvest)
+                            linea.append(numWorkers)
+                            linea.append(timeHarvest)
+                            linea.append(porcion)
+                            linea.append(simID)
                         
-                        liga = patungDirectory+ "/initialConditions"
-                        os.makedirs(liga, exist_ok= True)
+                            liga = patungDirectory+ "/initialConditions"
+                            os.makedirs(liga, exist_ok= True)
     
-                        with open(path.join(liga, "CI_%s_%s_%s_%s_%s_%s" %(rep, numPlants, harvest, numWorkers, timeHarvest, simID)), "wb") as output:
-                            pickle.dump(linea, output)
+                            with open(path.join(liga, "CI_%s_%s_%s_%s_%s_%s_%s" %(rep, numPlants, harvest, numWorkers, timeHarvest, porcion, simID)), "wb") as output:
+                                pickle.dump(linea, output)
              #output.write(lista)
-                        simID = simID+1  #en principio este debe guardar cada combinacion para cada grupo de repeticiones. en el MISMO orden
-                        linea= []
+                            simID = simID+1  #en principio este debe guardar cada combinacion para cada grupo de repeticiones. en el MISMO orden
+                            linea= []
         
     
 
