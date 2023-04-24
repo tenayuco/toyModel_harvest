@@ -31,10 +31,13 @@ DF_BASE$CAT[DF_BASE$CAT==2] <- paste("[",maxLim,"-inf)",sep = "")
 DF_BASE$contador <-1
 
 DF_TOTAL_AG <- DF_BASE %>%
-    group_by(HarvestModel, numPlants, numWorkers, Rust, Rep, HarvestTime, SimID, CAT) %>%
+    group_by(HarvestModel, numPlants, numWorkers, Rust, Rep, HarvestTime, SimID, porcionCosecha, CAT) %>%
     summarise(sumCAT = sum(contador))
 
 DF_TOTAL_AG$proCAT <- DF_TOTAL_AG$sumCAT/DF_TOTAL_AG$numPlants*100
+
+DF_TOTAL_AG$porcionCosecha[DF_TOTAL_AG$porcionCosecha =="0.5"] <- "Asynchronic"
+DF_TOTAL_AG$porcionCosecha[DF_TOTAL_AG$porcionCosecha =="1"] <- "Synchronic" 
 
 
 FIG_PASOS <- DF_TOTAL_AG %>%
@@ -47,8 +50,8 @@ FIG_PASOS <- DF_TOTAL_AG %>%
     geom_boxplot(aes(fill = as.character(CAT)))+
     #geom_jitter(size= 1)+
     #  geom_line()+
-    scale_fill_manual(values = mycols3a)+
-    facet_wrap(~HarvestModel*HarvestTime, nrow = 2) +
+    scale_fill_manual(values = mycolsBW)+
+    facet_wrap(porcionCosecha~HarvestTime, nrow = 2) +
     theme_bw() +
     theme(text = element_text(size = 20))+
     labs(x= "HarvestingTime", y= "% Rust-Effective Steps per size", fill= "SizeStep")
@@ -67,20 +70,19 @@ DF_TOTAL_AG_EF <- DF_TOTAL_AG %>%
 DF_DIF<- DF_TOTAL_AG_EF  %>%
   #esto es para tener la maxima diferencia, pero tambien porque es aqui en donde pasa la cosecha
   group_by(Rep, numPlants, numWorkers, HarvestTime, CAT)%>% #son las vairables que quedan y sobre esos escenarios, vamos a hacer las diferencias entre modelos
-  summarise(difPro = diff(proCAT))  # esto es solo para que despues de leer por condicion, regrese...?
+  summarise(difPro = -diff(proCAT))  # esto es solo para que despues de leer por condicion, regrese...?
 
 FIG_DIF <- DF_DIF %>%
   ggplot(aes(x= CAT, y = difPro)) +
   geom_boxplot(aes(fill = as.character(CAT)))+
   #geom_jitter(size= 1)+
   #  geom_line()+
-  scale_fill_manual(values = mycols3a)+
+  scale_fill_manual(values = mycolsBW)+
   facet_wrap(~HarvestTime, nrow = 1) +
-  geom_segment(aes(x=-1.5, y=0, xend= 3.5, yend=0), linewidth = 0.2, color= "DarkRed")+
+  geom_segment(aes(x=0.5, y=0, xend= 3.5, yend=0), linewidth = 0.2, color= "DarkRed")+
   theme_bw() +
   theme(text = element_text(size = 20))+
   labs(x= "HarvestingTime", y= "% Rust-Effective Steps per size", fill= "SizeStep")
 
 
- # ggsave(FIG_PASOS,filename=paste("../../output/saltosEfectivos/", "Fig_pasos/","Fig_pasos", limiteSalto, ".png", sep=""),  height = 8, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-  
+ggsave(FIG_DIF,filename=paste("archivosTrabajandose/toyModelHarvest/output/saltosEfectivos/","Fig_DIF", maxLim, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
