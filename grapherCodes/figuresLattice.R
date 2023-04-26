@@ -16,8 +16,8 @@ mycols3c <- c("#759580", "#1b4a64","#fdb81c")
 #We take the full data frame of spatial average rust per condition. This average was the compounded average of each plant, In this sense,
 # We have to run all this code from the terminal. If not, change the directory to an absolute path
 
-#DF_AV <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_spatialAverage_complete.csv", header = TRUE)
-DF_AV <- read.csv("../../data/DF_spatialAverage_complete.csv", header = TRUE)
+DF_AV <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_spatialAverage_complete.csv", header = TRUE)
+#DF_AV <- read.csv("../../data/DF_spatialAverage_complete.csv", header = TRUE)
 
 #we change control model to "no har"
 DF_AV$porcionCosecha[DF_AV$HarvestModel =="control"] <- "control"
@@ -171,6 +171,11 @@ FIG_DIF_MODELS <- DF_MODELS%>%
   
 ggsave(FIG_DIF_MODELS,filename="../../output/graficas/DIF_RUST/dif_rust.png",  height = 8, width = 6*densidades) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
+
+
+
+
+
 ##############y aqui control vs tipos de cosecha (promediando todo el interior dentro de cada rep)
 
 #DF_AV_TOTAL <- DF_AV %>%
@@ -191,19 +196,66 @@ DF_MODvsCON$numPlants[DF_MODvsCON$numPlants == 500] <- " 500"
 
 FIG_DIF_CONTROL <- DF_MODvsCON %>%
   filter(porcionCosecha != "control")%>%
-  ggplot(aes(x= numPlants, y= ModCo_Rust))+
-  geom_boxplot(aes(fill= as.character(numPlants)))+ 
+  ggplot(aes(x= porcionCosecha, y= ModCo_Rust))+
+  geom_boxplot(aes(fill= as.character(porcionCosecha)))+ 
   ggtitle("")+
   theme(text = element_text(size = 20))+
-  facet_wrap(~porcionCosecha, nrow=1)+
-  scale_fill_brewer(palette="YlOrRd") +
-  #scale_fill_viridis_d(inferno(length(unique(DF_MODvsCON$numPlants))))
+  facet_wrap(~numPlants, nrow=1)+
+  scale_fill_brewer(palette = "Dark2")+ 
+  #scale_fill_brewer(palette="YlOrRd") +
   #scale_fill_manual(values = mycols)+
   theme_bw() +
   theme(text = element_text(size = 20))+
-  labs(x= "Plants/ha", y= "% Rust (Scenario-Control)/Control)", fill= "Plants/ha")
+  labs(x= "Porcion Cosecha", y= "% Rust (Scenario-Control)/Control)", fill= "PorcionCosecha")
 
-ggsave(FIG_DIF_CONTROL,filename="../../output/graficas/DIF_RUST/dif_ModelvsControl.png",  height = 8, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_DIF_CONTROL,filename="../../output/graficas/DIF_RUST/dif_ModelvsControl2.png",  height = 8, width = 6*densidades) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+
+############33333s solo para que despues de leer por condicion, regrese...?
+
+DF_MODvsCON_GEN <- DF_AV %>%
+  filter(Time == 5)%>% 
+  #filter(HarvestTime == 2 | HarvestTime == "NoH") %>%
+  #filter(numWorkers ==5 | numWorkers== "NoH")%>%
+  #esto es para tener la maxima diferencia, pero tambien porque es aqui en donde pasa la cosecha
+  group_by(Rep, numPlants)%>% #son las vairables que quedan y sobre esos escenarios, vamos a hacer las diferencias entre modelos
+  summarise(ModCo_Rust = 100*((Rust - Rust[HarvestModel=="control"])/Rust[HarvestModel=="control"]),
+            porcionCosecha = porcionCosecha, HarvestTime = HarvestTime, numWorkers = numWorkers)  # esto es solo para que despues de leer por condicion, regrese...?
+
+
+
+
+FIG_DIF_CONTROL_MUL <- DF_MODvsCON_GEN %>%
+  filter(porcionCosecha != "control")%>%
+  ggplot(aes(x= as.character(HarvestTime), y= ModCo_Rust))+
+  geom_boxplot(aes(fill= as.character(numWorkers)))+ 
+  ggtitle("")+
+  theme(text = element_text(size = 20))+
+  facet_wrap(porcionCosecha~numPlants, nrow=2)+
+  scale_fill_manual(values = mycols3a)+ 
+  geom_segment(aes(x=0, y=0, xend= 6, yend=0), linewidth = 0.2, color= "DarkRed")+
+  #scale_fill_brewer(palette="YlOrRd") +
+  #scale_fill_manual(values = mycols)+
+  theme_bw() +
+  theme(text = element_text(size = 20))+
+  labs(x= "Time of Harvest", y= "% Rust (Scenario-Control)/Control)", fill= "Number of Workers")
+
+
+
+ggsave(FIG_DIF_CONTROL_MUL,filename="../../output/graficas/DIF_RUST/dif_ModelvsControl3.png",  height = 16, width = 6*densidades) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
