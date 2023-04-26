@@ -189,7 +189,7 @@ DF_MODvsCON <- DF_AV %>%
   filter(numWorkers ==5 | numWorkers== "NoH")%>%
   #esto es para tener la maxima diferencia, pero tambien porque es aqui en donde pasa la cosecha
   group_by(Rep, numPlants)%>% #son las vairables que quedan y sobre esos escenarios, vamos a hacer las diferencias entre modelos
-  summarise(ModCo_Rust = 100*((Rust - Rust[HarvestModel=="control"])/Rust[HarvestModel=="control"]),
+  summarise(ModCo_Rust = 100*(Rust - Rust[HarvestModel=="control"]),
             porcionCosecha = porcionCosecha)  # esto es solo para que despues de leer por condicion, regrese...?
 
 DF_MODvsCON$numPlants[DF_MODvsCON$numPlants == 500] <- " 500"
@@ -206,9 +206,9 @@ FIG_DIF_CONTROL <- DF_MODvsCON %>%
   #scale_fill_manual(values = mycols)+
   theme_bw() +
   theme(text = element_text(size = 20))+
-  labs(x= "Porcion Cosecha", y= "% Rust (Scenario-Control)/Control)", fill= "PorcionCosecha")
+  labs(x= "Porcion Cosecha", y= "% Rust (Scenario-Control)", fill= "PorcionCosecha")
 
-ggsave(FIG_DIF_CONTROL,filename="../../output/graficas/DIF_RUST/dif_ModelvsControl2.png",  height = 8, width = 6*densidades) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_DIF_CONTROL,filename="../../output/graficas/DIF_RUST/dif_ModelvsControl22.png",  height = 8, width = 6*densidades) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 ############33333s solo para que despues de leer por condicion, regrese...?
