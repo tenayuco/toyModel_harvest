@@ -13,9 +13,9 @@ rm creator_CI_patung.py shortCommand creator_SubmitFile.py readme_toyModel execu
 
 graciaspatung en nahuaaa
 
-
+cd toyModelHarvest
 source venv3/bin/activate  #ver si este es el bueno
-source em_env/bin/activate 
+
 
 
 --------------------
@@ -44,7 +44,15 @@ condor_submit submit_file_toyModel.sub
 condor_q
 
 ----
+Para ever si algun archivo tiene error en la bitacora
 
+grep -il "ERROR" *
+------------
+para enlistar el numero de archivos en una carpeta
+
+ls -1 | wc -l
+
+----
 exit
 
 

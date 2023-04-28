@@ -40,7 +40,7 @@ Fixed parameters
 
 
 
-Tmax = 5
+Tmax = 10  #ESTE ESEL CA;MIBO NUEBO por szatch
 dimIni = [100, 100]
 iniInf = [0.8, 0.1, 0.1]
 modeArr = "random"

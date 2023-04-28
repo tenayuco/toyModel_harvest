@@ -19,10 +19,8 @@ def setScenario(dic_Lattice, dic_Simulation, dic_Harvest):
         rstate = np.random.RandomState(dic_Simulation["rep_"])  #para cada repeticion mismo seed
         
     #harvesting conditions (will be filled or modified during simulation)
-        #HarvestModel = np.repeat(0, dic_Lattice["num_Plants"])
         WorkerID = np.repeat(0, dic_Lattice["num_Plants"])
         HarvestStep = np.repeat(0, dic_Lattice["num_Plants"])
-       # HarvestEvent = np.repeat(0, dic_Lattice["num_Plants"])
         TotalHarvest = np.repeat(0, dic_Lattice["num_Plants"])
         
     #fruit load (will change in simulation)  #THIS IS DIFFERENTE
@@ -34,9 +32,6 @@ def setScenario(dic_Lattice, dic_Simulation, dic_Harvest):
         rstate.shuffle(FruitLoad)
         
        # print(FruitLoad)
-        
-#simulation        
-       # Rep = np.repeat(dic_Simulation["rep_"], dic_Lattice["num_Plants"]) #add initial value of rep for each ID of the plant
         
      # plants and coordinae   
         IDplants = np.arange(0, dic_Lattice["num_Plants"], 1)  #add each ID 
@@ -155,68 +150,6 @@ def contactModel(old_DF, dic_Simulation): #r_h is ruested trees durign harvest
     return(tempDF)
 
 
-def HM_closeness(old_DF, dic_Harvest):
-    
-    tempDF = old_DF
-    hSteps= dic_Harvest["harvest_Steps"]-1 #hago el -1 para que sean n pasos contando el 0
-    numW = dic_Harvest["num_Workers"]
-    
-    UN_HARV = tempDF.loc[tempDF["FruitLoad"] != 0]#this is a view
-       
-    initialPlants = random.sample(list(UN_HARV["ID"]), numW)
-    
-    liWorkers = []
-        
-    for w in np.arange(0,numW,1):
-        liWorkers.append("W_%d" % (w))
-        tempDF.loc[tempDF["ID"] == initialPlants[w], "TotalHarvest"] = tempDF.loc[tempDF["ID"] == initialPlants[w], "FruitLoad"]
-        tempDF.loc[tempDF["ID"] == initialPlants[w], "FruitLoad"] = 0
-        tempDF.loc[tempDF["ID"] == initialPlants[w], "WorkerID"] = "W_%d" % (w)
-        tempDF.loc[tempDF["ID"] == initialPlants[w], "HarvestStep"] = 1
-
-        
-    conteo = 0  #CUANDO CA;BIP ESTO NO FUCNIONA
-    print ("hSteps", hSteps)
-    while conteo<hSteps:
-        #print("contadorPersonas", conteo)
-        conteo= conteo +1
-        for w in np.arange(0, numW,1):
-            
-            conteoTemp = conteo
-            LAST_W = tempDF.loc[(tempDF["HarvestStep"] == conteo) & (tempDF["WorkerID"] == liWorkers[w])] #esto filtra solo los ultimos pasos, que deben tener 3 trabajadores
-            
-            royaOrigen = LAST_W.iloc[0]["Rust"]
-            
-           # print("lastw \n", LAST_W)
-            
-            
-            UH_DIN = tempDF.loc[tempDF["FruitLoad"] != 0].copy()#this is a copy dentro de lo no cosechado
-            UH_DIN["Distance"] = (UH_DIN["X"] -LAST_W.iloc[0]["X"])**2  + (UH_DIN["Y"] - LAST_W.iloc[0]["Y"])**2
-            UH_DIN= UH_DIN.loc[UH_DIN["Distance"] == min(UH_DIN["Distance"])]
-
-            royaDestino = UH_DIN.iloc[0]["Rust"]
- #           print("w", w, "UHDIN \n", UH_DIN)
-
-            conteoTemp = conteoTemp+1
-    
-                        
-            tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["TotalHarvest"]] = UH_DIN.iloc[0]["FruitLoad"]  
-            tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["FruitLoad"]] = 0
-            tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["WorkerID"]] = "W_%d" % (w)  
-            tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["HarvestStep"]] = conteoTemp 
-
-            if royaDestino == 0:  #esto para asegurar que no fuera una planta infectada (0.75 o 1 o 0.5)
-                if royaOrigen == 1:
-                    tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["Rust"]] = 0.25 
-                else:
-                    pass
-            else:
-                pass
-             
- 
-    
-    return(tempDF)
-
 
 
 def HM_general(old_DF, dic_Harvest, dic_Simulation):
@@ -228,18 +161,15 @@ def HM_general(old_DF, dic_Harvest, dic_Simulation):
     
     UN_HARV = tempDF.loc[tempDF["FruitLoad"] != 0]  ##IN both scenario, we star at a random plant, to have the same random stat
     
-    #if dic_Harvest["har_vest"] == "closeness":
-     #   UN_HARV = tempDF.loc[tempDF["FruitLoad"] != 0]#this is a view
-    #elif dic_Harvest["har_vest"] == "productivity":
-     #   UN_HARV = tempDF.loc[tempDF["FruitLoad"] ==2]#this is a view
         
+      
     
     rstate = np.random.RandomState(dic_Simulation["rep_"])  #para cada repeticion mismo seed
 
-    initialPlants = rstate.choice(list(UN_HARV["ID"]), numW)
-    #initialPlants = random.sample(list(UN_HARV["ID"]), numW)
     
+    initialPlants = rstate.choice(list(UN_HARV["ID"]), numW, replace= False)  ###ESTE ES EL PEDO!
     
+    #print("iniPans", initialPlants)
     liWorkers = []
         
     for w in np.arange(0,numW,1):
@@ -252,23 +182,23 @@ def HM_general(old_DF, dic_Harvest, dic_Simulation):
         
         
 
-        
+    #print("liW", liWorkers)   
     conteo = 0  #CUANDO CA;BIP ESTO NO FUCNIONA
     #print ("hSteps", hSteps)
     while conteo<hSteps:
-       # print("contadorPersonas", conteo)
         conteo= conteo +1
+       # print("conteoPasos", conteo)
         for w in np.arange(0, numW,1):
-        #    print("Worker", w)
+            #print("Worker", w)
             
-            conteoTemp = conteo
-            
+            #print("TEMPSTEP", tempDF["HarvestStep"].unique())
+            #print("TEMPwOrker", tempDF["WorkerID"].unique())
             
             LAST_W = tempDF.loc[(tempDF["HarvestStep"] == conteo) & (tempDF["WorkerID"] == liWorkers[w])] #esto filtra solo los ultimos pasos, que deben tener 3 trabajadores
             
             royaOrigen = LAST_W.iloc[0]["Rust"]
             
-         #   print("lastw \n", LAST_W)
+            #print("lastw \n", LAST_W)
             #print("royaOrigen \n", royaOrigen)
             
             if dic_Harvest["har_vest"] == "closeness":
@@ -286,7 +216,7 @@ def HM_general(old_DF, dic_Harvest, dic_Simulation):
             royaDestino = UH_DIN.iloc[0]["Rust"]
  #           print("w", w, "UHDIN \n", UH_DIN)
 
-            conteoTemp = conteoTemp+1
+            conteoTemp = conteo+1
     
                         
             tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["TotalHarvest"]] = UH_DIN.iloc[0]["FruitLoad"]  

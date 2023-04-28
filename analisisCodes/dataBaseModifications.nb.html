@@ -1774,28 +1774,9 @@ setwd(&quot;../../dataPatung_descargado/salida/DF_spatialAverage/&quot;)</code><
 <!-- rnb-output-begin eyJkYXRhIjoiV2FybmluZzogVGhlIHdvcmtpbmcgZGlyZWN0b3J5IHdhcyBjaGFuZ2VkIHRvIC9ob21lL2VtaWxpby9hcmNoaXZvc1RyYWJhamFuZG9zZS90b3lNb2RlbEhhcnZlc3QvZGF0YVBhdHVuZ19kZXNjYXJnYWRvL3NhbGlkYS9ERl9zcGF0aWFsQXZlcmFnZSBpbnNpZGUgYSBub3RlYm9vayBjaHVuay4gVGhlIHdvcmtpbmcgZGlyZWN0b3J5IHdpbGwgYmUgcmVzZXQgd2hlbiB0aGUgY2h1bmsgaXMgZmluaXNoZWQgcnVubmluZy4gVXNlIHRoZSBrbml0ciByb290LmRpciBvcHRpb24gaW4gdGhlIHNldHVwIGNodW5rIHRvIGNoYW5nZSB0aGUgd29ya2luZyBkaXJlY3RvcnkgZm9yIG5vdGVib29rIGNodW5rcy5cbiJ9 -->
 <pre><code>Warning: The working directory was changed to /home/emilio/archivosTrabajandose/toyModelHarvest/dataPatung_descargado/salida/DF_spatialAverage inside a notebook chunk. The working directory will be reset when the chunk is finished running. Use the knitr root.dir option in the setup chunk to change the working directory for notebook chunks.</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShwbHlyKVxuYGBgIn0= -->
-<pre class="r"><code>library(plyr)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLVxuWW91IGhhdmUgbG9hZGVkIHBseXIgYWZ0ZXIgZHBseXIgLSB0aGlzIGlzIGxpa2VseSB0byBjYXVzZSBwcm9ibGVtcy5cbklmIHlvdSBuZWVkIGZ1bmN0aW9ucyBmcm9tIGJvdGggcGx5ciBhbmQgZHBseXIsIHBsZWFzZSBsb2FkIHBseXIgZmlyc3QsIHRoZW4gZHBseXI6XG5saWJyYXJ5KHBseXIpOyBsaWJyYXJ5KGRwbHlyKVxuLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLVxuXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYcGx5cuKAmVxuXG5UaGUgZm9sbG93aW5nIG9iamVjdCBpcyBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOnB1cnJy4oCZOlxuXG4gICAgY29tcGFjdFxuXG5UaGUgZm9sbG93aW5nIG9iamVjdHMgYXJlIG1hc2tlZCBmcm9tIOKAmHBhY2thZ2U6ZHBseXLigJk6XG5cbiAgICBhcnJhbmdlLCBjb3VudCwgZGVzYywgZmFpbHdpdGgsIGlkLCBtdXRhdGUsIHJlbmFtZSwgc3VtbWFyaXNlLCBzdW1tYXJpemVcbiJ9 -->
-<pre><code>-------------------------------------------------------------------------------------------------
-You have loaded plyr after dplyr - this is likely to cause problems.
-If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
-library(plyr); library(dplyr)
--------------------------------------------------------------------------------------------------
-
-Attaching package: ‘plyr’
-
-The following object is masked from ‘package:purrr’:
-
-    compact
-
-The following objects are masked from ‘package:dplyr’:
-
-    arrange, count, desc, failwith, id, mutate, rename, summarise, summarize</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuREZfc3BhdGlhbCA8LSBsZHBseShsaXN0LmZpbGVzKCksIHJlYWQuY3N2LCBoZWFkZXI9VFJVRSlcbiMgaXQgaXMgaW1wb3J0YW50IHRvIGRldGFjaCBwbHlyIGZvciBkcGx5ciB0byBiZSB1c2VkXG5kZXRhY2gocGFja2FnZTpwbHlyKVxuYGBgIn0= -->
-<pre class="r"><code>DF_spatial &lt;- ldply(list.files(), read.csv, header=TRUE)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShwbHlyKVxuREZfc3BhdGlhbCA8LSBsZHBseShsaXN0LmZpbGVzKCksIHJlYWQuY3N2LCBoZWFkZXI9VFJVRSlcbiMgaXQgaXMgaW1wb3J0YW50IHRvIGRldGFjaCBwbHlyIGZvciBkcGx5ciB0byBiZSB1c2VkXG5kZXRhY2gocGFja2FnZTpwbHlyKVxuYGBgIn0= -->
+<pre class="r"><code>library(plyr)
+DF_spatial &lt;- ldply(list.files(), read.csv, header=TRUE)
 # it is important to detach plyr for dplyr to be used
 detach(package:plyr)</code></pre>
 <!-- rnb-source-end -->
@@ -1817,28 +1798,9 @@ setwd(&quot;../../dataPatung_descargado/salida/DF_muestrasPath/&quot;)</code></p
 <!-- rnb-output-begin eyJkYXRhIjoiV2FybmluZzogVGhlIHdvcmtpbmcgZGlyZWN0b3J5IHdhcyBjaGFuZ2VkIHRvIC9ob21lL2VtaWxpby9hcmNoaXZvc1RyYWJhamFuZG9zZS90b3lNb2RlbEhhcnZlc3QvZGF0YVBhdHVuZ19kZXNjYXJnYWRvL3NhbGlkYS9ERl9tdWVzdHJhc1BhdGggaW5zaWRlIGEgbm90ZWJvb2sgY2h1bmsuIFRoZSB3b3JraW5nIGRpcmVjdG9yeSB3aWxsIGJlIHJlc2V0IHdoZW4gdGhlIGNodW5rIGlzIGZpbmlzaGVkIHJ1bm5pbmcuIFVzZSB0aGUga25pdHIgcm9vdC5kaXIgb3B0aW9uIGluIHRoZSBzZXR1cCBjaHVuayB0byBjaGFuZ2UgdGhlIHdvcmtpbmcgZGlyZWN0b3J5IGZvciBub3RlYm9vayBjaHVua3MuXG4ifQ== -->
 <pre><code>Warning: The working directory was changed to /home/emilio/archivosTrabajandose/toyModelHarvest/dataPatung_descargado/salida/DF_muestrasPath inside a notebook chunk. The working directory will be reset when the chunk is finished running. Use the knitr root.dir option in the setup chunk to change the working directory for notebook chunks.</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShwbHlyKVxuYGBgIn0= -->
-<pre class="r"><code>library(plyr)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLVxuWW91IGhhdmUgbG9hZGVkIHBseXIgYWZ0ZXIgZHBseXIgLSB0aGlzIGlzIGxpa2VseSB0byBjYXVzZSBwcm9ibGVtcy5cbklmIHlvdSBuZWVkIGZ1bmN0aW9ucyBmcm9tIGJvdGggcGx5ciBhbmQgZHBseXIsIHBsZWFzZSBsb2FkIHBseXIgZmlyc3QsIHRoZW4gZHBseXI6XG5saWJyYXJ5KHBseXIpOyBsaWJyYXJ5KGRwbHlyKVxuLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLVxuXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYcGx5cuKAmVxuXG5UaGUgZm9sbG93aW5nIG9iamVjdCBpcyBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOnB1cnJy4oCZOlxuXG4gICAgY29tcGFjdFxuXG5UaGUgZm9sbG93aW5nIG9iamVjdHMgYXJlIG1hc2tlZCBmcm9tIOKAmHBhY2thZ2U6ZHBseXLigJk6XG5cbiAgICBhcnJhbmdlLCBjb3VudCwgZGVzYywgZmFpbHdpdGgsIGlkLCBtdXRhdGUsIHJlbmFtZSwgc3VtbWFyaXNlLCBzdW1tYXJpemVcbiJ9 -->
-<pre><code>-------------------------------------------------------------------------------------------------
-You have loaded plyr after dplyr - this is likely to cause problems.
-If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
-library(plyr); library(dplyr)
--------------------------------------------------------------------------------------------------
-
-Attaching package: ‘plyr’
-
-The following object is masked from ‘package:purrr’:
-
-    compact
-
-The following objects are masked from ‘package:dplyr’:
-
-    arrange, count, desc, failwith, id, mutate, rename, summarise, summarize</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuREZfc2FtcGxlIDwtIGxkcGx5KGxpc3QuZmlsZXMoKSwgcmVhZC5jc3YsIGhlYWRlcj1UUlVFKVxuIyBpdCBpcyBpbXBvcnRhbnQgdG8gZGV0YWNoIHBseXIgZm9yIGRwbHlyIHRvIGJlIHVzZWRcbmRldGFjaChwYWNrYWdlOnBseXIpXG5gYGAifQ== -->
-<pre class="r"><code>DF_sample &lt;- ldply(list.files(), read.csv, header=TRUE)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShwbHlyKVxuREZfc2FtcGxlIDwtIGxkcGx5KGxpc3QuZmlsZXMoKSwgcmVhZC5jc3YsIGhlYWRlcj1UUlVFKVxuIyBpdCBpcyBpbXBvcnRhbnQgdG8gZGV0YWNoIHBseXIgZm9yIGRwbHlyIHRvIGJlIHVzZWRcbmRldGFjaChwYWNrYWdlOnBseXIpXG5gYGAifQ== -->
+<pre class="r"><code>library(plyr)
+DF_sample &lt;- ldply(list.files(), read.csv, header=TRUE)
 # it is important to detach plyr for dplyr to be used
 detach(package:plyr)</code></pre>
 <!-- rnb-source-end -->
@@ -1851,70 +1813,142 @@ detach(package:plyr)</code></pre>
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2VudGVyIHRoZSBmaWxlIHdpdGggYWxsIHRoZSBuZXcgcmVkdWNlZCBkYXRhIGZyYW1lcyBhbmQgbWVyZ2UgdGhlbSBcbmxpYnJhcnkoZHBseXIpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcblxuc2V0d2QoXCIuLi8uLi9kYXRhUGF0dW5nX2Rlc2NhcmdhZG8vc2FsaWRhL0RGX3RvdGFsL1wiKVxuYGBgIn0= -->
-<pre class="r"><code>#enter the file with all the new reduced data frames and merge them 
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuI2VudGVyIHRoZSBmaWxlIHdpdGggYWxsIHRoZSBuZXcgcmVkdWNlZCBkYXRhIGZyYW1lcyBhbmQgbWVyZ2UgdGhlbSBcbmxpYnJhcnkoZHBseXIpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcblxuc2V0d2QoXFwuLi8uLi9kYXRhUGF0dW5nX2Rlc2NhcmdhZG8vc2FsaWRhL0RGX3RvdGFsL1xcKVxuYGBgXG5gYGAifQ== -->
+<pre class="r"><code>```r
+#enter the file with all the new reduced data frames and merge them 
 library(dplyr)
 library(tidyverse)
 
-setwd(&quot;../../dataPatung_descargado/salida/DF_total/&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiV2FybmluZzogVGhlIHdvcmtpbmcgZGlyZWN0b3J5IHdhcyBjaGFuZ2VkIHRvIC9ob21lL2VtaWxpby9hcmNoaXZvc1RyYWJhamFuZG9zZS90b3lNb2RlbEhhcnZlc3QvZGF0YVBhdHVuZ19kZXNjYXJnYWRvL3NhbGlkYS9ERl90b3RhbCBpbnNpZGUgYSBub3RlYm9vayBjaHVuay4gVGhlIHdvcmtpbmcgZGlyZWN0b3J5IHdpbGwgYmUgcmVzZXQgd2hlbiB0aGUgY2h1bmsgaXMgZmluaXNoZWQgcnVubmluZy4gVXNlIHRoZSBrbml0ciByb290LmRpciBvcHRpb24gaW4gdGhlIHNldHVwIGNodW5rIHRvIGNoYW5nZSB0aGUgd29ya2luZyBkaXJlY3RvcnkgZm9yIG5vdGVib29rIGNodW5rcy5cbiJ9 -->
-<pre><code>Warning: The working directory was changed to /home/emilio/archivosTrabajandose/toyModelHarvest/dataPatung_descargado/salida/DF_total inside a notebook chunk. The working directory will be reset when the chunk is finished running. Use the knitr root.dir option in the setup chunk to change the working directory for notebook chunks.</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShwbHlyKVxuYGBgIn0= -->
-<pre class="r"><code>library(plyr)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLVxuWW91IGhhdmUgbG9hZGVkIHBseXIgYWZ0ZXIgZHBseXIgLSB0aGlzIGlzIGxpa2VseSB0byBjYXVzZSBwcm9ibGVtcy5cbklmIHlvdSBuZWVkIGZ1bmN0aW9ucyBmcm9tIGJvdGggcGx5ciBhbmQgZHBseXIsIHBsZWFzZSBsb2FkIHBseXIgZmlyc3QsIHRoZW4gZHBseXI6XG5saWJyYXJ5KHBseXIpOyBsaWJyYXJ5KGRwbHlyKVxuLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLVxuXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYcGx5cuKAmVxuXG5UaGUgZm9sbG93aW5nIG9iamVjdCBpcyBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOnB1cnJy4oCZOlxuXG4gICAgY29tcGFjdFxuXG5UaGUgZm9sbG93aW5nIG9iamVjdHMgYXJlIG1hc2tlZCBmcm9tIOKAmHBhY2thZ2U6ZHBseXLigJk6XG5cbiAgICBhcnJhbmdlLCBjb3VudCwgZGVzYywgZmFpbHdpdGgsIGlkLCBtdXRhdGUsIHJlbmFtZSwgc3VtbWFyaXNlLCBzdW1tYXJpemVcbiJ9 -->
-<pre><code>-------------------------------------------------------------------------------------------------
-You have loaded plyr after dplyr - this is likely to cause problems.
-If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
-library(plyr); library(dplyr)
--------------------------------------------------------------------------------------------------
+setwd(\../../dataPatung_descargado/salida/DF_total/\)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
 
-Attaching package: ‘plyr’
+&lt;!-- rnb-output-begin eyJkYXRhIjoiV2FybmluZzogVGhlIHdvcmtpbmcgZGlyZWN0b3J5IHdhcyBjaGFuZ2VkIHRvIC9ob21lL2VtaWxpby9hcmNoaXZvc1RyYWJhamFuZG9zZS90b3lNb2RlbEhhcnZlc3QvZGF0YVBhdHVuZ19kZXNjYXJnYWRvL3NhbGlkYS9ERl90b3RhbCBpbnNpZGUgYSBub3RlYm9vayBjaHVuay4gVGhlIHdvcmtpbmcgZGlyZWN0b3J5IHdpbGwgYmUgcmVzZXQgd2hlbiB0aGUgY2h1bmsgaXMgZmluaXNoZWQgcnVubmluZy4gVXNlIHRoZSBrbml0ciByb290LmRpciBvcHRpb24gaW4gdGhlIHNldHVwIGNodW5rIHRvIGNoYW5nZSB0aGUgd29ya2luZyBkaXJlY3RvcnkgZm9yIG5vdGVib29rIGNodW5rcy5cbiJ9 --&gt;
+</code></pre>
+<p>Warning: The working directory was changed to
+/home/emilio/archivosTrabajandose/toyModelHarvest/dataPatung_descargado/salida/DF_total
+inside a notebook chunk. The working directory will be reset when the
+chunk is finished running. Use the knitr root.dir option in the setup
+chunk to change the working directory for notebook chunks.</p>
+<pre><code>
 
-The following object is masked from ‘package:purrr’:
 
-    compact
+&lt;!-- rnb-output-end --&gt;
 
-The following objects are masked from ‘package:dplyr’:
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubGlicmFyeShwbHlyKVxuYGBgXG5gYGAifQ== --&gt;
 
-    arrange, count, desc, failwith, id, mutate, rename, summarise, summarize</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuREZfdG90YWwgPC0gbGRwbHkobGlzdC5maWxlcygpLCByZWFkLmNzdiwgaGVhZGVyPVRSVUUpXG4jIGl0IGlzIGltcG9ydGFudCB0byBkZXRhY2ggcGx5ciBmb3IgZHBseXIgdG8gYmUgdXNlZFxuZGV0YWNoKHBhY2thZ2U6cGx5cilcblxuREZfdG90YWwgPC0gREZfdG90YWwgJT4lXG4gIGZpbHRlcighaXMubmEoRGlzdGFuY2VXKSkgIyU+JVxuICBmaWx0ZXIoUmVwICVpbiUgYygwLDEsMiwzLDQsNSkpXG5gYGAifQ== -->
-<pre class="r"><code>DF_total &lt;- ldply(list.files(), read.csv, header=TRUE)
+```r
+```r
+library(plyr)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-output-begin eyJkYXRhIjoiLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLVxuWW91IGhhdmUgbG9hZGVkIHBseXIgYWZ0ZXIgZHBseXIgLSB0aGlzIGlzIGxpa2VseSB0byBjYXVzZSBwcm9ibGVtcy5cbklmIHlvdSBuZWVkIGZ1bmN0aW9ucyBmcm9tIGJvdGggcGx5ciBhbmQgZHBseXIsIHBsZWFzZSBsb2FkIHBseXIgZmlyc3QsIHRoZW4gZHBseXI6XG5saWJyYXJ5KHBseXIpOyBsaWJyYXJ5KGRwbHlyKVxuLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLVxuXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYcGx5cuKAmVxuXG5UaGUgZm9sbG93aW5nIG9iamVjdCBpcyBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOnB1cnJy4oCZOlxuXG4gICAgY29tcGFjdFxuXG5UaGUgZm9sbG93aW5nIG9iamVjdHMgYXJlIG1hc2tlZCBmcm9tIOKAmHBhY2thZ2U6ZHBseXLigJk6XG5cbiAgICBhcnJhbmdlLCBjb3VudCwgZGVzYywgZmFpbHdpdGgsIGlkLCBtdXRhdGUsIHJlbmFtZSwgc3VtbWFyaXNlLCBzdW1tYXJpemVcbiJ9 --&gt;
+</code></pre>
+<table>
+<tbody>
+<tr class="odd">
+<td align="left">You have loaded plyr after dplyr - this is likely to
+cause problems.</td>
+</tr>
+<tr class="even">
+<td align="left">If you need functions from both plyr and dplyr, please
+load plyr first, then dplyr:</td>
+</tr>
+<tr class="odd">
+<td align="left">library(plyr); library(dplyr)</td>
+</tr>
+</tbody>
+</table>
+<p>Attaching package: ‘plyr’</p>
+<p>The following object is masked from ‘package:purrr’:</p>
+<pre><code>compact</code></pre>
+<p>The following objects are masked from ‘package:dplyr’:</p>
+<pre><code>arrange, count, desc, failwith, id, mutate, rename, summarise, summarize</code></pre>
+<pre><code>
+
+
+&lt;!-- rnb-output-end --&gt;
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuREZfdG90YWwgPC0gbGRwbHkobGlzdC5maWxlcygpLCByZWFkLmNzdiwgaGVhZGVyPVRSVUUpXG4jIGl0IGlzIGltcG9ydGFudCB0byBkZXRhY2ggcGx5ciBmb3IgZHBseXIgdG8gYmUgdXNlZFxuZGV0YWNoKHBhY2thZ2U6cGx5cilcblxuREZfdG90YWwgPC0gREZfdG90YWwgJT4lXG4gIGZpbHRlcighaXMubmEoRGlzdGFuY2VXKSkgIyU+JVxuICBmaWx0ZXIoUmVwICVpbiUgYygwLDEsMiwzLDQsNSkpXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+DF_total &lt;- ldply(list.files(), read.csv, header=TRUE)
 # it is important to detach plyr for dplyr to be used
 detach(package:plyr)
 
 DF_total &lt;- DF_total %&gt;%
   filter(!is.na(DistanceW)) #%&gt;%
   filter(Rep %in% c(0,1,2,3,4,5))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gUmVwICVpbiUgYygwLCAxLCAyLCAzLCA0LCA1KSA6IG9iamVjdCAnUmVwJyBub3QgZm91bmRcbiJ9 -->
-<pre><code>Error in Rep %in% c(0, 1, 2, 3, 4, 5) : object &#39;Rep&#39; not found</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud3JpdGUuY3N2KERGX3RvdGFsLCBcIi4uLy4uL2RhdGEvREZfdG90YWxfVEYuY3N2XCIsIHJvdy5uYW1lcyA9IEZBTFNFKVxuYGBgIn0= -->
-<pre class="r"><code>write.csv(DF_total, &quot;../../data/DF_total_TF.csv&quot;, row.names = FALSE)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2VudGVyIHRoZSBmaWxlIHdpdGggYWxsIHRoZSBuZXcgcmVkdWNlZCBkYXRhIGZyYW1lcyBhbmQgbWVyZ2UgdGhlbSBcblxuI3NldHdkKFwiLi9ERl90b3RhbC9cIilcbiNsaWJyYXJ5KHBseXIpXG4jREZfdG90YWxfY29tcGxldGUgPC0gbGRwbHkobGlzdC5maWxlcygpLCByZWFkLmNzdiwgaGVhZGVyPVRSVUUpXG4jIGl0IGlzIGltcG9ydGFudCB0byBkZXRhY2ggcGx5ciBmb3IgZHBseXIgdG8gYmUgdXNlZFxuI2RldGFjaChwYWNrYWdlOnBseXIpXG5gYGAifQ== -->
-<pre class="r"><code>#enter the file with all the new reduced data frames and merge them 
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
 
-#setwd(&quot;./DF_total/&quot;)
+&lt;!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gUmVwICVpbiUgYygwLCAxLCAyLCAzLCA0LCA1KSA6IG9iamVjdCAnUmVwJyBub3QgZm91bmRcbiJ9 --&gt;
+</code></pre>
+<p>Error in Rep %in% c(0, 1, 2, 3, 4, 5) : object ‘Rep’ not found</p>
+<pre><code>
+
+
+&lt;!-- rnb-output-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxud3JpdGUuY3N2KERGX3RvdGFsLCBcXC4uLy4uL2RhdGEvREZfdG90YWxfVEYuY3N2XFwsIHJvdy5uYW1lcyA9IEZBTFNFKVxuYGBgXG5gYGAifQ== --&gt;
+
+```r
+```r
+write.csv(DF_total, \../../data/DF_total_TF.csv\, row.names = FALSE)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+
+
+
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuI2VudGVyIHRoZSBmaWxlIHdpdGggYWxsIHRoZSBuZXcgcmVkdWNlZCBkYXRhIGZyYW1lcyBhbmQgbWVyZ2UgdGhlbSBcblxuI3NldHdkKFxcLi9ERl90b3RhbC9cXClcbiNsaWJyYXJ5KHBseXIpXG4jREZfdG90YWxfY29tcGxldGUgPC0gbGRwbHkobGlzdC5maWxlcygpLCByZWFkLmNzdiwgaGVhZGVyPVRSVUUpXG4jIGl0IGlzIGltcG9ydGFudCB0byBkZXRhY2ggcGx5ciBmb3IgZHBseXIgdG8gYmUgdXNlZFxuI2RldGFjaChwYWNrYWdlOnBseXIpXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+#enter the file with all the new reduced data frames and merge them 
+
+#setwd(\./DF_total/\)
 #library(plyr)
 #DF_total_complete &lt;- ldply(list.files(), read.csv, header=TRUE)
 # it is important to detach plyr for dplyr to be used
 #detach(package:plyr)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI3dyaXRlLmNzdihERl90b3RhbF9jb21wbGV0ZSwgXCIuLi8uLi9kYXRhL0RGX3RvdGFsX2NvbXBsZXRlLmNzdlwiLCByb3cubmFtZXMgPSBGQUxTRSlcbmBgYCJ9 -->
-<pre class="r"><code>#write.csv(DF_total_complete, &quot;../../data/DF_total_complete.csv&quot;, row.names = FALSE)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuI3dyaXRlLmNzdihERl90b3RhbF9jb21wbGV0ZSwgXFwuLi8uLi9kYXRhL0RGX3RvdGFsX2NvbXBsZXRlLmNzdlxcLCByb3cubmFtZXMgPSBGQUxTRSlcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+#write.csv(DF_total_complete, \../../data/DF_total_complete.csv\, row.names = FALSE)</code></pre>
+<p>```</p>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
