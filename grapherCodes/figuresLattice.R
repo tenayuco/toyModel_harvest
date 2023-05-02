@@ -303,19 +303,29 @@ for(nP in unique(DF_SAM$numPlants)){
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #############DISTRIBUCIOMES########################3
 
 #DF_BASE <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_total_TF.csv", header = TRUE)
 DF_BASE <- read.csv("../../data/DF_total_TF.csv", header = TRUE)
-
 DF_BASE$DistanceW <- sqrt(DF_BASE$DistanceW)
-
 DF_TOTAL = DF_BASE
-
 DF_TOTAL$Conteo <- 1
 #DF_TOTAL <- DF_TOTAL %>% filter(DistanceW > 1.5)  ##ESTO ES TRAMPA, perp vamos a ver
 DF_TOTAL$DistanceW <- round(DF_TOTAL$DistanceW,1) 
-
 DF_TOTAL$porcionCosecha[DF_TOTAL$porcionCosecha =="0.5"] <- "Asynchronic"
 DF_TOTAL$porcionCosecha[DF_TOTAL$porcionCosecha =="1"] <- "Synchronic" 
 DF_TOTAL$Rust[DF_TOTAL$Rust =="1"] <- "No Infection" 
@@ -326,7 +336,6 @@ DF_TOTAL$Rust[DF_TOTAL$Rust =="0.5"] <- "New Infection"
 DF_TOTAL_AG <- DF_TOTAL %>%
   group_by(HarvestModel, numPlants, numWorkers, Rust, DistanceW, Rep, HarvestTime, porcionCosecha, SimID) %>%
   summarise(FrecAbs =sum(Conteo))
-
 DF_TOTAL_AG$Frec <- DF_TOTAL_AG$FrecAbs/DF_TOTAL_AG$numPlants*100
 
 #DF_PRUEBA_2 <- DF_TOTAL_AG %>% filter(SimID == 1 & Rep == 0)  #esto es solo para ver que lo este haciendo bien
@@ -334,7 +343,6 @@ DF_TOTAL_AG$Frec <- DF_TOTAL_AG$FrecAbs/DF_TOTAL_AG$numPlants*100
 
 DF_TOTAL_AG$logDistanceW <- log(DF_TOTAL_AG$DistanceW)
 DF_TOTAL_AG$logFrec <- log(DF_TOTAL_AG$Frec)
-
 
 DF_TOTAL_AG_SHORT <- DF_TOTAL_AG %>%
   filter(!is.na(DistanceW))%>%
@@ -352,7 +360,8 @@ FIG_PASOS <- DF_TOTAL_AG_SHORT %>%
   facet_wrap(porcionCosecha~numPlants, nrow = 2) +
   theme_bw() +
   theme(text = element_text(size = 20))+
-  labs(color= "Rust", x= "Distance Step", y= "Proportion of Rust Effective Steps")
+  theme(strip.background = element_rect(fill = "white"))+ 
+  labs(color= "Rust", x= "Distance Step", y= "Proportion of Steps")
 
 ggsave(FIG_PASOS,filename=paste("../../output/graficas/PATH/", "DisPasos_H2.png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
@@ -364,10 +373,41 @@ FIG_PASOS_LOG <- DF_TOTAL_AG_SHORT %>%
   scale_color_manual(values = colorsDis)+
   facet_wrap(porcionCosecha~numPlants, nrow = 2) +
   theme_bw() +
+  geom_segment(aes(x=log(1.5), y=-4, xend= log(1.5), yend=2), linewidth = 0.2, color= "Black")+
   theme(text = element_text(size = 20))+
-  labs(x= "log(Distance Step)", y= "log(Proportion of Rust Effective Steps)", color= "Rust")
+  theme(strip.background = element_rect(fill = "white"))+ 
+  labs(x= "log(Distance Step)", y= "log(Proportion of Steps)", color= "Rust")
 
 
 ggsave(FIG_PASOS_LOG,filename=paste("../../output/graficas/PATH/", "logDisPasos_H2.png", sep=""),  height = 8, width = 14)
 
+
+DF_TOTAL_AG$LIM_1.5 <- (DF_TOTAL_AG$DistanceW>1.5)*1
+
+DF_TOTAL_AG$LIM_1.5[DF_TOTAL_AG$LIM_1.5 ==0] <- "=<1.5"
+DF_TOTAL_AG$LIM_1.5[DF_TOTAL_AG$LIM_1.5 ==1] <- ">1.5"
+
+DF_SUM_AG <- DF_TOTAL_AG %>%
+  group_by(HarvestModel, numPlants, numWorkers, Rust, HarvestTime, porcionCosecha, SimID, LIM_1.5) %>%
+  summarise(FrecSum = sum(FrecAbs))
+
+
+DF_SUM_AG$FrecSumREL <-  (DF_SUM_AG$FrecSum /(DF_SUM_AG$numPlants*6))*2  #6 es por el num de reper
+
+
+FIG_CAT <- DF_SUM_AG %>%
+  filter(HarvestTime== 2)%>%
+  filter(numWorkers== 1) %>%
+  filter(numPlants== 2000 | numPlants== 500| numPlants== 5000)%>%
+  ggplot(aes(x= as.character(LIM_1.5), y = FrecSumREL,fill = Rust)) +
+  geom_bar(stat = "identity", color= "black")+
+  scale_fill_manual(values = colorsDis)+
+  facet_wrap(porcionCosecha~numPlants, nrow = 2) +
+  theme_bw() +
+  theme(strip.background = element_rect(fill = "white"))+ 
+  theme(text = element_text(size = 20))+
+  labs(x= "Stpp Category", y= "Proportion of Steps", color= "Rust")
+
+
+ggsave(FIG_CAT,filename=paste("../../output/graficas/PATH/", "CATDisPasos_H2.png", sep=""),  height = 8, width = 10)
 
