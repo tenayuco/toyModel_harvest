@@ -8,9 +8,10 @@ mycols <- c("#021128","#1b4a64", "#3585a0", "#759580", "#c78f34", "#fd9706","#fd
 mycolsViridis <- c("#440154", "#3b528b", "#21918c", "#5ec962","#fde725","#111111")
 mycols3a <-c("#021128", "#fd9706", "#1b4a64", "#759580")
 mycols3b <-c("#1b4a64", "#fdb81c", "#759580")
-mycols3c <- c("#759580", "#1b4a64","#fdb81c")
+mycols3c <- c("#fdb81c", "#759580", "#1b4a64")
 groupColors <- c("#fd9706", "#fbdb30", "#021128", "#1b4a64",'#56B4E9', "#555555")
 groupColors2 <- c("#fd9706", "#021128",'#56B4E9', "#555555")
+colorsDis <- c("#8B0000","#555555")
 
 
 
@@ -302,5 +303,71 @@ for(nP in unique(DF_SAM$numPlants)){
 }
 
 
+#############DISTRIBUCIOMES########################3
+
+#DF_BASE <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_total_TF.csv", header = TRUE)
+DF_BASE <- read.csv("../../data/DF_total_TF.csv", header = TRUE)
+
+DF_BASE$DistanceW <- sqrt(DF_BASE$DistanceW)
+
+DF_TOTAL = DF_BASE
+
+DF_TOTAL$Conteo <- 1
+#DF_TOTAL <- DF_TOTAL %>% filter(DistanceW > 1.5)  ##ESTO ES TRAMPA, perp vamos a ver
+DF_TOTAL$DistanceW <- round(DF_TOTAL$DistanceW,1) 
+
+DF_TOTAL$porcionCosecha[DF_TOTAL$porcionCosecha =="0.5"] <- "Asynchronic"
+DF_TOTAL$porcionCosecha[DF_TOTAL$porcionCosecha =="1"] <- "Synchronic" 
+DF_TOTAL$Rust[DF_TOTAL$Rust =="1"] <- "No Infection" 
+DF_TOTAL$Rust[DF_TOTAL$Rust =="0"] <- "No Infection"
+DF_TOTAL$Rust[DF_TOTAL$Rust =="0.5"] <- "New Infection"
+
+
+DF_TOTAL_AG <- DF_TOTAL %>%
+  group_by(HarvestModel, numPlants, numWorkers, Rust, DistanceW, Rep, HarvestTime, porcionCosecha, SimID) %>%
+  summarise(FrecAbs =sum(Conteo))
+
+DF_TOTAL_AG$Frec <- DF_TOTAL_AG$FrecAbs/DF_TOTAL_AG$numPlants*100
+
+#DF_PRUEBA_2 <- DF_TOTAL_AG %>% filter(SimID == 1 & Rep == 0)  #esto es solo para ver que lo este haciendo bien
+#sum(DF_PRUEBA_2$Frec)
+
+DF_TOTAL_AG$logDistanceW <- log(DF_TOTAL_AG$DistanceW)
+DF_TOTAL_AG$logFrec <- log(DF_TOTAL_AG$Frec)
+
+
+DF_TOTAL_AG_SHORT <- DF_TOTAL_AG %>%
+  filter(!is.na(DistanceW))%>%
+  filter(DistanceW != 0)%>%
+  filter(HarvestTime== 2)%>%
+  filter(numWorkers== 1)
+
+
+FIG_PASOS <- DF_TOTAL_AG_SHORT %>%
+  filter(numPlants== 2000 | numPlants== 500| numPlants== 5000)%>%
+  ggplot(aes(x= DistanceW, y = Frec)) +
+  geom_point(aes(color= as.character(Rust)))+
+  #  geom_line()+
+  scale_color_manual(values = colorsDis)+
+  facet_wrap(porcionCosecha~numPlants, nrow = 2) +
+  theme_bw() +
+  theme(text = element_text(size = 20))+
+  labs(color= "Rust", x= "Distance Step", y= "Proportion of Rust Effective Steps")
+
+ggsave(FIG_PASOS,filename=paste("../../output/graficas/PATH/", "DisPasos_H2.png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+
+FIG_PASOS_LOG <- DF_TOTAL_AG_SHORT %>%
+  filter(numPlants== 2000 | numPlants== 500| numPlants== 5000)%>%
+  ggplot(aes(x= logDistanceW, y = logFrec)) +
+  geom_jitter(aes(color= as.character(Rust)))+
+  scale_color_manual(values = colorsDis)+
+  facet_wrap(porcionCosecha~numPlants, nrow = 2) +
+  theme_bw() +
+  theme(text = element_text(size = 20))+
+  labs(x= "log(Distance Step)", y= "log(Proportion of Rust Effective Steps)", color= "Rust")
+
+
+ggsave(FIG_PASOS_LOG,filename=paste("../../output/graficas/PATH/", "logDisPasos_H2.png", sep=""),  height = 8, width = 14)
 
 
