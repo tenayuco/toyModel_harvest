@@ -1813,12 +1813,13 @@ detach(package:plyr)</code></pre>
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2VudGVyIHRoZSBmaWxlIHdpdGggYWxsIHRoZSBuZXcgcmVkdWNlZCBkYXRhIGZyYW1lcyBhbmQgbWVyZ2UgdGhlbSBcbmxpYnJhcnkoZHBseXIpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcblxuc2V0d2QoXCIuLi8uLi9kYXRhUGF0dW5nX2Rlc2NhcmdhZG8vc2FsaWRhL0RGX3RvdGFsL1wiKVxubGlicmFyeShwbHlyKVxuREZfdG90YWwgPC0gbGRwbHkobGlzdC5maWxlcygpLCByZWFkLmNzdiwgaGVhZGVyPVRSVUUpXG4jIGl0IGlzIGltcG9ydGFudCB0byBkZXRhY2ggcGx5ciBmb3IgZHBseXIgdG8gYmUgdXNlZFxuZGV0YWNoKHBhY2thZ2U6cGx5cilcblxuREZfdG90YWwgPC0gREZfdG90YWwgJT4lXG4gIGZpbHRlcighaXMubmEoRGlzdGFuY2VXKSkgIyU+JVxuICBmaWx0ZXIoUmVwICVpbiUgYygwLDEsMiwzLDQsNSkpXG5cbiMlPiVcbiAjIGZpbHRlcihSZXAgJWluJSBjKDAsMSwyLDMsNCw1LDYsNyw4LDksMTApKVxuYGBgIn0= -->
-<pre class="r"><code>#enter the file with all the new reduced data frames and merge them 
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuI2VudGVyIHRoZSBmaWxlIHdpdGggYWxsIHRoZSBuZXcgcmVkdWNlZCBkYXRhIGZyYW1lcyBhbmQgbWVyZ2UgdGhlbSBcbmxpYnJhcnkoZHBseXIpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcblxuc2V0d2QoXFwuLi8uLi9kYXRhUGF0dW5nX2Rlc2NhcmdhZG8vc2FsaWRhL0RGX3RvdGFsL1xcKVxubGlicmFyeShwbHlyKVxuREZfdG90YWwgPC0gbGRwbHkobGlzdC5maWxlcygpLCByZWFkLmNzdiwgaGVhZGVyPVRSVUUpXG4jIGl0IGlzIGltcG9ydGFudCB0byBkZXRhY2ggcGx5ciBmb3IgZHBseXIgdG8gYmUgdXNlZFxuZGV0YWNoKHBhY2thZ2U6cGx5cilcblxuREZfdG90YWwgPC0gREZfdG90YWwgJT4lXG4gIGZpbHRlcighaXMubmEoRGlzdGFuY2VXKSkgIyU+JVxuICBmaWx0ZXIoUmVwICVpbiUgYygwLDEsMiwzLDQsNSkpXG5cbiMlPiVcbiAjIGZpbHRlcihSZXAgJWluJSBjKDAsMSwyLDMsNCw1LDYsNyw4LDksMTApKVxuYGBgXG5gYGAifQ== -->
+<pre class="r"><code>```r
+#enter the file with all the new reduced data frames and merge them 
 library(dplyr)
 library(tidyverse)
 
-setwd(&quot;../../dataPatung_descargado/salida/DF_total/&quot;)
+setwd(\../../dataPatung_descargado/salida/DF_total/\)
 library(plyr)
 DF_total &lt;- ldply(list.files(), read.csv, header=TRUE)
 # it is important to detach plyr for dplyr to be used
@@ -1830,29 +1831,66 @@ DF_total &lt;- DF_total %&gt;%
 
 #%&gt;%
  # filter(Rep %in% c(0,1,2,3,4,5,6,7,8,9,10))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud3JpdGUuY3N2KERGX3RvdGFsLCBcIi4uLy4uL2RhdGEvREZfdG90YWxfVEYuY3N2XCIsIHJvdy5uYW1lcyA9IEZBTFNFKVxuYGBgIn0= -->
-<pre class="r"><code>write.csv(DF_total, &quot;../../data/DF_total_TF.csv&quot;, row.names = FALSE)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2VudGVyIHRoZSBmaWxlIHdpdGggYWxsIHRoZSBuZXcgcmVkdWNlZCBkYXRhIGZyYW1lcyBhbmQgbWVyZ2UgdGhlbSBcblxuI3NldHdkKFwiLi9ERl90b3RhbC9cIilcbiNsaWJyYXJ5KHBseXIpXG4jREZfdG90YWxfY29tcGxldGUgPC0gbGRwbHkobGlzdC5maWxlcygpLCByZWFkLmNzdiwgaGVhZGVyPVRSVUUpXG4jIGl0IGlzIGltcG9ydGFudCB0byBkZXRhY2ggcGx5ciBmb3IgZHBseXIgdG8gYmUgdXNlZFxuI2RldGFjaChwYWNrYWdlOnBseXIpXG5gYGAifQ== -->
-<pre class="r"><code>#enter the file with all the new reduced data frames and merge them 
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
 
-#setwd(&quot;./DF_total/&quot;)
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxud3JpdGUuY3N2KERGX3RvdGFsLCBcXC4uLy4uL2RhdGEvREZfdG90YWxfVEYuY3N2XFwsIHJvdy5uYW1lcyA9IEZBTFNFKVxuYGBgXG5gYGAifQ== --&gt;
+
+```r
+```r
+write.csv(DF_total, \../../data/DF_total_TF.csv\, row.names = FALSE)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-text-begin --&gt;
+
+
+
+
+
+
+
+&lt;!-- rnb-text-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuI2VudGVyIHRoZSBmaWxlIHdpdGggYWxsIHRoZSBuZXcgcmVkdWNlZCBkYXRhIGZyYW1lcyBhbmQgbWVyZ2UgdGhlbSBcblxuI3NldHdkKFxcLi9ERl90b3RhbC9cXClcbiNsaWJyYXJ5KHBseXIpXG4jREZfdG90YWxfY29tcGxldGUgPC0gbGRwbHkobGlzdC5maWxlcygpLCByZWFkLmNzdiwgaGVhZGVyPVRSVUUpXG4jIGl0IGlzIGltcG9ydGFudCB0byBkZXRhY2ggcGx5ciBmb3IgZHBseXIgdG8gYmUgdXNlZFxuI2RldGFjaChwYWNrYWdlOnBseXIpXG5gYGBcbmBgYCJ9 --&gt;
+
+```r
+```r
+#enter the file with all the new reduced data frames and merge them 
+
+#setwd(\./DF_total/\)
 #library(plyr)
 #DF_total_complete &lt;- ldply(list.files(), read.csv, header=TRUE)
 # it is important to detach plyr for dplyr to be used
 #detach(package:plyr)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI3dyaXRlLmNzdihERl90b3RhbF9jb21wbGV0ZSwgXCIuLi8uLi9kYXRhL0RGX3RvdGFsX2NvbXBsZXRlLmNzdlwiLCByb3cubmFtZXMgPSBGQUxTRSlcbmBgYCJ9 -->
-<pre class="r"><code>#write.csv(DF_total_complete, &quot;../../data/DF_total_complete.csv&quot;, row.names = FALSE)</code></pre>
+<pre><code>
+&lt;!-- rnb-source-end --&gt;
+
+&lt;!-- rnb-chunk-end --&gt;
+
+
+&lt;!-- rnb-chunk-begin --&gt;
+
+
+&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuI3dyaXRlLmNzdihERl90b3RhbF9jb21wbGV0ZSwgXFwuLi8uLi9kYXRhL0RGX3RvdGFsX2NvbXBsZXRlLmNzdlxcLCByb3cubmFtZXMgPSBGQUxTRSlcbmBgYFxuYGBgIn0= --&gt;
+
+```r
+```r
+#write.csv(DF_total_complete, \../../data/DF_total_complete.csv\, row.names = FALSE)</code></pre>
+<p>```</p>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->

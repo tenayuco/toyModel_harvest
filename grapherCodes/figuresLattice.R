@@ -29,6 +29,8 @@ DF_AV$numWorkers[DF_AV$HarvestModel =="control"] <- "NoH"
 DF_AV$porcionCosecha[DF_AV$porcionCosecha =="0.5"] <- "Asynchronic"
 DF_AV$porcionCosecha[DF_AV$porcionCosecha =="1"] <- "Synchronic" 
 
+DF_AV$Rust <- DF_AV$Rust*100 #lo pasamos a un porcentage de infeccion para tener una intepretacion as sencilla 
+
 #Our first verification is the number of lines for DF_AV
 # we need to have a data frame with 
 # [(2 porcCosecha (A and S)* 5 harvestingTime * 2 numWorkers) + (1 control)]* 5 numPlants * 21 (time max*2+1) times * 30 rep
@@ -82,7 +84,7 @@ FIG_RUST <- DF_AV_MOD%>%
   theme(text = element_text(size = 20))+
   theme(strip.background = element_rect(fill = "white"))+ 
   theme(legend.position = "none")+
-  ylim(0,1)+
+  ylim(0,100)+
   labs(x= "Time of Harvest", y= "Average Rust", fill= "Time of harvest")
 
 ggsave(FIG_RUST,filename=paste("../../output/graficas/RUST/", "rust_plants_abs", ".png", sep=""),  height = 12, width = 18) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
@@ -91,9 +93,9 @@ FIG_SLI_time <- DF_AV_MOD_AVR %>%
   filter(numWorkers !=5)%>% 
   filter(numPlants == 500 | numPlants == 2000 |numPlants == 5000)%>% 
   ggplot(aes(x= Time))+
-  geom_line(linewidth= 1, aes(y= AverageRust, color= as.character(HarvestTime), linetype =HarvestModel))+
+  geom_line(linewidth= 1.5, aes(y= AverageRust, color= as.character(HarvestTime), linetype =HarvestModel))+
   #geom_point(aes(y= AverageRust, color= as.character(HarvestTime)), size= 2)+
-  geom_errorbar(linewidth= 1, aes(ymin=AverageRust-SD_Rust, ymax=AverageRust+SD_Rust, color= as.character(HarvestTime)), width=.2,
+  geom_errorbar(linewidth= 1.5, aes(ymin=AverageRust-SD_Rust, ymax=AverageRust+SD_Rust, color= as.character(HarvestTime)), width=.2,
                 position=position_dodge(0.05)) +
   ggtitle("")+
   facet_wrap(~porcionCosecha* numPlants, nrow =2)+
@@ -126,38 +128,20 @@ DF_MODELS <- DF_AV %>%
 
 DF_MODELS$numPlants[DF_MODELS$numPlants == 500] <- " 500"
 
-#we remove numWokers ==5
-FIG_DIF_MODELS_PER <- DF_MODELS%>%
-    filter(numWorkers !=5)%>%
-    filter(numPlants == 2000) %>%
-    ggplot(aes(x= as.character(HarvestTime), y= PercIncrease))+
-    geom_boxplot(color= "black", aes(fill= as.character(numPlants), group= interaction(numWorkers, HarvestTime)))+ 
-    ggtitle("")+
-    facet_wrap(~numPlants, nrow=2)+
-    scale_fill_grey()+
-    geom_segment(aes(x=0, y=0, xend= 6, yend=0), linewidth = 0.2, color= "DarkRed")+
-    theme_bw() +
-    theme(legend.position = "none")+
-   theme(text = element_text(size = 20))+
-  theme(strip.background = element_rect(fill = "white"))+ 
-    labs(x= "Time of Harvest", y= "% Increase (A-S)/S", fill= "Density (Plants/ha)")
-  
-ggsave(FIG_DIF_MODELS_PER,filename="../../output/graficas/DIF_RUST/perDif_models.png",  height = 8, width = 8) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-
-
 FIG_DIF_MODELS <- DF_MODELS%>%
   filter(numWorkers !=5)%>%
-  ggplot(aes(x= as.character(HarvestTime), y= DifRust))+
-  geom_boxplot(color= "black", aes(fill= as.character(numPlants), group= interaction(numWorkers, HarvestTime)))+ 
+  filter(HarvestTime==2)%>%
+  ggplot(aes(x= as.character(numPlants), y= DifRust))+
+  geom_boxplot(color= "black", aes(fill= as.character(numPlants)))+ 
   ggtitle("")+
-  facet_wrap(~numPlants, nrow=2)+
+  #facet_wrap(~numPlants, nrow=2)+
   scale_fill_grey()+
   geom_segment(aes(x=0, y=0, xend= 6, yend=0), linewidth = 0.2, color= "DarkRed")+
   theme_bw() +
   theme(legend.position = "none")+
   theme(text = element_text(size = 20))+
   theme(strip.background = element_rect(fill = "white"))+ 
-  labs(x= "Time of Harvest", y= "% Increase (A-S)/S", fill= "Density (Plants/ha)")
+  labs(x= "Density (Plants.ha)", y= "Rust Increase (A-S)", fill= "Density (Plants/ha)")
 
 ggsave(FIG_DIF_MODELS,filename="../../output/graficas/DIF_RUST/dif_models.png",  height = 8, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
@@ -210,26 +194,6 @@ FIG_DIF_CONTROL_H2 <- DF_MODvsCON_GEN %>%
 ggsave(FIG_DIF_CONTROL_H2,filename="../../output/graficas/DIF_RUST/ModelvsControl_harvest2_numW1.png",  height = 8, width = 16) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
-
-FIG_DIF_CONTROL_H2_PER <- DF_MODvsCON_GEN %>%
-  filter(porcionCosecha != "control")%>%
-  filter(numWorkers == 1)%>%
-  filter(HarvestTime== 2)%>%
-  ggplot(aes(x= as.character(porcionCosecha), y= Per_Rust))+
-  geom_boxplot(color = "black", aes(fill= as.character(porcionCosecha)))+ 
-  ggtitle("")+
-  theme(text = element_text(size = 20))+
-  facet_wrap(~numPlants, nrow=1)+
-  scale_fill_manual(values = groupColors)+ 
-  theme_bw() +
-  theme(text = element_text(size = 20))+
-  theme(strip.background = element_rect(fill = "white"))+ 
-  theme(legend.position = "none")+
-  labs(x= "Time of Harvest", y= "% Rust (Scenario-Control)/(Control)", fill= "Coffee Maturation", title = "HarvestTime=2")
-
-ggsave(FIG_DIF_CONTROL_H2_PER,filename="../../output/graficas/DIF_RUST/ModelvsControl_harvest2_numW1PER.png",  height = 8, width = 16) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-
-
 FIG_DIF_CONTROL_ALL <- DF_MODvsCON_GEN %>%
   filter(porcionCosecha != "control")%>%
   filter(numWorkers != "NoH")%>%
@@ -247,7 +211,6 @@ FIG_DIF_CONTROL_ALL <- DF_MODvsCON_GEN %>%
 
 
 ggsave(FIG_DIF_CONTROL_ALL,filename="../../output/graficas/DIF_RUST/ModelvsControl_allHar_numW1.png",  height = 8, width = 16) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-
 
 
 
@@ -316,7 +279,7 @@ if (wholePlot ==1){
 #DF_SAM = DF_sample
 
 for(nP in unique(DF_SAM$numPlants)){
-  for(tiempo in c(0,5)){
+  for(tiempo in c(0,timeMAX)){
     FIG_PLOT <- DF_SAM %>%
     filter(numPlants == nP)%>%
     filter(Rep ==0)%>%
