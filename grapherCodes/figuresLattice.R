@@ -320,7 +320,6 @@ DF_TOTAL_AG$logFrec <- log(DF_TOTAL_AG$Frec)
 DF_TOTAL_AG_SHORT <- DF_TOTAL_AG %>%
   filter(!is.na(DistanceW))%>%
   filter(DistanceW != 0)%>%
-  filter(HarvestTime== 2)%>%
   filter(numWorkers== 1) %>%
   filter(numPlants ==500 | numPlants== 2000 | numPlants==5000)
 
@@ -329,8 +328,8 @@ for (nP in unique(DF_TOTAL_AG_SHORT$numPlants)){
   for (pC in unique(DF_TOTAL_AG_SHORT$porcionCosecha)){
 
 DF_TOTAL_TEMP <- DF_TOTAL_AG_SHORT %>%
-  filter((numPlants== nP) & (porcionCosecha == pC))
-      
+  filter((numPlants== nP) & (porcionCosecha == pC)) %>%
+  filter(HarvestTime== 2)    
       
 FIG_PASOS_G <- DF_TOTAL_TEMP %>%
   ggplot(aes(x= DistanceW, y = Frec)) +
@@ -343,7 +342,7 @@ FIG_PASOS_G <- DF_TOTAL_TEMP %>%
   theme(text = element_text(size = 20))+
   theme(strip.background = element_rect(fill = "white"))+ 
   scale_alpha(guide = 'none')+
-  labs(color= "Rust", x= "Distance Step", y= "Proportion of Steps")
+  labs(color= "Rust", x= "Step length", y= "Proportion of Steps")
 
 FIG_PASOS_C <- DF_TOTAL_TEMP %>%
   ggplot(aes(x= DistanceW, y = Frec)) +
@@ -356,7 +355,7 @@ FIG_PASOS_C <- DF_TOTAL_TEMP %>%
   theme(text = element_text(size = 20))+
   theme(strip.background = element_rect(fill = "white"))+ 
   theme(legend.position = "none")+
-  labs(color= "Rust", x= "Distance Step", y= "Proportion of Steps")
+  labs(color= "Rust", x= "Step length", y= "Proportion of Steps")
 
 FIG_INSIDE <- FIG_PASOS_G + annotation_custom(ggplotGrob(FIG_PASOS_C), xmin = 15, xmax = 80, ymin = max(DF_TOTAL_TEMP$Frec)/3, ymax = max(DF_TOTAL_TEMP$Frec))
 
@@ -368,11 +367,12 @@ ggsave(FIG_INSIDE,filename=paste("../../output/graficas/PATH/", "DisPasos_INSIDE
 
 
 FIG_PASOS_LOG <- DF_TOTAL_AG_SHORT %>%
+  filter(HarvestTime ==0 | HarvestTime ==2 |HarvestTime ==4)  %>%  
   filter(numPlants== 2000 | numPlants== 500| numPlants== 5000)%>%
   ggplot(aes(x= logDistanceW, y = logFrec)) +
   geom_jitter(aes(color= as.character(Rust)), alpha=0.7, size= 1.5)+
   scale_color_manual(values = colorsDis)+
-  facet_wrap(porcionCosecha~numPlants, nrow = 2) +
+  facet_grid(numPlants ~porcionCosecha*HarvestTime) +
   theme_bw() +
   geom_segment(aes(x=log(1.5), y=-11, xend= log(1.5), yend=-2), linewidth = 0.2, color= "Black")+
   theme(text = element_text(size = 20))+
@@ -380,7 +380,7 @@ FIG_PASOS_LOG <- DF_TOTAL_AG_SHORT %>%
   labs(x= "log(Distance Step)", y= "log(Proportion of Steps)", color= "Rust")
 
 
-ggsave(FIG_PASOS_LOG,filename=paste("../../output/graficas/PATH/", "logDisPasos_H2.png", sep=""),  height = 8, width = 14)
+ggsave(FIG_PASOS_LOG,filename=paste("../../output/graficas/PATH/", "logDisPasos_H2.png", sep=""),  height = 8, width = 18)
 
 
 DF_TOTAL_AG$LIM_1.5 <- (DF_TOTAL_AG$DistanceW>1.5)*1
@@ -397,17 +397,17 @@ DF_SUM_AG$FrecSumREL <-  (DF_SUM_AG$FrecSum /(DF_SUM_AG$numPlants*6))*2  #6 es p
 
 
 FIG_CAT <- DF_SUM_AG %>%
-  filter(HarvestTime== 2)%>%
+  filter(HarvestTime ==2) %>%
   filter(numWorkers== 1) %>%
   filter(numPlants== 2000 | numPlants== 500| numPlants== 5000)%>%
   ggplot(aes(x= as.character(LIM_1.5), y = FrecSumREL,fill = Rust)) +
-  geom_bar(stat = "identity", color= "black", alpha=0.8)+
+  geom_bar(stat = "identity", color= "black", alpha=0.8, width=0.4)+
   scale_fill_manual(values = colorsDis)+
-  facet_wrap(porcionCosecha~numPlants, nrow = 2) +
+  facet_grid(porcionCosecha ~numPlants) + 
   theme_bw() +
   theme(strip.background = element_rect(fill = "white"))+ 
   theme(text = element_text(size = 20))+
-  labs(x= "Stpp Category", y= "Proportion of Steps", color= "Rust")
+  labs(x= "Step Size Category", y= "Proportion of Steps", color= "Rust")
 
 
 ggsave(FIG_CAT,filename=paste("../../output/graficas/PATH/", "CATDisPasos_H2.png", sep=""),  height = 8, width = 10)
