@@ -7,11 +7,12 @@ library(reshape2)
 mycols <- c("#021128","#1b4a64", "#3585a0", "#759580", "#c78f34", "#fd9706","#fdb81c","#fbdb30")
 mycolsViridis <- c("#440154", "#3b528b", "#21918c", "#5ec962","#fde725","#111111")
 mycols3a <-c("#021128", "#fd9706", "#1b4a64", "#759580")
-mycols3b <-c("#1b4a64", "#fdb81c", "#759580")
+mycols3b <-c("#1b4a64", "#759580", "#fdb81c")
 mycols3c <- c("#fdb81c", "#759580", "#1b4a64")
-groupColors <- c("#fd9706", "#fbdb30", "#021128", "#1b4a64",'#56B4E9', "#555555")
+groupColors <- c("#1b4a64", '#56B4E9', "#759580", "#fd9706", "#fbdb30", "#111111")
 groupColors2 <- c("#fd9706", "#021128",'#56B4E9', "#555555")
 colorsDis <- c("#8B0000","#111111")
+colorsDis3 <- c("#111111","#8B0000","#fd9706")
 
 
 
@@ -101,7 +102,7 @@ FIG_SLI_time <- DF_AV_MOD_AVR %>%
                 position=position_dodge(0.05)) +
   ggtitle("")+
   facet_wrap(~porcionCosecha* numPlants, nrow =2)+
-  scale_color_manual(values = mycolsViridis)+
+  scale_color_manual(values = groupColors)+
   theme_bw()+
   theme(text = element_text(size = 20))+
   theme(strip.background = element_rect(fill = "white"))+ 
@@ -110,8 +111,9 @@ ggsave(FIG_SLI_time,filename=paste("../../output/graficas/SUP_FIG/", "rust_time_
 
 ### now we are going to see the differences between the model and control and between models for each repetition
 
-densidades = length(unique(DF_AV$numPlants))
 
+
+densidades = length(unique(DF_AV$numPlants))
 
 #this takes the Average and first remove all control rows. and put only time =10
 # [(2 porcCosecha (A and S)* 5 harvestingTime * 2 numWorkers)]* 5 numPlants * * 30 rep
@@ -174,26 +176,26 @@ FIG_DIF_CONTROL_MUL <- DF_MODvsCON_GEN %>%
   theme(strip.background = element_rect(fill = "white"))+ 
   labs(x= "Date of Harvest", y= "% Rust (Scenario-Control)", fill= "Coffee Maturation")
 
-ggsave(FIG_DIF_CONTROL_MUL,filename="../../output/graficas/DIF_RUST/ModelvsControl_timeHarvest.png",  height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+#ggsave(FIG_DIF_CONTROL_MUL,filename="../../output/graficas/DIF_RUST/ModelvsControl_timeHarvest.png",  height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 FIG_DIF_CONTROL_H2 <- DF_MODvsCON_GEN %>%
   filter(porcionCosecha != "control")%>%
-  #filter(numWorkers == 1)%>%
-  filter(HarvestTime== 2)%>%
-  ggplot(aes(x= as.character(porcionCosecha), y= ModCo_Rust))+
-  geom_boxplot(color = "black", aes(fill= interaction(as.character(numWorkers), porcionCosecha)))+ 
+  filter(numWorkers == 1)%>%
+  filter(HarvestTime== 0 | HarvestTime== 2 |HarvestTime== 4)%>%
+  ggplot(aes(x= as.factor(numPlants), y= ModCo_Rust))+
+  geom_boxplot(color = "black", aes(fill= porcionCosecha))+ 
   ggtitle("")+
   theme(text = element_text(size = 20))+
-  facet_wrap(~numPlants, nrow=1)+
-  scale_fill_manual(values = groupColors)+ 
+  facet_wrap(~HarvestTime, nrow=1)+
+  scale_fill_manual(values = groupColors2)+ 
   theme_bw() +
   theme(text = element_text(size = 20))+
   theme(strip.background = element_rect(fill = "white"))+ 
-  theme(legend.position = "none")+
-  labs(x= "Coffee maturation", y= "% Rust (Scenario-Control)", fill= "numWorkers.coffeeMAT", title = "HarvestTime=2")
+  #theme(legend.position = "none")+
+  labs(x= "Plants/ha", y= "% Rust (Scenario-Control)", fill= "Coffee maturation")
 
-ggsave(FIG_DIF_CONTROL_H2,filename="../../output/graficas/DIF_RUST/ModelvsControl_harvest2_numW1.png",  height = 8, width = 16) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_DIF_CONTROL_H2,filename="../../output/graficas/DIF_RUST/ModelvsControl_harvest2_numW1.png",  height = 8, width = 20) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 FIG_DIF_CONTROL_ALL <- DF_MODvsCON_GEN %>%
@@ -215,7 +217,6 @@ FIG_DIF_CONTROL_ALL <- DF_MODvsCON_GEN %>%
 ggsave(FIG_DIF_CONTROL_ALL,filename="../../output/graficas/SUP_FIG/ModelvsControl_allHar_numW1.png",  height = 8, width = 16) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
-
 ##################PATHS###############3
 
 DF_SAM <- read.csv("../../data/DF_muestrasPath_complete.csv", header = TRUE)
@@ -230,9 +231,6 @@ DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="1"] <- "Synchronic"
 DF_SAM$numWorkers[DF_SAM$numWorkers =="1"] <- "1 worker" 
 DF_SAM$numWorkers[DF_SAM$numWorkers =="5"] <- "5 workers" 
 
-
-
-  
 
 
 
@@ -272,9 +270,12 @@ DF_TOTAL$Conteo <- 1
 DF_TOTAL$DistanceW <- round(DF_TOTAL$DistanceW,1) 
 DF_TOTAL$porcionCosecha[DF_TOTAL$porcionCosecha =="0.5"] <- "Asynchronic"
 DF_TOTAL$porcionCosecha[DF_TOTAL$porcionCosecha =="1"] <- "Synchronic" 
-DF_TOTAL$Rust[DF_TOTAL$Rust =="1"] <- "No Infection" 
-DF_TOTAL$Rust[DF_TOTAL$Rust =="0"] <- "No Infection"
-DF_TOTAL$Rust[DF_TOTAL$Rust =="0.5"] <- "New Infection"
+DF_TOTAL$Infection <- 0
+DF_TOTAL$Infection[DF_TOTAL$Rust =="1"] <- "No Infection" 
+DF_TOTAL$Infection[DF_TOTAL$Rust =="0"] <- "No Infection"
+DF_TOTAL$Infection[DF_TOTAL$Rust =="0.5"] <- "New Infection"
+
+
 
 
 FIG_PATH_2000_W1_V2<- DF_TOTAL %>% 
@@ -286,7 +287,7 @@ FIG_PATH_2000_W1_V2<- DF_TOTAL %>%
   arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
   rowwise() %>% 
   ggplot(aes(x= X, y = Y, group=WorkerID)) +
-  geom_path(aes(col= as.character(Rust)),linewidth=1.5, alpha= 0.8)+
+  geom_path(aes(col= as.character(Infection)),linewidth=1.5, alpha= 0.8)+
   geom_point(size=1.5)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
   #scale_color_viridis_c()+
   scale_color_manual(values = colorsDis)+
@@ -304,10 +305,10 @@ FIG_PATH_2000_W1_V2<- DF_TOTAL %>%
 
 ggsave(FIG_PATH_2000_W1_V2,filename=paste("../../output/graficas/PATH/", "path_plants_2000_w1_V2.png", sep=""),  height = 10, width = 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
-
+#
 
 DF_TOTAL_AG <- DF_TOTAL %>%
-  group_by(HarvestModel, numPlants, numWorkers, Rust, DistanceW, HarvestTime, porcionCosecha, SimID) %>%
+  group_by(HarvestModel, numPlants, numWorkers, Rust,  Infection, DistanceW, HarvestTime, porcionCosecha, SimID) %>%
   summarise(FrecAbs =sum(Conteo))
 DF_TOTAL_AG$Frec <- DF_TOTAL_AG$FrecAbs/(DF_TOTAL_AG$numPlants*length(unique(DF_TOTAL$Rep)))
 
@@ -333,10 +334,10 @@ DF_TOTAL_TEMP <- DF_TOTAL_AG_SHORT %>%
       
 FIG_PASOS_G <- DF_TOTAL_TEMP %>%
   ggplot(aes(x= DistanceW, y = Frec)) +
-  geom_point(aes(color= as.character(Rust), alpha= 0.7), size=3.5)+
+  geom_point(aes(color= as.character(Rust), alpha= 0.8), size=3.5)+
   #  geom_line()+
   xlim(0, 110)+
-  scale_color_manual(values = colorsDis)+
+  scale_color_manual(values = colorsDis3)+
   #facet_wrap(~porcionCosecha, nrow = 2) +
   theme_bw() +
   theme(text = element_text(size = 20))+
@@ -346,10 +347,11 @@ FIG_PASOS_G <- DF_TOTAL_TEMP %>%
 
 FIG_PASOS_C <- DF_TOTAL_TEMP %>%
   ggplot(aes(x= DistanceW, y = Frec)) +
-  geom_point(aes(color= as.character(Rust), alpha= 0.7), size=3.5)+
+  geom_point(aes(color= as.character(Rust), alpha= 0.8), size=3.5)+
   #  geom_line()+
   xlim(0, 5.1)+
-  scale_color_manual(values = colorsDis)+
+  scale_color_manual(values = colorsDis3)+
+  geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= 0.01), linewidth = 0.2, color= "Black")+
   #facet_wrap(~porcionCosecha, nrow = 2) +
   theme_bw() +
   theme(text = element_text(size = 20))+
@@ -359,7 +361,7 @@ FIG_PASOS_C <- DF_TOTAL_TEMP %>%
 
 FIG_INSIDE <- FIG_PASOS_G + annotation_custom(ggplotGrob(FIG_PASOS_C), xmin = 15, xmax = 80, ymin = max(DF_TOTAL_TEMP$Frec)/3, ymax = max(DF_TOTAL_TEMP$Frec))
 
-ggsave(FIG_INSIDE,filename=paste("../../output/graficas/PATH/", "DisPasos_INSIDE", "nP", nP, "pC", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_INSIDE,filename=paste("../../output/graficas/PATH/", "DisPasos_INSIDE_2", "nP", nP, "pC", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
   }
 }
@@ -370,8 +372,8 @@ FIG_PASOS_LOG <- DF_TOTAL_AG_SHORT %>%
   filter(HarvestTime ==0 | HarvestTime ==2 |HarvestTime ==4)  %>%  
   filter(numPlants== 2000 | numPlants== 500| numPlants== 5000)%>%
   ggplot(aes(x= logDistanceW, y = logFrec)) +
-  geom_jitter(aes(color= as.character(Rust)), alpha=0.7, size= 1.5)+
-  scale_color_manual(values = colorsDis)+
+  geom_jitter(aes(color= as.character(Rust)), alpha=0.8, size= 1.5)+
+  scale_color_manual(values = colorsDis3)+
   facet_grid(numPlants ~porcionCosecha*HarvestTime) +
   theme_bw() +
   geom_segment(aes(x=log(1.5), y=-11, xend= log(1.5), yend=-2), linewidth = 0.2, color= "Black")+
@@ -380,39 +382,115 @@ FIG_PASOS_LOG <- DF_TOTAL_AG_SHORT %>%
   labs(x= "log(Distance Step)", y= "log(Proportion of Steps)", color= "Rust")
 
 
-ggsave(FIG_PASOS_LOG,filename=paste("../../output/graficas/PATH/", "logDisPasos_H2.png", sep=""),  height = 8, width = 18)
+ggsave(FIG_PASOS_LOG,filename=paste("../../output/graficas/PATH/", "logDisPasos_H2.png", sep=""),  height = 12, width = 18)
 
 
-DF_TOTAL_AG$LIM_1.5 <- (DF_TOTAL_AG$DistanceW>1.5)*1
-
-DF_TOTAL_AG$LIM_1.5[DF_TOTAL_AG$LIM_1.5 ==0] <- "=<1.5"
-DF_TOTAL_AG$LIM_1.5[DF_TOTAL_AG$LIM_1.5 ==1] <- ">1.5"
-
-DF_SUM_AG <- DF_TOTAL_AG %>%
-  group_by(HarvestModel, numPlants, numWorkers, Rust, HarvestTime, porcionCosecha, SimID, LIM_1.5) %>%
-  summarise(FrecSum = sum(FrecAbs))
 
 
-DF_SUM_AG$FrecSumREL <-  (DF_SUM_AG$FrecSum /(DF_SUM_AG$numPlants*6))*2  #6 es por el num de reper
 
 
-FIG_CAT <- DF_SUM_AG %>%
-  filter(HarvestTime ==2) %>%
-  filter(numWorkers== 1) %>%
-  filter(numPlants== 2000 | numPlants== 500| numPlants== 5000)%>%
-  ggplot(aes(x= as.character(LIM_1.5), y = FrecSumREL,fill = Rust)) +
-  geom_bar(stat = "identity", color= "black", alpha=0.8, width=0.4)+
-  scale_fill_manual(values = colorsDis)+
-  facet_grid(porcionCosecha ~numPlants) + 
-  theme_bw() +
-  theme(strip.background = element_rect(fill = "white"))+ 
-  theme(text = element_text(size = 20))+
-  labs(x= "Step Size Category", y= "Proportion of Steps", color= "Rust")
 
 
-ggsave(FIG_CAT,filename=paste("../../output/graficas/PATH/", "CATDisPasos_H2.png", sep=""),  height = 8, width = 10)
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 
+# 
+# 
+# 
+# 
+# 
+# DF_TOTAL_AG$LIM_1.5 <- (DF_TOTAL_AG$DistanceW>1.5)*1
+# 
+# DF_TOTAL_AG$LIM_1.5[DF_TOTAL_AG$LIM_1.5 ==0] <- "=<1.5"
+# DF_TOTAL_AG$LIM_1.5[DF_TOTAL_AG$LIM_1.5 ==1] <- ">1.5"
+# 
+# #vvamos a hacer el cambio agrupand sin categorias
+# DF_SUM_AG <- DF_TOTAL_AG %>%
+#   group_by(HarvestModel, numPlants, numWorkers, Infection, Rust, HarvestTime, porcionCosecha, SimID, LIM_1.5) %>%
+#   summarise(FrecSum = sum(FrecAbs))
+# 
+# 
+# DF_SUM_AG$FrecSumREL <-  (DF_SUM_AG$FrecSum /(DF_SUM_AG$numPlants*6))*2  #6 es por el num de reper
+# 
+# DF_SUM_AG_DIV <- DF_SUM_AG %>% 
+#   group_by(HarvestModel, numPlants, numWorkers, LIM_1.5, HarvestTime, porcionCosecha, SimID) %>%
+#   summarise(PropIvsN = (FrecSum[Rust == 0.5]/((FrecSum[Rust == 0])+ (FrecSum[Rust == 1]))))
+# 
+# 
+# 
+# 
+# FIG_W_DEN <- DF_SUM_AG %>%
+#   filter(HarvestTime ==2)  %>% 
+#   #filter(Rust == "New Infection")%>%
+#   filter(numWorkers == 1)%>%
+#   filter(LIM_1.5 == ">1.5")%>%
+#   ggplot(aes(x = numPlants, y = FrecSumREL))+
+#   geom_line(aes(group = Rust))+
+#  #stat_summary(fun = , na.rm = TRUE, color = 'darkblue', geom ='line')+
+#   geom_point(aes(shape= as.character(Rust), color= as.character(Rust)), size= 3)+
+#   scale_color_manual(values = colorsDis3)+
+#   facet_wrap(~porcionCosecha, nrow = 1) +
+#   theme_bw() +
+#   #geom_segment(aes(x=log(1.5), y=-11, xend= log(1.5), yend=-2), linewidth = 0.2, color= "Black")+
+#   theme(text = element_text(size = 20))+
+#   theme(strip.background = element_rect(fill = "white"))+
+#   theme(legend.position  = "none")+
+#   labs(x= "numPlants", y= ">1.5 effective rust ", color= "RUST")
+# 
+# 
+# FIG_W_DIV <- DF_SUM_AG_DIV %>%
+#   filter(HarvestTime ==2)  %>% 
+#   filter(LIM_1.5 == ">1.5")%>%
+#   filter(numWorkers == 1)%>%
+#   ggplot(aes(x = numPlants, y = PropIvsN))+
+#   geom_line(aes())+
+#   #stat_summary(fun = , na.rm = TRUE, color = 'darkblue', geom ='line')+
+#   geom_point(size= 3)+
+#   scale_color_manual(values = colorsDis)+
+#   facet_wrap(porcionCosecha~HarvestTime, nrow = 1) +
+#   theme_bw() +
+#   #geom_segment(aes(x=log(1.5), y=-11, xend= log(1.5), yend=-2), linewidth = 0.2, color= "Black")+
+#   theme(text = element_text(size = 20))+
+#   theme(strip.background = element_rect(fill = "white"))+
+#   #theme(legend.position  = "none")+
+#   labs(x= "numPlants", y= ">1.5 effective rust ", color= "RUST")
+# 
+# 
+# 
+# 
+# FIG_CAT <- DF_SUM_AG %>%
+#   filter(HarvestTime ==2) %>%
+#   filter(numWorkers== 1) %>%
+#   filter(numPlants== 2000 | numPlants== 500| numPlants== 5000)%>%
+#   ggplot(aes(x= as.character(LIM_1.5), y = FrecSumREL,fill = Rust)) +
+#   geom_bar(stat = "identity", color= "black", alpha=0.8, width=0.4)+
+#   scale_fill_manual(values = colorsDis)+
+#   facet_grid(porcionCosecha ~numPlants) + 
+#   theme_bw() +
+#   theme(strip.background = element_rect(fill = "white"))+ 
+#   theme(text = element_text(size = 20))+
+#   labs(x= "Step Size Category", y= "Proportion of Steps", color= "Rust")
+# 
+# 
+# ggsave(FIG_CAT,filename=paste("../../output/graficas/PATH/", "CATDisPasos_H2.png", sep=""),  height = 8, width = 10)
+# 
 
 
 
