@@ -293,7 +293,7 @@ FIG_PATH_GEN<- DF_SAM %>%
 
 #############DISTRIBUCIOMES########################3
 
-#DF_BASE <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_total_TF.csv", header = TRUE)
+#DF_BASE <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_total_TF_short.csv", header = TRUE)
 DF_BASE <- read.csv("../../data/DF_total_TF.csv", header = TRUE)
 
 DF_BASE$DistanceW <- sqrt(DF_BASE$DistanceW)
@@ -308,14 +308,12 @@ DF_TOTAL$Infection[DF_TOTAL$Rust =="1"] <- "No Infection"
 DF_TOTAL$Infection[DF_TOTAL$Rust =="0"] <- "No Infection"
 DF_TOTAL$Infection[DF_TOTAL$Rust =="0.5"] <- "New Infection"
 
-
-
-
-FIG_PATH_2000_W1_V2<- DF_TOTAL %>% 
+FIG_PATH_3000_W1_V1<- DF_TOTAL %>% 
   filter(HarvestTime ==2)%>% 
+  filter(HarvestStep <160)%>% #ultimo 160 plantas de ahi
   filter(Rep == 1)%>%
   filter(numWorkers ==1)%>%
-  filter(numPlants == 2000)%>% #solo un ejepmplo
+  filter(numPlants == 3000)%>% #solo un ejepmplo
   filter(WorkerID != 0)%>% 
   arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
   rowwise() %>% 
@@ -336,7 +334,38 @@ FIG_PATH_2000_W1_V2<- DF_TOTAL %>%
   )+ 
   labs(x= "X", y= "Y", col= "Rust")
 
-ggsave(FIG_PATH_2000_W1_V2,filename=paste("../../output/graficas/PATH/", "path_plants_2000_w1_V2.png", sep=""),  height = 10, width = 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_PATH_3000_W1_V1,filename=paste("../../output/graficas/PATH/", "path_plants_3000_w1_primeros_160.png", sep=""),  height = 10, width = 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+
+
+
+FIG_PATH_3000_W1_V2<- DF_TOTAL %>% 
+  filter(HarvestTime ==2)%>% 
+  filter(HarvestStep >((numPlants/2)-160))%>% #ultimo 160 plantas de ahi
+  filter(Rep == 2)%>%
+  filter(numWorkers ==1)%>%
+  filter(numPlants == 3000)%>% #solo un ejepmplo
+  filter(WorkerID != 0)%>% 
+  arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
+  rowwise() %>% 
+  ggplot(aes(x= X, y = Y, group=WorkerID)) +
+  geom_path(aes(col= as.character(Infection)),size=1.5, alpha= 0.8)+
+  geom_point(size=1.5)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
+  #scale_color_viridis_c()+
+  scale_color_manual(values = colorsDis)+
+  theme(panel.spacing = unit(0.8, "lines"), text = element_text(size = 15))+
+  theme_bw()+
+  facet_wrap(~porcionCosecha, nrow = 2) +
+  theme(strip.background = element_rect(fill = "white"))+ 
+  theme(text = element_text(size = 25))+
+  theme(legend.position = "none") +
+  theme(
+    strip.background = element_blank(),
+    strip.text.x = element_blank()
+  )+ 
+  labs(x= "X", y= "Y", col= "Rust")
+
+ggsave(FIG_PATH_3000_W1_V2,filename=paste("../../output/graficas/PATH/", "path_plants_3000_w1_ultimo_160.png", sep=""),  height = 10, width = 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 #
@@ -360,8 +389,7 @@ DF_TOTAL_AG$logFrec <- log(DF_TOTAL_AG$Frec)
 DF_TOTAL_AG_SHORT <- DF_TOTAL_AG %>%
   filter(!is.na(DistanceW))%>%
   filter(DistanceW != 0)%>%  #aqui perdemos un porcentaje del total
-  filter(numWorkers== 1) %>%
-  filter(numPlants ==500 | numPlants== 2000 | numPlants==5000)
+  filter(numWorkers== 5)
 
 
 for (nP in unique(DF_TOTAL_AG_SHORT$numPlants)){
