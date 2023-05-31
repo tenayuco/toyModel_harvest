@@ -1,5 +1,7 @@
 ssh emilio@patung.lancis.ecologia.unam.mx
 
+Si estas en lancis, cambia todo de emilio@patung.lancis.ecologia.unam.mx a emilio@192.168.1.10
+
 condor_rm emilio para quitar los jobs
 
 ----------
@@ -32,6 +34,19 @@ scp -r emilio@patung.lancis.ecologia.unam.mx:/srv/home/emilio/toyModelHarvest/sa
 
 --------------------
 
+VERSION LANCIS
+
+scp -r /home/emilio/archivosTrabajandose/toyModelHarvest/src/patungCodes/* emilio@192.168.1.10:/srv/home/emilio/toyModelHarvest/
+
+bajar:
+
+scp -r emilio@192.168.1.10:/srv/home/emilio/toyModelHarvest/salida /home/emilio/archivosTrabajandose/toyModelHarvest/dataPatung_descargado
+
+
+
+
+----------------
+
 Create all the files and subfiles within the supercomputer
 
 chmod +x execute_toyModel_pat.py; mkdir bitacora salida initialConditions nwg; cd salida/ ; mkdir DF_total DF_spatialAverage DF_muestrasPath ; cd ..;  mv __init__.py ./nwg/ 
@@ -54,6 +69,7 @@ ls -1 | wc -l
 
 ----
 exit
+
 
 
 
