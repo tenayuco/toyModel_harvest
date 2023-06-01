@@ -89,10 +89,10 @@ FIG_SLI_time <- DF_AV_AVR %>%
   filter(HarvestTime ==4|HarvestTime =="control")%>% 
   filter(numPlants == 500 | numPlants == 2000 |numPlants == 5000)%>% 
   mutate(porcionCosecha = (ifelse(porcionCosecha == "control", " Control", porcionCosecha)))%>% 
-  ggplot(aes(x= Time))+
-  geom_line(size= 1.5, aes(y= AverageRust, color= as.character(porcionCosecha)))+
+  ggplot(aes(x= Time, color= as.character(porcionCosecha) ,fill= as.character(porcionCosecha)))+
+  geom_line(size= 1.5, aes(y= AverageRust))+
   #geom_point(aes(y= AverageRust, color= as.character(porcionCosecha)), size= 2)+
-  geom_ribbon(aes(fill= as.character(porcionCosecha), 
+  geom_ribbon(aes( 
                   ymin=AverageRust-SD_Rust, ymax=AverageRust+SD_Rust),alpha=0.5) +
   ggtitle("")+
   facet_wrap(~ numPlants, nrow =1)+
@@ -102,7 +102,7 @@ FIG_SLI_time <- DF_AV_AVR %>%
   theme(text = element_text(size = 25))+
   theme(strip.background = element_rect(fill = "white"))+ 
   #theme(legend.position = "none")
-  labs(x= "Time", y= "Average Rust", color= "Coffee Maturation", fill= "Error per Coffee maturation")
+  labs(x= "Time", y= "Average Rust", color= "Coffee Maturation", fill= "Coffee Maturation")
 ggsave(FIG_SLI_time,filename=paste("../../output/graficas/SUP_FIG/", "rust_time_abs", ".png", sep=""),  height = 8, width = 22) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc)
 
 ### now we are going to see the differences between the model and control and between models for each repetition
