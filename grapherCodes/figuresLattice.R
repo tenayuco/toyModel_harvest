@@ -291,12 +291,10 @@ FIG_PATH_GEN<- DF_SAM %>%
 
 #############DISTRIBUCIOMES########################3
 
-#DF_BASE <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_total_TF_short.csv", header = TRUE)
-#DF_BASE <- read.csv("../../data/DF_total_TF.csv", header = TRUE)
+
 
 DF_SAM$DistanceW <- sqrt(DF_SAM$DistanceW)
 
-#DF_BASE$DistanceW <- sqrt(DF_BASE$DistanceW)
 DF_TOTAL = DF_SAM %>%
   filter(Time ==5.5)
 
@@ -310,8 +308,8 @@ DF_TOTAL$Infection[DF_TOTAL$Rust =="0"] <- "No Infection"
 DF_TOTAL$Infection[DF_TOTAL$Rust =="0.5"] <- "New Infection"
 
 FIG_PATH_3000_W1_V1<- DF_TOTAL %>% 
-  filter(HarvestStep <160)%>% #ultimo 160 plantas de ahi
-  filter(Rep == 1)%>%
+  #filter(HarvestStep <160)%>% #ultimo 160 plantas de ahi
+  filter(Rep == 2)%>%
   filter(numWorkers =="1 worker")%>%
   filter(numPlants == 3000)%>% #solo un ejepmplo
   filter(WorkerID != 0)%>% 
@@ -334,7 +332,7 @@ FIG_PATH_3000_W1_V1<- DF_TOTAL %>%
   )+ 
   labs(x= "X", y= "Y", col= "Rust")
 
-ggsave(FIG_PATH_3000_W1_V1,filename=paste("../../output/graficas/PATH/", "path_plants_3000_w1_primeros_160.png", sep=""),  height = 10, width = 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_PATH_3000_W1_V1,filename=paste("../../output/graficas/PATH/", "path_plants_3000_w1_todos.png", sep=""),  height = 10, width = 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 

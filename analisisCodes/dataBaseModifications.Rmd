@@ -50,11 +50,11 @@ DF_total <- ldply(list.files(), read.csv, header=TRUE)
 # it is important to detach plyr for dplyr to be used
 detach(package:plyr)
 
-DF_total <- DF_total %>%
-  filter(!is.na(DistanceW)) 
+#DF_total <- DF_total %>%
+ # filter(!is.na(DistanceW)) 
 
 DF_total_short <- DF_total %>%
-  filter(!is.na(DistanceW)) %>%
+  #filter(!is.na(DistanceW)) %>%
   filter(Rep %in% c(0,1,2,3,4,5))
 
 #%>%
