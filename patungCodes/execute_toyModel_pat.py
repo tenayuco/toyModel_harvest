@@ -40,7 +40,7 @@ Fixed parameters
 
 
 
-Tmax = 10  #ESTE ESEL CA;MIBO NUEBO por szatch
+Tmax = 12  #ESTE ESEL CA;MIBO NUEBO por szatch
 dimIni = [100, 100]
 iniInf = [0.8, 0.1, 0.1]
 modeArr = "random"
@@ -124,20 +124,20 @@ DF_spatialAverage.to_csv(liga0+ "DF_spatialAverage_%s.csv" %(args.code)) #averag
 
 liga1 = patungDirectory + "/salida/DF_muestrasPath/"  #mkdir salida/matricesGenerales before running inside the directory
 
-if rep ==0:
-    if harvest != "control":
-        if numWorkers == 1 or numWorkers ==5:
-            if timeHarvest == 2:
-                DF.to_csv(liga1+ "DF_muestrasPath_%s.csv" %(args.code)) #these are for the path examples
+
+if harvest != "control":
+    if numWorkers == 1 or numWorkers ==5:
+        if timeHarvest == 5:
+            DF_sample = DF.loc[(DF["Time"] == 5.5)].copy()  #agarro 5.5 porque es justo despues de la cosecha
+            DF_sample.to_csv(liga1+ "DF_muestrasPath_%s.csv" %(args.code)) #these are for the path examples
                 
             
 liga3 = patungDirectory + "/salida/DF_total/"
 
 
 
-if harvest != "control":
-    DF_harvest = DF.loc[DF["Time"] == timeHarvest+0.5].copy()
-    DF_harvest.to_csv(liga3+ "DF_distanceW_%s.csv" %(args.code)) #average matrix
+DF_harvest = DF.loc[(DF["Time"] == Tmax)].copy()
+DF_harvest.to_csv(liga3+ "DF_distanceW_%s.csv" %(args.code)) #average matrix
 
 
 

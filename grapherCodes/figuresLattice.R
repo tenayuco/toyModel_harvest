@@ -32,8 +32,8 @@ DF_AV <- read.csv("../../data/DF_spatialAverage_complete.csv", header = TRUE)
 DF_AV$HarvestTime[DF_AV$HarvestModel =="control"] <- "control"
 DF_AV$porcionCosecha[DF_AV$HarvestModel =="control"] <- "control"
 #DF_AV$numWorkers[DF_AV$HarvestModel =="control"] <- "NoH" 
-DF_AV$porcionCosecha[DF_AV$porcionCosecha =="0.5"] <- "Asynchronic"
-DF_AV$porcionCosecha[DF_AV$porcionCosecha =="1"] <- "Synchronic" 
+DF_AV$porcionCosecha[DF_AV$porcionCosecha =="0.5"] <- "Asynchronous"
+DF_AV$porcionCosecha[DF_AV$porcionCosecha =="1"] <- "Synchronous" 
 DF_AV$HarvestModel[DF_AV$HarvestModel =="control"] <- "control"
 DF_AV$HarvestModel[DF_AV$HarvestModel =="closeness"] <- "harvest"
 
@@ -44,8 +44,8 @@ DF_AV$Rust <- DF_AV$Rust*100 #lo pasamos a un porcentage de infeccion para tener
 
 #Our first verification is the number of lines for DF_AV
 # we need to have a data frame with 
-# [(2 porcCosecha (A and S)* 5 harvestingTime * 2 numWorkers) + (1 control)]* 5 numPlants * 21 (time max*2+1) times * 30 rep
-#[21] * 5 * 21 * 30
+# [(2 porcCosecha (A and S)* 1 harvestingTime * 2 numWorkers) + (1 control)]* 6 numPlants * 25 (time max*2+1) times * 30 rep
+#[2 * 1 * 2 +1) * 5* 25* 30 rep
 # 66150  rows
 
 
@@ -58,16 +58,16 @@ DF_AV_AVR <- DF_AV %>%
 
 ##################FIRST FIGURES, time seires, final time, control paarte
 #these figures are only plotted without the number of workers that did not show a relevant difference
-# so we are plotting only the last time == 10
+# so we are plotting only the last time == 12
 
-timeMAX <- 10
+timeMAX <- 12
 
 
 FIG_RUST <- DF_AV%>%
   filter(Time == timeMAX)%>%
   filter(numWorkers !=5)%>%
   #filter(numPlants == 500 | numPlants == 2000 |numPlants == 5000)%>% 
-  filter(HarvestTime ==4 |HarvestTime =="control")%>% 
+  filter(HarvestTime ==5 |HarvestTime =="control")%>% 
   mutate(porcionCosecha = (ifelse(porcionCosecha == "control", " Control", porcionCosecha)))%>% 
   ggplot(aes(x= as.factor(HarvestModel), y= Rust))+
   geom_boxplot(color= "black", aes(fill= as.character(porcionCosecha)))+ 
@@ -86,7 +86,7 @@ ggsave(FIG_RUST,filename=paste("../../output/graficas/SUP_FIG/", "rust_plants_ab
 #
 FIG_SLI_time <- DF_AV_AVR %>% 
   filter(numWorkers !=5)%>% 
-  filter(HarvestTime ==4|HarvestTime =="control")%>% 
+  filter(HarvestTime ==5|HarvestTime =="control")%>% 
   filter(numPlants == 500 | numPlants == 2000 |numPlants == 5000)%>% 
   mutate(porcionCosecha = (ifelse(porcionCosecha == "control", " Control", porcionCosecha)))%>% 
   ggplot(aes(x= Time, color= as.character(porcionCosecha) ,fill= as.character(porcionCosecha)))+
@@ -124,12 +124,12 @@ DF_MODELS <- DF_AV %>%
   filter(HarvestModel != "control")%>%  #we remove the contorl, we do not need it. 
   filter(Time == timeMAX)%>%
   group_by(Rep, numPlants, numWorkers, HarvestTime) %>%  #we add all the variables we dont add the ID, we remove it
-  summarise(DifRust = diff(Rust)*(-1), PercIncrease = (-1)* 100*diff(Rust)/Rust[porcionCosecha=="Synchronic"])
+  summarise(DifRust = diff(Rust)*(-1), PercIncrease = (-1)* 100*diff(Rust)/Rust[porcionCosecha=="Synchronous"])
 
 
 FIG_DIF_MODELS <- DF_MODELS%>%
   filter(numWorkers ==1)%>%
-  filter(HarvestTime==4)%>%
+  filter(numPlants!=4000)%>%
   ggplot(aes(x= as.factor(numPlants), y= DifRust))+
   geom_boxplot(color= "black", aes(fill= as.character(numPlants)))+ 
   ggtitle("")+
@@ -177,7 +177,7 @@ filter(porcionCosecha != "control")
 FIG_DIF_CONTROL_H2 <- DF_MODvsCON_GEN %>%
   filter(Time == timeMAX)%>%
   filter(numWorkers == 1)%>%
-  filter(HarvestTime== 4)%>%
+  filter(numPlants!=4000)%>%
   ggplot(aes(x= as.factor(numPlants), y= ModCo_Rust))+
   geom_boxplot(color = "black", aes(fill= porcionCosecha))+ 
   ggtitle("")+
@@ -194,6 +194,7 @@ ggsave(FIG_DIF_CONTROL_H2,filename="../../output/graficas/DIF_RUST/ModelvsContro
 
 FIG_DIF_CONTROL_ALL <- DF_MODvsCON_GEN %>%
   filter(Time == timeMAX)%>%
+  filter(numPlants!=4000)%>%
   filter(porcionCosecha != "control")%>%
   filter(numWorkers != "NoH")%>%
   ggplot(aes(x= as.character(porcionCosecha), y= ModCo_Rust))+
@@ -217,7 +218,7 @@ FIG_DIF_CONTROL_ALL <- DF_MODvsCON_GEN %>%
 DF_MODvsCON_GEN$SI <- (DF_MODvsCON_GEN$Rust/100)*(1- (DF_MODvsCON_GEN$Rust/100))
 
 DF_MODvsCON_GEN$HarvestVsFinal <- 0
-DF_MODvsCON_GEN$HarvestVsFinal[DF_MODvsCON_GEN$Time == 10] <- 1
+DF_MODvsCON_GEN$HarvestVsFinal[DF_MODvsCON_GEN$Time == 12] <- 1
 
 DF_TEM_0 <- DF_MODvsCON_GEN %>%
 filter(HarvestVsFinal ==0)
@@ -234,7 +235,6 @@ DF_FR_THR <- merge(DF_TEM_0, DF_TEM_1, by = c("Rep", "numPlants", "porcionCosech
 
 FIGNUE <-DF_FR_THR %>% 
   filter(numWorkers == 1)%>%
-  filter(HarvestTime== 4)%>%
   ggplot(aes(x= as.factor(numPlants) , y = SI))+
   geom_boxplot(color = "black", aes(fill= porcionCosecha))+ 
   ggtitle("")+
@@ -253,14 +253,13 @@ ggsave(FIGNUE, filename= "../../output/graficas/SUP_FIG/SIvsRust.png",  height =
 
 
 DF_SAM <- read.csv("../../data/DF_muestrasPath_complete.csv", header = TRUE)
-
 #DF_SAM <-read.csv("archivosTrabajandose/toyModelHarvest/data/DF_muestrasPath_complete.csv")
 #nP <- 2000
 #nW <- "1 worker"
 ###########Plo
 
-DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="0.5"] <- "Asynchronic"
-DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="1"] <- "Synchronic" 
+DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="0.5"] <- "Asynchronous"
+DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="1"] <- "Synchronous" 
 DF_SAM$numWorkers[DF_SAM$numWorkers =="1"] <- "1 worker" 
 DF_SAM$numWorkers[DF_SAM$numWorkers =="5"] <- "5 workers" 
 
@@ -268,7 +267,6 @@ DF_SAM$numWorkers[DF_SAM$numWorkers =="5"] <- "5 workers"
 
 
 FIG_PATH_GEN<- DF_SAM %>% 
-    filter(Time == 5)%>% 
     filter(Rep == 0)%>%
     #filter(numWorkers ==nW)%>%
     filter(numPlants == 500 |numPlants == 2000 | numPlants == 5000)%>% #solo un ejepmplo
@@ -294,25 +292,27 @@ FIG_PATH_GEN<- DF_SAM %>%
 #############DISTRIBUCIOMES########################3
 
 #DF_BASE <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_total_TF_short.csv", header = TRUE)
-DF_BASE <- read.csv("../../data/DF_total_TF.csv", header = TRUE)
+#DF_BASE <- read.csv("../../data/DF_total_TF.csv", header = TRUE)
 
-DF_BASE$DistanceW <- sqrt(DF_BASE$DistanceW)
-DF_TOTAL = DF_BASE
+DF_SAM$DistanceW <- sqrt(DF_SAM$DistanceW)
+
+#DF_BASE$DistanceW <- sqrt(DF_BASE$DistanceW)
+DF_TOTAL = DF_SAM %>%
+  filter(Time ==5.5)
+
 DF_TOTAL$Conteo <- 1
 #DF_TOTAL <- DF_TOTAL %>% filter(DistanceW > 1.5)  ##ESTO ES TRAMPA, perp vamos a ver
 DF_TOTAL$DistanceW <- round(DF_TOTAL$DistanceW,1) 
-DF_TOTAL$porcionCosecha[DF_TOTAL$porcionCosecha =="0.5"] <- "Asynchronic"
-DF_TOTAL$porcionCosecha[DF_TOTAL$porcionCosecha =="1"] <- "Synchronic" 
+
 DF_TOTAL$Infection <- 0
 DF_TOTAL$Infection[DF_TOTAL$Rust =="1"] <- "No Infection" 
 DF_TOTAL$Infection[DF_TOTAL$Rust =="0"] <- "No Infection"
 DF_TOTAL$Infection[DF_TOTAL$Rust =="0.5"] <- "New Infection"
 
 FIG_PATH_3000_W1_V1<- DF_TOTAL %>% 
-  filter(HarvestTime ==2)%>% 
   filter(HarvestStep <160)%>% #ultimo 160 plantas de ahi
   filter(Rep == 1)%>%
-  filter(numWorkers ==1)%>%
+  filter(numWorkers =="1 worker")%>%
   filter(numPlants == 3000)%>% #solo un ejepmplo
   filter(WorkerID != 0)%>% 
   arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
@@ -340,10 +340,9 @@ ggsave(FIG_PATH_3000_W1_V1,filename=paste("../../output/graficas/PATH/", "path_p
 
 
 FIG_PATH_3000_W1_V2<- DF_TOTAL %>% 
-  filter(HarvestTime ==2)%>% 
   filter(HarvestStep >((numPlants/2)-160))%>% #ultimo 160 plantas de ahi
   filter(Rep == 2)%>%
-  filter(numWorkers ==1)%>%
+  filter(numWorkers =="1 worker")%>%
   filter(numPlants == 3000)%>% #solo un ejepmplo
   filter(WorkerID != 0)%>% 
   arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
@@ -389,15 +388,14 @@ DF_TOTAL_AG$logFrec <- log(DF_TOTAL_AG$Frec)
 DF_TOTAL_AG_SHORT <- DF_TOTAL_AG %>%
   filter(!is.na(DistanceW))%>%
   filter(DistanceW != 0)%>%  #aqui perdemos un porcentaje del total
-  filter(numWorkers== 5)
+  filter(numWorkers== "1 worker")
 
 
 for (nP in unique(DF_TOTAL_AG_SHORT$numPlants)){
   for (pC in unique(DF_TOTAL_AG_SHORT$porcionCosecha)){
 
 DF_TOTAL_TEMP <- DF_TOTAL_AG_SHORT %>%
-  filter((numPlants== nP) & (porcionCosecha == pC)) %>%
-  filter(HarvestTime== 4)
+  filter((numPlants== nP) & (porcionCosecha == pC))
       
 FIG_PASOS_G <- DF_TOTAL_TEMP %>%
   ggplot(aes(x= DistanceW, y = Frec)) +
@@ -434,12 +432,11 @@ ggsave(FIG_INSIDE,filename=paste("../../output/graficas/PATH/", "DisPasos_INSIDE
 
 
 FIG_PASOS_LOG <- DF_TOTAL_AG_SHORT %>%
-  filter(HarvestTime ==4)  %>%  
  # filter(Rust == 0.5)%>%  
   filter(numPlants== 2000 | numPlants== 500| numPlants== 5000)%>%
   ggplot(aes(x= logDistanceW, y = logFrec)) +
   geom_jitter(aes(color= as.character(Infection)), alpha=0.7, size= 1.5)+
-  scale_color_manual(values = colorsDis3)+
+  scale_color_manual(values = colorsDis)+
   facet_grid(porcionCosecha ~numPlants) +
   theme_bw() +
   geom_segment(aes(x=log(1.5), y=-11, xend= log(1.5), yend=-2), size = 0.2, color= "Black")+
@@ -452,14 +449,13 @@ ggsave(FIG_PASOS_LOG,filename=paste("../../output/graficas/PATH/", "logDisPasos_
 
 
 FIG_PASOS <- DF_TOTAL_AG_SHORT %>%
-  filter(HarvestTime ==4)  %>%  
   #filter(Rust == 0.5)%>%  
   filter(DistanceW >= 1.5)%>%  
   filter(numPlants== 2000 | numPlants== 500| numPlants== 5000)%>%
   ggplot(aes(x= DistanceW, y = Frec)) +
   geom_jitter(aes(color= as.character(Infection)), alpha=0.7, size= 1.5)+
   geom_smooth()+
-  scale_color_manual(values = colorsDis3)+
+  scale_color_manual(values = colorsDis)+
   xlim(0,5)+
   facet_grid(porcionCosecha ~numPlants) +
   theme_bw() +
@@ -494,9 +490,8 @@ DF_SUM_AG$FrecSumREL <-  (DF_SUM_AG$FrecSum /(DF_SUM_AG$numPlants*length(unique(
 
 
 FIG_W_DEN <- DF_SUM_AG %>%
-  filter(HarvestTime ==4)  %>%
   filter(Infection == "New Infection")%>%
-  filter(numWorkers == 1)%>%
+  filter(numWorkers == "1 worker")%>%
   filter(LIM_1.5 == ">=1.5")%>%
   ggplot(aes(x = numPlants, y = FrecSumREL))+
   geom_line(aes(group = porcionCosecha))+
@@ -550,8 +545,8 @@ if (wholePlot ==1){
         filter(numPlants == nP)%>%
         filter(Rep ==0)%>%
         filter(Time == tiempo) %>%
-        add_row(porcionCosecha = "Asynchronic",  Rep= 0,   ID= 999999,  X= NA,  Y=NA , Rust= 0.5)%>% ##ESte es un truquito para que siempre hayan 3 colores en cada graficas, porque le 0.5 siempre desaprece
-        add_row(porcionCosecha = "Synchronic",  Rep= 0,   ID= 9999999,  X= NA,  Y=NA , Rust= 0.5)%>%
+        add_row(porcionCosecha = "Asynchronous",  Rep= 0,   ID= 999999,  X= NA,  Y=NA , Rust= 0.5)%>% ##ESte es un truquito para que siempre hayan 3 colores en cada graficas, porque le 0.5 siempre desaprece
+        add_row(porcionCosecha = "Synchronous",  Rep= 0,   ID= 9999999,  X= NA,  Y=NA , Rust= 0.5)%>%
         ggplot()+
         geom_point(aes(x=X , y= Y, color= as.character(Rust)), size= 2)+
         ggtitle("")+
