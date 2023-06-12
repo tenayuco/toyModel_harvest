@@ -59,10 +59,30 @@ condor_submit submit_file_toyModel.sub
 condor_q
 
 ----
+
+Cosas adicionales patung
+
+condor_q -nobatch
+
+te ayuda a ver los ids de los jobs que siguen corriendo (no los agrupa)
+
+condor_status 
+
+te ayuda a ver los nombres de las computadoras en uso
+
+y despues de que tienes los ids de los jobs, te vas a la bitacora, y ahi puedes ver el log para ver en que computadora esta corriendo
+
+-----------------
+
 Para ever si algun archivo tiene error en la bitacora
 
 grep -il "ERROR" *
 ------------
+para ver si alguno corre en alguna maquina
+
+grep -il "kat15" *
+
+
 para enlistar el numero de archivos en una carpeta
 
 ls -1 | wc -l
