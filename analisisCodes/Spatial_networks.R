@@ -38,30 +38,7 @@ DF_TOTAL<- DF_TOTAL %>%
 
 DF_TOTAL$porcionCosecha[DF_TOTAL$HarvestModel =="control"] <- 99
 
-################################
-#PARTE I
-#primero vamos a hacer las visualizaciones sin analisis
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+###############################
 
 
 
