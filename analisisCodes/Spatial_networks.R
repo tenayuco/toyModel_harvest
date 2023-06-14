@@ -13,7 +13,7 @@ mycols3a <-c("#021128", "#fd9706", "#1b4a64", "#759580")
 mycols3b <-c("#1b4a64", "#fdb81c", "#759580")
 mycols3c <- c("#759580", "#1b4a64","#fdb81c")
 groupColors2 <- c("#fd9706", "#1b4a64",'#56B4E9', "#555555")
-colorRedes <- c("black", "black", "darkred")
+colorRedes <- c("black", "black","darkred")
 
 
 
@@ -176,28 +176,40 @@ melt_DF_POST_RES <- cbind(melt_mean, melt_sd[,c(3:4)])
 melt_DF_POST_RES$comPuesta <- "no" 
 melt_DF_POST_RES$comPuesta[melt_DF_POST_RES$variable_mean == "MUL_N_T_mean"] <- "si"
 
+
+#cambiar antes a caracter
+melt_DF_POST_RES$variable_mean  <- as.character(melt_DF_POST_RES$variable_mean)
+
+melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "N_REDES_mean"] <- "i. Proportion of infected networks d.t.h. (x10)"
+melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "T_REDES_mean"] <- "ii. Mean degree of infected networks d.t.h."
+melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "MUL_N_T_mean"] <- "iii. Proportion of infected plants d.t.h. (i x ii)"
+
+
+
+
+
+
 FIG_REDES <- melt_DF_POST_RES %>% 
 #  filter(comPuesta =="no")%>% 
   ggplot(aes(x= numPlants, y= value_mean))+
-  geom_point(size= 1.5, aes(color = variable_mean))+
-  geom_line(size=1, aes(color = variable_mean, linetype = variable_mean))+
-  geom_errorbar(size=1, aes( 
-    ymin=value_mean-value_sd, ymax=value_mean+value_sd, color = variable_mean, linetype = variable_mean)) +
+  geom_line(size=1, aes(color = variable_mean, linetype = variable_mean, group=variable_mean))+
+  geom_errorbar(size=0.5, aes( 
+    ymin=value_mean-value_sd, ymax=value_mean+value_sd, color = variable_mean)) +
+  geom_point(size= 4, aes(color = variable_mean, shape= variable_mean), fill="white", stroke= 1)+
+  scale_shape_manual(values = c(21, 24, 22))+
   scale_color_manual(values = colorRedes)+
+  scale_linetype_manual(values = c(1,1,2))+
   facet_wrap(~porcionCosecha, scales = "free_y")+
-  scale_y_continuous(
-    
-    # Features of the first axis
-    name = "Normalized number of networks (x10)",
-    
-    # Add a second axis and specify its features
-    sec.axis = sec_axis(~.*1, name="Mean network degree")
-  ) +
   theme_bw()+
-  theme(text = element_text(size = 25))+
-  theme(strip.background = element_rect(fill = "white"))
+  theme(text = element_text(size = 25), 
+        legend.key.size=unit(1,"cm"))+
+  theme(strip.background = element_rect(colour= "black",
+                                        fill="white"))+
+  #theme(legend.position = "none") +
+  labs(x ="Density (Plants/ha)", y="Magnitude", shape= "Treatment", linetype= "Treatment", color= "Treatment")
+
   
-ggsave(FIG_REDES,filename=paste("../../output/graficas/", "redesAna", ".png", sep=""),  height = 8, width = 20) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_REDES,filename=paste("../../output/graficas/", "redesAna", ".pdf", sep=""),  height = 8, width = 24) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 
