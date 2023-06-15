@@ -115,16 +115,7 @@ colnames(DF_POST) = columns
     zippin[,1] <- DF_TEMP$X
     zippin[,2] <- DF_TEMP$Y
     
-   # plot(plot_graph,layout = zippin,vertex.size = 1, vertex.label = NA,edge.arrow.size = 0.1,edge.color="red",edge.curved=0,vertex.color="black",edge.width=2,frame=T)
-    
-   # print("con")
-  #  print(contador)
-   # if (contador ==0){
-  #  plot(plot_graph,layout = zippin,vertex.size = 1, vertex.label = NA,edge.arrow.size = 0.1,
-   #      edge.color="red",edge.curved=0,vertex.color="black",edge.width=2,frame=T,
-    #     main = paste("numPlants", nP, "coffee maturation", pC, "rep", rP))
-   #}
-  #  contador <- contador+1
+
     
     DF_TEMP <- DF_TEMP %>%
       select(Rep, numPlants, porcionCosecha)

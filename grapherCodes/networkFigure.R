@@ -9,7 +9,9 @@ mycols3a <-c("#021128", "#fd9706", "#1b4a64", "#759580")
 mycols3b <-c("#1b4a64", "#fdb81c", "#759580")
 mycols3c <- c("#759580", "#1b4a64","#fdb81c")
 groupColors2 <- c("#fd9706", "#1b4a64",'#56B4E9', "#555555")
-colorsDis3 <- c("#006600","#BA110C", "#777777")
+colorsDis3 <- c("white","black", "#999999")
+#colorsDis3 <- c("#006600","#BA110C", "#777777")
+#colorsDis3 <- c("#006600","#BA110C", "#777777")
 
 
 #take the dataframe
@@ -118,7 +120,7 @@ for (nP in unique(DF_TODAS$numPlants)){
         
         jpeg(paste("../../output/network_","numPlants_", nP, "coffee maturation_", pC, "rep_", rP, ".jpg"), width = 10, height = 10, unit="in", res=300)
         par(mar = c(0.1, 0.1, 0.1, 0.1))
-        plot(plot_graph,layout = zippin,vertex.size = 6, vertex.label = NA,edge.arrow.size = 0.1,
+        plot(plot_graph,layout = zippin,vertex.size = 7, vertex.label = NA,edge.arrow.size = 0.1,
                edge.color="black",edge.curved=0,vertex.color= vecColor ,edge.width=3,frame=T)
           dev.off()
         
