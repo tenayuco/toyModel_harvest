@@ -118,7 +118,7 @@ for (nP in unique(DF_TODAS$numPlants)){
         
         
         
-        jpeg(paste("../../output/network_","numPlants_", nP, "coffee maturation_", pC, "rep_", rP, ".jpg"), width = 10, height = 10, unit="in", res=300)
+        jpeg(paste("../../output/graficas/NETWORKS/network_","numPlants_", nP, "coffee maturation_", pC, "rep_", rP, ".jpg"), width = 10, height = 10, unit="in", res=300)
         par(mar = c(0.1, 0.1, 0.1, 0.1))
         plot(plot_graph,layout = zippin,vertex.size = 7, vertex.label = NA,edge.arrow.size = 0.1,
                edge.color="black",edge.curved=0,vertex.color= vecColor ,edge.width=3,frame=T)

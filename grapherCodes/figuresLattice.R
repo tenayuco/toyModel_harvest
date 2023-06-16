@@ -12,8 +12,8 @@ groupColors2 <- c("#fd9706", "#1b4a64",'#56B4E9', "#555555")#ESTE ES CEMTAL
 groupColors3 <- c("white", "#fd9706", "#1b4a64" )
 groupColors4 <- c("black", "#fd9706", "#1b4a64" )
 
-colorsDis <- c("#8B0000","#bbbbbb")
-colorsDis2 <- c("#8B0000","#555555")
+colorsDis <- c("#B87400","#CCCCCC")
+colorsDis2 <- c("#B87400","#555555")
 colorsDis3 <- c("#111111","#8B0000","#fd9706")
 
 
@@ -107,11 +107,12 @@ FIG_SLI_time <- DF_AV_AVR %>%
   scale_fill_manual(values = groupColors4)+
   scale_color_manual(values = groupColors4)+
   theme_bw()+
-  theme(text = element_text(size = 25))+
-  theme(strip.background = element_rect(fill = "white"))+ 
+  theme(text = element_text(size = 20))+
+  theme(strip.background = element_rect(fill = "white"))+
+  theme(panel.spacing = unit(1, "cm"))+
   #theme(legend.position = "none")
   labs(x= "Time", y= "Average Rust (%)", color= "Harvesting scenario", fill= "Harvesting scenario")
-ggsave(FIG_SLI_time,filename=paste("../../output/graficas/SUP_FIG/", "rust_time_abs", ".png", sep=""),  height = 8, width = 24) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc)
+ggsave(FIG_SLI_time,filename=paste("../../output/graficas/SUP_FIG/", "rust_time_abs", ".png", sep=""),  height = 5, width = 17) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc)
 
 ### now we are going to see the differences between the model and control and between models for each repetition
 
@@ -195,7 +196,7 @@ FIG_DIF_CONTROL_H2 <- DF_MODvsCON_GEN %>%
   facet_wrap(~numPlants, nrow = 1, strip.position = "bottom")+
   scale_fill_manual(values = groupColors2)+ 
   theme_bw() +
-  theme(text = element_text(size = 25),
+  theme(text = element_text(size = 20),
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank())+
   #theme(strip.background = element_rect(fill = "white"))+ 
@@ -204,7 +205,7 @@ FIG_DIF_CONTROL_H2 <- DF_MODvsCON_GEN %>%
   #theme(legend.position = "none")+
   labs(x= "Density (Plants/ha)", y= "Rust Increase (Scenario-Control)", fill= "Harvesting Scenario")
 
-ggsave(FIG_DIF_CONTROL_H2,filename="../../output/graficas/DIF_RUST/ModelvsControl_harvest4_numW1.png",  height = 8, width = 16) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_DIF_CONTROL_H2,filename="../../output/graficas/DIF_RUST/ModelvsControl_harvest4_numW1.png",  height = 5, width = 13) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 FIG_DIF_CONTROL_ALL <- DF_MODvsCON_GEN %>%
@@ -328,11 +329,11 @@ DF_TOTAL$Infection[DF_TOTAL$Rust =="1"] <- "No Infection"
 DF_TOTAL$Infection[DF_TOTAL$Rust =="0"] <- "No Infection"
 DF_TOTAL$Infection[DF_TOTAL$Rust =="0.5"] <- "New Infection"
 
-FIG_PATH_3000_W1_V1<- DF_TOTAL %>% 
+FIG_PATH_2000_W1_V1<- DF_TOTAL %>% 
   #filter(HarvestStep <160)%>% #ultimo 160 plantas de ahi
   filter(Rep == 2)%>%
   filter(numWorkers =="1 worker")%>%
-  filter(numPlants == 3000)%>% #solo un ejepmplo
+  filter(numPlants == 2000)%>% #solo un ejepmplo
   filter(WorkerID != 0)%>% 
   arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
   rowwise() %>% 
@@ -340,12 +341,11 @@ FIG_PATH_3000_W1_V1<- DF_TOTAL %>%
   geom_path(aes(col= as.character(Infection)),size=1.5, alpha= 0.8)+
   geom_point(size=1.5)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
   #scale_color_viridis_c()+
-  scale_color_manual(values = colorsDis)+
-  theme(panel.spacing = unit(0.8, "lines"), text = element_text(size = 15))+
+  scale_color_manual(values = colorsDis2)+
+  theme(panel.spacing = unit(0.8, "lines"))+
   theme_bw()+
   facet_wrap(~porcionCosecha, nrow = 2) +
-  theme(strip.background = element_rect(fill = "white"))+ 
-  theme(text = element_text(size = 25))+
+  theme(text = element_text(size = 20))+
   theme(legend.position = "none") +
   theme(
     strip.background = element_blank(),
@@ -353,7 +353,7 @@ FIG_PATH_3000_W1_V1<- DF_TOTAL %>%
   )+ 
   labs(x= "X", y= "Y", col= "Rust")
 
-ggsave(FIG_PATH_3000_W1_V1,filename=paste("../../output/graficas/PATH/", "path_plants_3000_w1_todos.png", sep=""),  height = 10, width = 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_PATH_2000_W1_V1,filename=paste("../../output/graficas/PATH/", "path_plants_2000_w1_todos.png", sep=""),  height = 10, width = 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 
@@ -370,12 +370,11 @@ FIG_PATH_3000_W1_V2<- DF_TOTAL %>%
   geom_path(aes(col= as.character(Infection)),size=1.5, alpha= 0.8)+
   geom_point(size=1.5)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
   #scale_color_viridis_c()+
-  scale_color_manual(values = colorsDis)+
-  theme(panel.spacing = unit(0.8, "lines"), text = element_text(size = 15))+
+  scale_color_manual(values = colorsDis2)+
+  theme(panel.spacing = unit(0.8, "lines"))+
   theme_bw()+
   facet_wrap(~porcionCosecha, nrow = 2) +
-  theme(strip.background = element_rect(fill = "white"))+ 
-  theme(text = element_text(size = 25))+
+  theme(text = element_text(size = 20))+
   theme(legend.position = "none") +
   theme(
     strip.background = element_blank(),
@@ -418,31 +417,35 @@ DF_TOTAL_TEMP <- DF_TOTAL_AG_SHORT %>%
       
 FIG_PASOS_G <- DF_TOTAL_TEMP %>%
   ggplot(aes(x= DistanceW, y = Frec)) +
-  geom_point(aes(fill= as.character(Infection), alpha= 0.9), shape=21, size=3.5, color="black", stroke=1)+
+  geom_point(aes(fill= as.character(Infection)), shape=21, size=3.5, color="black", stroke=1)+
   xlim(0, 110)+
  # scale_color_manual(values = colorsDis)+
   scale_fill_manual(values =colorsDis)+
   theme_bw() +
-  theme(text = element_text(size = 25))+
+  theme(text = element_text(size = 30))+
   theme(strip.background = element_rect(fill = "white"))+ 
   scale_alpha(guide = 'none')+
   labs(fill= "Rust", x= "Step length", y= "Proportion of Steps")
 
 FIG_PASOS_C <- DF_TOTAL_TEMP %>%
   ggplot(aes(x= DistanceW, y = Frec)) +
-  geom_point(aes(fill= as.character(Infection), alpha= 0.9), shape=21, size=3.5, color="black", stroke=1)+
+  geom_point(aes(fill= as.character(Infection)), shape=21, size=3.5, color="black", stroke=1)+
   xlim(0, 5.1)+
   scale_fill_manual(values = colorsDis)+
   geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= max(DF_TOTAL_TEMP$Frec)), size = 0.2, color= "Black")+
-  annotate(geom="text", x=3.5, y=max(DF_TOTAL_TEMP$Frec), label="Contact mediated infection reach",
-           color="black")+
+  annotate(geom="text", x=3.5, y=max(DF_TOTAL_TEMP$Frec)-0.002, label="Contact mediated \ninfection reach",
+           color="black",
+           size =6)+
   geom_segment(aes(x=2, y=max(DF_TOTAL_TEMP$Frec), xend=1.52, yend=max(DF_TOTAL_TEMP$Frec)-0.001), 
                arrow = arrow(length=unit(.2, 'cm')))+
     theme_bw() +
-  theme(text = element_text(size = 25))+
+  theme(text = element_text(size = 30))+
   theme(strip.background = element_rect(fill = "white"))+ 
   theme(legend.position = "None")+
-  labs(fill= "Rust", x= "Step length", y= "Proportion of Steps")
+  theme(axis.title.x=element_blank(), #remove x axis labels
+        axis.title.y=element_blank(),  #remove y axis labels
+  )
+  #labs(fill= "Rust", x= "Step length", y= "Proportion of Steps")
 
 FIG_INSIDE <- FIG_PASOS_G + annotation_custom(ggplotGrob(FIG_PASOS_C), xmin = 15, xmax = 80, ymin = max(DF_TOTAL_TEMP$Frec)/3, ymax = max(DF_TOTAL_TEMP$Frec))
 

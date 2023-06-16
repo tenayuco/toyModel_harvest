@@ -200,7 +200,7 @@ FIG_REDES <- melt_DF_POST_RES %>%
   labs(x ="Density (Plants/ha)", y="Magnitude", shape= "Legend", linetype= "Legend", color= "Legend")
 
   
-ggsave(FIG_REDES,filename=paste("../../output/graficas/", "redesAna", ".pdf", sep=""),  height = 8, width = 24) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_REDES,filename=paste("../../output/graficas/NETWORKS", "redesAna", ".pdf", sep=""),  height = 8, width = 24) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 
