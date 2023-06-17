@@ -375,14 +375,13 @@ FIG_PATH_3000_W1_V2<- DF_TOTAL %>%
   theme_bw()+
   facet_wrap(~porcionCosecha, nrow = 2) +
   theme(text = element_text(size = 20))+
-  theme(legend.position = "none") +
   theme(
     strip.background = element_blank(),
     strip.text.x = element_blank()
   )+ 
   labs(x= "X", y= "Y", col= "Rust")
 
-ggsave(FIG_PATH_3000_W1_V2,filename=paste("../../output/graficas/PATH/", "path_plants_3000_w1_ultimo_160.png", sep=""),  height = 10, width = 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_PATH_3000_W1_V2,filename=paste("../../output/graficas/PATH/", "path_plants_3000_w1_ultimo_160.png", sep=""),  height = 10, width = 8) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 #
