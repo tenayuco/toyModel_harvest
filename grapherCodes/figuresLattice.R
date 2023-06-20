@@ -12,7 +12,7 @@ groupColors2 <- c("#fd9706", "#1b4a64",'#56B4E9', "#555555")#ESTE ES CEMTAL
 groupColors3 <- c("white", "#fd9706", "#1b4a64" )
 groupColors4 <- c("black", "#fd9706", "#1b4a64" )
 
-colorsDis <- c("#B87400","#CCCCCC")
+colorsDis <- c("#B87400","white")
 colorsDis2 <- c("#B87400","#555555")
 colorsDis3 <- c("#111111","#8B0000","#fd9706")
 
@@ -93,8 +93,8 @@ FIG_SLI_time <- DF_AV_AVR %>%
   filter(numPlants == 500 | numPlants == 2000 |numPlants == 5000)%>% 
   
   mutate(porcionCosecha = (ifelse(porcionCosecha == "control", "No harvesting (control)", porcionCosecha)))%>% 
-  mutate(porcionCosecha = (ifelse(porcionCosecha == "0.5", "Under asynchronous coffee ripening", porcionCosecha)))%>% 
-  mutate(porcionCosecha = (ifelse(porcionCosecha == "1", "Under synchronous coffee ripening", porcionCosecha)))%>% 
+  mutate(porcionCosecha = (ifelse(porcionCosecha == "0.5", "With large steps", porcionCosecha)))%>% 
+  mutate(porcionCosecha = (ifelse(porcionCosecha == "1", "Without large steps", porcionCosecha)))%>% 
   
   ggplot(aes(x= Time, color= as.character(porcionCosecha) ,fill= as.character(porcionCosecha)))+
   geom_line(size= 1.5, aes(y= AverageRust))+
@@ -112,7 +112,7 @@ FIG_SLI_time <- DF_AV_AVR %>%
   theme(panel.spacing = unit(1, "cm"))+
   #theme(legend.position = "none")
   labs(x= "Time", y= "Average Rust (%)", color= "Harvesting scenario", fill= "Harvesting scenario")
-ggsave(FIG_SLI_time,filename=paste("../../output/graficas/SUP_FIG/", "rust_time_abs", ".png", sep=""),  height = 5, width = 17) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc)
+ggsave(FIG_SLI_time,filename=paste("../../output/graficas/SUP_FIG/", "rust_time_abs", ".png", sep=""),  height = 5, width = 16) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc)
 
 ### now we are going to see the differences between the model and control and between models for each repetition
 
@@ -188,8 +188,8 @@ FIG_DIF_CONTROL_H2 <- DF_MODvsCON_GEN %>%
   filter(numWorkers == 1)%>%
   filter(numPlants!=4000)%>%
   mutate(porcionCosecha = (ifelse(porcionCosecha == "control", "No harvesting (control)", porcionCosecha)))%>% 
-  mutate(porcionCosecha = (ifelse(porcionCosecha == "0.5", "Under asynchronous coffee ripening", porcionCosecha)))%>% 
-  mutate(porcionCosecha = (ifelse(porcionCosecha == "1", "Under synchronous coffee ripening", porcionCosecha)))%>% 
+  mutate(porcionCosecha = (ifelse(porcionCosecha == "0.5", "With large steps", porcionCosecha)))%>% 
+  mutate(porcionCosecha = (ifelse(porcionCosecha == "1", "Without large steps", porcionCosecha)))%>% 
   ggplot(aes(x= as.factor(HarvestTime), y= ModCo_Rust))+
   geom_boxplot(color = "black", aes(fill= porcionCosecha), position = "dodge")+ 
   ggtitle("")+
@@ -205,7 +205,7 @@ FIG_DIF_CONTROL_H2 <- DF_MODvsCON_GEN %>%
   #theme(legend.position = "none")+
   labs(x= "Density (Plants/ha)", y= "Rust Increase (Scenario-Control)", fill= "Harvesting Scenario")
 
-ggsave(FIG_DIF_CONTROL_H2,filename="../../output/graficas/DIF_RUST/ModelvsControl_harvest4_numW1.png",  height = 5, width = 13) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_DIF_CONTROL_H2,filename="../../output/graficas/DIF_RUST/ModelvsControl_harvest4_numW1.png",  height = 5, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 FIG_DIF_CONTROL_ALL <- DF_MODvsCON_GEN %>%
@@ -416,9 +416,8 @@ DF_TOTAL_TEMP <- DF_TOTAL_AG_SHORT %>%
       
 FIG_PASOS_G <- DF_TOTAL_TEMP %>%
   ggplot(aes(x= DistanceW, y = Frec)) +
-  geom_point(aes(fill= as.character(Infection)), shape=21, size=3.5, color="black", stroke=1)+
+  geom_point(aes(fill= as.character(Infection)), color= "black",  shape=21, size=5, stroke=1, alpha= 0.7)+
   xlim(0, 110)+
- # scale_color_manual(values = colorsDis)+
   scale_fill_manual(values =colorsDis)+
   theme_bw() +
   theme(text = element_text(size = 30))+
@@ -428,7 +427,7 @@ FIG_PASOS_G <- DF_TOTAL_TEMP %>%
 
 FIG_PASOS_C <- DF_TOTAL_TEMP %>%
   ggplot(aes(x= DistanceW, y = Frec)) +
-  geom_point(aes(fill= as.character(Infection)), shape=21, size=3.5, color="black", stroke=1)+
+  geom_point(aes(fill= as.character(Infection)), color= "black",  shape=21, size=5, stroke=1,alpha= 0.7)+
   xlim(0, 5.1)+
   scale_fill_manual(values = colorsDis)+
   geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= max(DF_TOTAL_TEMP$Frec)), size = 0.2, color= "Black")+
