@@ -516,6 +516,8 @@ FIG_W_DEN <- DF_SUM_AG %>%
   filter(Infection == "New Infection")%>%
   filter(numWorkers == "1 worker")%>%
   filter(LIM_1.5 == ">=1.5")%>%
+  mutate(porcionCosecha = (ifelse(porcionCosecha == "Asynchronous", "With large steps", porcionCosecha)))%>% 
+  mutate(porcionCosecha = (ifelse(porcionCosecha == "Synchronous", "Without large steps", porcionCosecha)))%>% 
   ggplot(aes(x = numPlants, y = FrecSumREL))+
   geom_line(aes(group = porcionCosecha))+
  #stat_summary(fun = , na.rm = TRUE, color = 'darkblue', geom ='line')+
@@ -527,9 +529,43 @@ FIG_W_DEN <- DF_SUM_AG %>%
   theme(text = element_text(size = 25))+
   theme(strip.background = element_rect(fill = "white"))+
 #  theme(legend.position  = "none")+
-  labs(x= "Density (Plants/ha)", y= "Proportion of newly infected plants during harvesting", color= "Coffee Maturation",shape= "Coffee Maturation")
+  labs(x= "Density (Plants/ha)", y= "Proportion of plants", color= "Harvesting Scenario",shape= "Harvesting Scenario")
 
-ggsave(FIG_W_DEN,filename=paste("../../output/graficas/SUP_FIG/", "FIG_W_DEN.png", sep=""),  height = 8, width = 12)
+ggsave(FIG_W_DEN,filename=paste("../../output/graficas/SUP_FIG/", "FIG_W_DEN.png", sep=""),  height = 6, width = 12)
+
+
+#######################cumulativo a ver########################33
+
+DF_ARRANGED <- DF_TOTAL %>%
+  filter(!is.na(DistanceW))%>%
+  filter(DistanceW != 0)%>%  #aqui perdemos un porcentaje del total
+  filter(numWorkers== "1 worker")%>%
+  select(HarvestStep, DistanceW, Rep, numPlants, HarvestModel, porcionCosecha)
+
+DF_CUM <- DF_ARRANGED %>%
+  group_by(Rep, numPlants, HarvestModel, porcionCosecha)%>%
+  arrange(numPlants, HarvestModel, porcionCosecha, Rep, HarvestStep) %>% 
+  dplyr::mutate(cs = cumsum(DistanceW))
+
+DF_CUM$PerStep <- 2* DF_CUM$HarvestStep/DF_CUM$numPlants *100
+
+FIG_CUM <- DF_CUM %>%
+  filter(Rep ==0)%>%
+  filter(numPlants== 2000 | numPlants== 500| numPlants== 5000)%>%
+  #filter(numPlants== 2000)%>%
+  ggplot(aes(x= PerStep, y = DistanceW)) +
+  geom_line()+
+  facet_grid(porcionCosecha ~numPlants) +
+  theme_bw() +
+  #geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= 0.025, size = 0.2, color= "Black")+
+  theme(text = element_text(size = 25))+
+  theme(strip.background = element_rect(fill = "white"))+ 
+  labs(x= "% Trajectory traveled", y= "Size of step", color= "Rust")
+
+
+ggsave(FIG_CUM,filename=paste("../../output/graficas/SUP_FIG/", "FIG_PROGRESSION.png", sep=""),  height = 10, width = 15)
+
+
 
 
 
