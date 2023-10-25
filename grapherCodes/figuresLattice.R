@@ -359,7 +359,7 @@ ggsave(FIG_PATH_2000_W1_V1,filename=paste("../../output/graficas/PATH/", "path_p
 
 
 FIG_PATH_3000_W1_V2<- DF_TOTAL %>% 
-  filter(HarvestStep >((numPlants/2)-160))%>% #ultimo 160 plantas de ahi
+  filter(HarvestStep >((numPlants/2)-160))%>% #ultimo 100 plantas de ahi
   filter(Rep == 2)%>%
   filter(numWorkers =="1 worker")%>%
   filter(numPlants == 3000)%>% #solo un ejepmplo
@@ -367,10 +367,8 @@ FIG_PATH_3000_W1_V2<- DF_TOTAL %>%
   arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
   rowwise() %>% 
   ggplot(aes(x= X, y = Y , group=WorkerID)) + #agregie la multiplicacion para rotar todo
-  geom_path(aes(col= as.character(Infection)),size=1.5, alpha= 0.8)+
+  geom_path(color = "#555555",size=1.5, alpha= 0.8)+
   geom_point(size=1.5)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
-  #scale_color_viridis_c()+
-  scale_color_manual(values = colorsDis2)+
   theme(panel.spacing = unit(0.8, "lines"))+
   theme_bw()+
   facet_wrap(~porcionCosecha, nrow = 2) +
@@ -381,7 +379,7 @@ FIG_PATH_3000_W1_V2<- DF_TOTAL %>%
   )+ 
   labs(x= "X (m)", y= "Y (m)", col= "Rust")
 
-ggsave(FIG_PATH_3000_W1_V2,filename=paste("../../output/graficas/PATH/", "path_plants_3000_w1_ultimo_160.png", sep=""),  height = 10, width = 8) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_PATH_3000_W1_V2,filename=paste("../../output/graficas/PATH/", "path_plants_3000_w1_ultimo_160.png", sep=""),  height = 10, width = 5.5) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 #
