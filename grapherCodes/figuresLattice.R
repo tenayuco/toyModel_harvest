@@ -111,7 +111,7 @@ FIG_SLI_time <- DF_AV_AVR %>%
   theme(strip.background = element_rect(fill = "white"))+
   theme(panel.spacing = unit(1, "cm"))+
   #theme(legend.position = "none")
-  labs(x= "Time", y= "Average Rust (%)", color= "Harvesting scenario", fill= "Harvesting scenario")
+  labs(x= "Time step (t)", y= "Average Rust (%)", color= "Harvesting scenario", fill= "Harvesting scenario")
 ggsave(FIG_SLI_time,filename=paste("../../output/graficas/SUP_FIG/", "rust_time_abs", ".png", sep=""),  height = 5, width = 16) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc)
 
 ### now we are going to see the differences between the model and control and between models for each repetition
@@ -351,7 +351,7 @@ FIG_PATH_2000_W1_V1<- DF_TOTAL %>%
     strip.background = element_blank(),
     strip.text.x = element_blank()
   )+ 
-  labs(x= "X", y= "Y", col= "Rust")
+  labs(x= "X (m)", y= "Y (m)", col= "Rust")
 
 ggsave(FIG_PATH_2000_W1_V1,filename=paste("../../output/graficas/PATH/", "path_plants_2000_w1_todos.png", sep=""),  height = 10, width = 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
@@ -366,7 +366,7 @@ FIG_PATH_3000_W1_V2<- DF_TOTAL %>%
   filter(WorkerID != 0)%>% 
   arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
   rowwise() %>% 
-  ggplot(aes(x= X, y = Y, group=WorkerID)) +
+  ggplot(aes(x= X, y = Y , group=WorkerID)) + #agregie la multiplicacion para rotar todo
   geom_path(aes(col= as.character(Infection)),size=1.5, alpha= 0.8)+
   geom_point(size=1.5)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
   #scale_color_viridis_c()+
@@ -379,7 +379,7 @@ FIG_PATH_3000_W1_V2<- DF_TOTAL %>%
     strip.background = element_blank(),
     strip.text.x = element_blank()
   )+ 
-  labs(x= "X", y= "Y", col= "Rust")
+  labs(x= "X (m)", y= "Y (m)", col= "Rust")
 
 ggsave(FIG_PATH_3000_W1_V2,filename=paste("../../output/graficas/PATH/", "path_plants_3000_w1_ultimo_160.png", sep=""),  height = 10, width = 8) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
@@ -423,7 +423,7 @@ FIG_PASOS_G <- DF_TOTAL_TEMP %>%
   theme(text = element_text(size = 30))+
   theme(strip.background = element_rect(fill = "white"))+ 
   scale_alpha(guide = 'none')+
-  labs(fill= "Rust", x= "Step length", y= "Proportion of Steps")
+  labs(fill= "Rust", x= "Step length (m)", y= "Proportion of Steps")
 
 FIG_PASOS_C <- DF_TOTAL_TEMP %>%
   ggplot(aes(x= DistanceW, y = Frec)) +
@@ -431,9 +431,9 @@ FIG_PASOS_C <- DF_TOTAL_TEMP %>%
   xlim(0, 5.1)+
   scale_fill_manual(values = colorsDis)+
   geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= max(DF_TOTAL_TEMP$Frec)), size = 0.2, color= "Black")+
-  annotate(geom="text", x=3.5, y=max(DF_TOTAL_TEMP$Frec)-0.002, label="Contact mediated \ninfection reach",
+  annotate(geom="text", x=3.75, y=max(DF_TOTAL_TEMP$Frec)-0.003, label="Max. contact \ndispersal distance",
            color="black",
-           size =6)+
+           size =8)+
   geom_segment(aes(x=2, y=max(DF_TOTAL_TEMP$Frec), xend=1.52, yend=max(DF_TOTAL_TEMP$Frec)-0.001), 
                arrow = arrow(length=unit(.2, 'cm')))+
     theme_bw() +
@@ -465,7 +465,7 @@ FIG_PASOS_LOG <- DF_TOTAL_AG_SHORT %>%
   geom_segment(aes(x=log(1.5), y=-11, xend= log(1.5), yend=-2), size = 0.2, color= "Black")+
   theme(text = element_text(size = 25))+
   theme(strip.background = element_rect(fill = "white"))+ 
-  labs(x= "ln(Distance Step)", y= "ln(Proportion of Steps)", color= "Rust")
+  labs(x= "ln(Step length) (m)", y= "ln(Proportion of Steps)", color= "Rust")
 
 
 ggsave(FIG_PASOS_LOG,filename=paste("../../output/graficas/PATH/", "logDisPasos_H2.png", sep=""),  height = 12, width = 18)
@@ -485,7 +485,7 @@ FIG_PASOS <- DF_TOTAL_AG_SHORT %>%
   #geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= 0.025, size = 0.2, color= "Black")+
   theme(text = element_text(size = 25))+
   theme(strip.background = element_rect(fill = "white"))+ 
-  labs(x= "Distance Step", y= "Proportion of Steps", color= "Rust")
+  labs(x= "Step length (m)", y= "Proportion of Steps", color= "Rust")
 
 ggsave(FIG_PASOS,filename=paste("../../output/graficas/PATH/", "DisPasos_total.png", sep=""),  height = 12, width = 18)
 
