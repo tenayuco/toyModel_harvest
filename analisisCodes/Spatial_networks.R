@@ -20,6 +20,10 @@ colorRedes <- c("black", "black","darkred")
 #take the dataframe
 
 #DF_TOTAL <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_total_TF.csv", header = TRUE)
+rerunAna <- 0
+
+if (rerunAna == 1){
+
 DF_TOTAL <- read.csv("../../data/DF_total_TF.csv", header = TRUE)
 
 
@@ -168,15 +172,23 @@ melt_DF_POST_RES$comPuesta <- "no"
 melt_DF_POST_RES$comPuesta[melt_DF_POST_RES$variable_mean == "MUL_N_T_mean"] <- "si"
 
 
+
+
+write.csv(melt_DF_POST_RES, "../../data/baseDatosREDES.csv")
+
+}
+
+
+melt_DF_POST_RES <- read.csv("../../data/baseDatosREDES.csv", header = TRUE)
+
+
 #cambiar antes a caracter
 melt_DF_POST_RES$variable_mean  <- as.character(melt_DF_POST_RES$variable_mean)
 
-melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "N_REDES_mean"] <- "i. Proportion of infected networks d.t.h. (x10)"
-melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "T_REDES_mean"] <- "ii. Mean degree of infected networks d.t.h."
-melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "MUL_N_T_mean"] <- "iii. Proportion of infected plants d.t.h. (i x ii)"
 
-
-
+melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "N_REDES_mean"] <- "i. Proportion of infected networks AH (x10)"
+melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "T_REDES_mean"] <- "ii. Mean size of infected networks AH"
+melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "MUL_N_T_mean"] <- "iii. Estimated proportion of infected plants AH (i x ii)"
 
 
 
