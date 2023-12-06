@@ -4,6 +4,8 @@
 Created on Tue Mar 21 11:55:53 2023
 
 @author: emilio
+
+This code has the necessary functions to run the whole model. 
 """
 
 import numpy as np  ##numpy paquete que acelera todo el manejo de matrices y demás
@@ -11,6 +13,26 @@ import random
 import pandas as pd
 import math as m
 
+"""
+Set scenario
+
+Receives:
+    - initial arrangement of plants
+    - the number of the repetition to create the same seed. (dic_Simulation["rep_"])
+    - the density (dic_Lattice["num_Plants"])
+    - the fruit charge (dic_Harvest[["hl_Plants"]])
+    -initial infection (dic_Lattice["ini_Inf"]])
+    
+generates:
+    a inital data frame, with the initial lattice in step 1:
+        pd.DataFrame({"ID": IDplants, "X": X, "Y": Y,
+                      "Rust": Rust, "WorkerID": WorkerID,
+                      "HarvestStep":HarvestStep, 
+                      "FruitLoad":FruitLoad, 
+                      "TotalHarvest": TotalHarvest})
+        
+calls: NA
+"""
 
 def setScenario(dic_Lattice, dic_Simulation, dic_Harvest):
     if dic_Lattice["mode_Arr"] == "random":  #so if the model is random
@@ -60,7 +82,24 @@ def setScenario(dic_Lattice, dic_Simulation, dic_Harvest):
 
 
 """
-This function generates all the dynamic
+generaldynamic
+
+Receives:
+    - dicLattice, dicSimulation, dicHarvest) (all the initial conditions9)
+    
+generates:
+    - a general data frame that will store all timesteps dataframes
+    pd.DataFrame(columns= ["ID", "X", "Y", 
+                           "Rust", "WorkerID", "HarvestStep","FruitLoad", 
+                           "TotalHarvest", "DistanceW", 
+                           "Time"])
+
+calls:
+    - setScenario 
+    loop per time step:
+    - HM_general
+    - contactModel
+    
 """
 
 def generalDynamic(dic_Lattice, dic_Simulation, dic_Harvest):
@@ -112,6 +151,24 @@ def generalDynamic(dic_Lattice, dic_Simulation, dic_Harvest):
     return(generalDF)
 
 
+
+"""
+contactModel
+
+Receives:
+    - old_data frame (a time t)
+    - the contact distance {dic_Simulation["contactDistance"]}
+    
+generates:
+    - new data frame updated with the contact infectin (a time t+1)
+
+calls:
+ NA
+    
+"""
+
+
+
 def contactModel(old_DF, dic_Simulation): #r_h is ruested trees durign harvest
     tempDF = old_DF 
     
@@ -149,6 +206,20 @@ def contactModel(old_DF, dic_Simulation): #r_h is ruested trees durign harvest
     
     return(tempDF)
 
+
+"""
+HM_general (harvesting model)
+
+Receives:
+    - old_data frame (a time t)
+    - the numberof worjers and steps (dic_Harvest["harvest_Steps"], dic_Harvest["num_wrkers"])
+    - the repetirion for the seed (dic_Simulation["rep_"])
+    
+generates:
+    - new data frame updated with the harvst infectin (a time t+1)
+calls:
+    -NA
+"""
 
 
 
@@ -237,6 +308,19 @@ def HM_general(old_DF, dic_Harvest, dic_Simulation):
     return(tempDF)
 
     
+"""
+actualizeHarves
+
+Receives:
+    - old_data frame (a time t)
+
+    
+generates:
+    - update the harvest status of each plant
+    - new data frame (tim +1)
+calls:
+    -NA
+"""
 
 
 

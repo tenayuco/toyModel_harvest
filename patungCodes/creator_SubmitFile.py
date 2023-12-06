@@ -29,7 +29,7 @@ error = bitacora/toyModel_$(Process).err
 log = bitacora/toyModel_$(Process).log
 
 request_cpus = 5
-requirements = ((machine != "tumas.patung.lancis.ecologia.unam.mx") && (machine != "kat15.lancis.ecologia.unam.mx"))
+requirements = ((machine != "tumas.patung.lancis.ecologia.unam.mx") && (machine != "kat15.lancis.ecologia.unam.mx") && (machine != "kat09.lancis.ecologia.unam.mx"))
 
 
 

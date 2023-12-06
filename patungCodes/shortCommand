@@ -82,6 +82,8 @@ para ver si alguno corre en alguna maquina
 
 grep -il "kat15" *
 
+si alguna no esta jalando, se puede quitar en el creador submit
+
 
 para enlistar el numero de archivos en una carpeta
 
