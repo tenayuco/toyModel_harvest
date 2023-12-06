@@ -1813,24 +1813,74 @@ detach(package:plyr)</code></pre>
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2VudGVyIHRoZSBmaWxlIHdpdGggYWxsIHRoZSBuZXcgcmVkdWNlZCBkYXRhIGZyYW1lcyBhbmQgbWVyZ2UgdGhlbSBcbmxpYnJhcnkoZHBseXIpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcblxuc2V0d2QoXCIuLi8uLi9kYXRhUGF0dW5nX2Rlc2NhcmdhZG8vc2FsaWRhL0RGX3RvdGFsL1wiKVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2VudGVyIHRoZSBmaWxlIHdpdGggYWxsIHRoZSBuZXcgcmVkdWNlZCBkYXRhIGZyYW1lcyBhbmQgbWVyZ2UgdGhlbSBcbmxpYnJhcnkoZHBseXIpXG5gYGAifQ== -->
 <pre class="r"><code>#enter the file with all the new reduced data frames and merge them 
-library(dplyr)
-library(tidyverse)
+library(dplyr)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYZHBseXLigJlcblxuVGhlIGZvbGxvd2luZyBvYmplY3RzIGFyZSBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOnN0YXRz4oCZOlxuXG4gICAgZmlsdGVyLCBsYWdcblxuVGhlIGZvbGxvd2luZyBvYmplY3RzIGFyZSBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOmJhc2XigJk6XG5cbiAgICBpbnRlcnNlY3QsIHNldGRpZmYsIHNldGVxdWFsLCB1bmlvblxuIn0= -->
+<pre><code>
+Attaching package: ‘dplyr’
 
-setwd(&quot;../../dataPatung_descargado/salida/DF_total/&quot;)</code></pre>
+The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeSh0aWR5dmVyc2UpXG5gYGAifQ== -->
+<pre class="r"><code>library(tidyverse)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiUmVnaXN0ZXJlZCBTMyBtZXRob2RzIG92ZXJ3cml0dGVuIGJ5ICdkYnBseXInOlxuICBtZXRob2QgICAgICAgICBmcm9tXG4gIHByaW50LnRibF9sYXp5ICAgICBcbiAgcHJpbnQudGJsX3NxbCAgICAgIFxu4pSA4pSAIEF0dGFjaGluZyBwYWNrYWdlcyDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIAgdGlkeXZlcnNlIDEuMy4yIOKUgOKUgOKclCBnZ3Bsb3QyIDMuMy42ICAgICDinJQgcHVycnIgICAwLjMuNVxu4pyUIHRpYmJsZSAgMy4xLjggICAgIOKclCBzdHJpbmdyIDEuNC4xXG7inJQgdGlkeXIgICAxLjIuMSAgICAg4pyUIGZvcmNhdHMgMC41LjJcbuKclCByZWFkciAgIDIuMS4zICAgICDilIDilIAgQ29uZmxpY3RzIOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgOKUgCB0aWR5dmVyc2VfY29uZmxpY3RzKCkg4pSA4pSAXG7inJYgZHBseXI6OmZpbHRlcigpIG1hc2tzIHN0YXRzOjpmaWx0ZXIoKVxu4pyWIGRwbHlyOjpsYWcoKSAgICBtYXNrcyBzdGF0czo6bGFnKClcbiJ9 -->
+<pre><code>Registered S3 methods overwritten by &#39;dbplyr&#39;:
+  method         from
+  print.tbl_lazy     
+  print.tbl_sql      
+── Attaching packages ────────────────────── tidyverse 1.3.2 ──✔ ggplot2 3.3.6     ✔ purrr   0.3.5
+✔ tibble  3.1.8     ✔ stringr 1.4.1
+✔ tidyr   1.2.1     ✔ forcats 0.5.2
+✔ readr   2.1.3     ── Conflicts ───────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2V0d2QoXCIuLi8uLi9kYXRhUGF0dW5nX2Rlc2NhcmdhZG8vc2FsaWRhL0RGX3RvdGFsL1wiKVxuYGBgIn0= -->
+<pre class="r"><code>setwd(&quot;../../dataPatung_descargado/salida/DF_total/&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-begin eyJkYXRhIjoiV2FybmluZzogVGhlIHdvcmtpbmcgZGlyZWN0b3J5IHdhcyBjaGFuZ2VkIHRvIC9ob21lL2VtaWxpby9hcmNoaXZvc1RyYWJhamFuZG9zZS90b3lNb2RlbEhhcnZlc3QvZGF0YVBhdHVuZ19kZXNjYXJnYWRvL3NhbGlkYS9ERl90b3RhbCBpbnNpZGUgYSBub3RlYm9vayBjaHVuay4gVGhlIHdvcmtpbmcgZGlyZWN0b3J5IHdpbGwgYmUgcmVzZXQgd2hlbiB0aGUgY2h1bmsgaXMgZmluaXNoZWQgcnVubmluZy4gVXNlIHRoZSBrbml0ciByb290LmRpciBvcHRpb24gaW4gdGhlIHNldHVwIGNodW5rIHRvIGNoYW5nZSB0aGUgd29ya2luZyBkaXJlY3RvcnkgZm9yIG5vdGVib29rIGNodW5rcy5cbiJ9 -->
 <pre><code>Warning: The working directory was changed to /home/emilio/archivosTrabajandose/toyModelHarvest/dataPatung_descargado/salida/DF_total inside a notebook chunk. The working directory will be reset when the chunk is finished running. Use the knitr root.dir option in the setup chunk to change the working directory for notebook chunks.</code></pre>
 <!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShwbHlyKVxuREZfdG90YWwgPC0gbGRwbHkobGlzdC5maWxlcygpLCByZWFkLmNzdiwgaGVhZGVyPVRSVUUpXG4jIGl0IGlzIGltcG9ydGFudCB0byBkZXRhY2ggcGx5ciBmb3IgZHBseXIgdG8gYmUgdXNlZFxuZGV0YWNoKHBhY2thZ2U6cGx5cilcblxuREZfdG90YWwgPC0gREZfdG90YWwgJT4lXG4gIGZpbHRlcighaXMubmEoRGlzdGFuY2VXKSkgJT4lXG4gIGZpbHRlcihSZXAgJWluJSBjKDAsMSwyLDMsNCw1KSlcblxuIyU+JVxuICMgZmlsdGVyKFJlcCAlaW4lIGMoMCwxLDIsMyw0LDUsNiw3LDgsOSwxMCkpXG5gYGAifQ== -->
-<pre class="r"><code>library(plyr)
-DF_total &lt;- ldply(list.files(), read.csv, header=TRUE)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShwbHlyKVxuYGBgIn0= -->
+<pre class="r"><code>library(plyr)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLVxuWW91IGhhdmUgbG9hZGVkIHBseXIgYWZ0ZXIgZHBseXIgLSB0aGlzIGlzIGxpa2VseSB0byBjYXVzZSBwcm9ibGVtcy5cbklmIHlvdSBuZWVkIGZ1bmN0aW9ucyBmcm9tIGJvdGggcGx5ciBhbmQgZHBseXIsIHBsZWFzZSBsb2FkIHBseXIgZmlyc3QsIHRoZW4gZHBseXI6XG5saWJyYXJ5KHBseXIpOyBsaWJyYXJ5KGRwbHlyKVxuLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLVxuXG5BdHRhY2hpbmcgcGFja2FnZTog4oCYcGx5cuKAmVxuXG5UaGUgZm9sbG93aW5nIG9iamVjdCBpcyBtYXNrZWQgZnJvbSDigJhwYWNrYWdlOnB1cnJy4oCZOlxuXG4gICAgY29tcGFjdFxuXG5UaGUgZm9sbG93aW5nIG9iamVjdHMgYXJlIG1hc2tlZCBmcm9tIOKAmHBhY2thZ2U6ZHBseXLigJk6XG5cbiAgICBhcnJhbmdlLCBjb3VudCwgZGVzYywgZmFpbHdpdGgsIGlkLCBtdXRhdGUsIHJlbmFtZSxcbiAgICBzdW1tYXJpc2UsIHN1bW1hcml6ZVxuIn0= -->
+<pre><code>-------------------------------------------------------------
+You have loaded plyr after dplyr - this is likely to cause problems.
+If you need functions from both plyr and dplyr, please load plyr first, then dplyr:
+library(plyr); library(dplyr)
+-------------------------------------------------------------
+
+Attaching package: ‘plyr’
+
+The following object is masked from ‘package:purrr’:
+
+    compact
+
+The following objects are masked from ‘package:dplyr’:
+
+    arrange, count, desc, failwith, id, mutate, rename,
+    summarise, summarize</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuREZfdG90YWwgPC0gbGRwbHkobGlzdC5maWxlcygpLCByZWFkLmNzdiwgaGVhZGVyPVRSVUUpXG4jIGl0IGlzIGltcG9ydGFudCB0byBkZXRhY2ggcGx5ciBmb3IgZHBseXIgdG8gYmUgdXNlZFxuZGV0YWNoKHBhY2thZ2U6cGx5cilcblxuI0RGX3RvdGFsIDwtIERGX3RvdGFsICU+JVxuICMgZmlsdGVyKCFpcy5uYShEaXN0YW5jZVcpKSBcblxuREZfdG90YWxfc2hvcnQgPC0gREZfdG90YWwgJT4lXG4gICNmaWx0ZXIoIWlzLm5hKERpc3RhbmNlVykpICU+JVxuICBmaWx0ZXIoUmVwICVpbiUgYygwLDEsMiwzLDQsNSkpXG5cbiMlPiVcbiAjIGZpbHRlcihSZXAgJWluJSBjKDAsMSwyLDMsNCw1LDYsNyw4LDksMTApKVxuYGBgIn0= -->
+<pre class="r"><code>DF_total &lt;- ldply(list.files(), read.csv, header=TRUE)
 # it is important to detach plyr for dplyr to be used
 detach(package:plyr)
 
-DF_total &lt;- DF_total %&gt;%
-  filter(!is.na(DistanceW)) %&gt;%
+#DF_total &lt;- DF_total %&gt;%
+ # filter(!is.na(DistanceW)) 
+
+DF_total_short &lt;- DF_total %&gt;%
+  #filter(!is.na(DistanceW)) %&gt;%
   filter(Rep %in% c(0,1,2,3,4,5))
 
 #%&gt;%
@@ -1838,43 +1888,34 @@ DF_total &lt;- DF_total %&gt;%
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud3JpdGUuY3N2KERGX3RvdGFsLCBcIi4uLy4uL2RhdGEvREZfdG90YWxfVEYuY3N2XCIsIHJvdy5uYW1lcyA9IEZBTFNFKVxuYGBgIn0= -->
-<pre class="r"><code>write.csv(DF_total, &quot;../../data/DF_total_TF.csv&quot;, row.names = FALSE)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud3JpdGUuY3N2KERGX3RvdGFsLCBcIi4uLy4uL2RhdGEvREZfdG90YWxfVEYuY3N2XCIsIHJvdy5uYW1lcyA9IEZBTFNFKVxud3JpdGUuY3N2KERGX3RvdGFsX3Nob3J0LCBcIi4uLy4uL2RhdGEvREZfdG90YWxfVEZfc2hvcnQuY3N2XCIsIHJvdy5uYW1lcyA9IEZBTFNFKVxuXG5gYGAifQ== -->
+<pre class="r"><code>write.csv(DF_total, &quot;../../data/DF_total_TF.csv&quot;, row.names = FALSE)
+write.csv(DF_total_short, &quot;../../data/DF_total_TF_short.csv&quot;, row.names = FALSE)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuI2VudGVyIHRoZSBmaWxlIHdpdGggYWxsIHRoZSBuZXcgcmVkdWNlZCBkYXRhIGZyYW1lcyBhbmQgbWVyZ2UgdGhlbSBcblxuI3NldHdkKFxcLi9ERl90b3RhbC9cXClcbiNsaWJyYXJ5KHBseXIpXG4jREZfdG90YWxfY29tcGxldGUgPC0gbGRwbHkobGlzdC5maWxlcygpLCByZWFkLmNzdiwgaGVhZGVyPVRSVUUpXG4jIGl0IGlzIGltcG9ydGFudCB0byBkZXRhY2ggcGx5ciBmb3IgZHBseXIgdG8gYmUgdXNlZFxuI2RldGFjaChwYWNrYWdlOnBseXIpXG5gYGBcbmBgYCJ9 -->
-<pre class="r"><code>```r
-#enter the file with all the new reduced data frames and merge them 
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2VudGVyIHRoZSBmaWxlIHdpdGggYWxsIHRoZSBuZXcgcmVkdWNlZCBkYXRhIGZyYW1lcyBhbmQgbWVyZ2UgdGhlbSBcblxuI3NldHdkKFwiLi9ERl90b3RhbC9cIilcbiNsaWJyYXJ5KHBseXIpXG4jREZfdG90YWxfY29tcGxldGUgPC0gbGRwbHkobGlzdC5maWxlcygpLCByZWFkLmNzdiwgaGVhZGVyPVRSVUUpXG4jIGl0IGlzIGltcG9ydGFudCB0byBkZXRhY2ggcGx5ciBmb3IgZHBseXIgdG8gYmUgdXNlZFxuI2RldGFjaChwYWNrYWdlOnBseXIpXG5gYGAifQ== -->
+<pre class="r"><code>#enter the file with all the new reduced data frames and merge them 
 
-#setwd(\./DF_total/\)
+#setwd(&quot;./DF_total/&quot;)
 #library(plyr)
 #DF_total_complete &lt;- ldply(list.files(), read.csv, header=TRUE)
 # it is important to detach plyr for dplyr to be used
 #detach(package:plyr)</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-chunk-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuI3dyaXRlLmNzdihERl90b3RhbF9jb21wbGV0ZSwgXFwuLi8uLi9kYXRhL0RGX3RvdGFsX2NvbXBsZXRlLmNzdlxcLCByb3cubmFtZXMgPSBGQUxTRSlcbmBgYFxuYGBgIn0= --&gt;
-
-```r
-```r
-#write.csv(DF_total_complete, \../../data/DF_total_complete.csv\, row.names = FALSE)</code></pre>
-<p>```</p>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI3dyaXRlLmNzdihERl90b3RhbF9jb21wbGV0ZSwgXCIuLi8uLi9kYXRhL0RGX3RvdGFsX2NvbXBsZXRlLmNzdlwiLCByb3cubmFtZXMgPSBGQUxTRSlcbmBgYCJ9 -->
+<pre class="r"><code>#write.csv(DF_total_complete, &quot;../../data/DF_total_complete.csv&quot;, row.names = FALSE)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKRXhwbGFuYXRpb246IFRoaXMgY29kZSB1c2VzIHRoZSBzdXBlckNvbXB1dGVyJ3Mgb3V0cHV0IGFuZCB0cmFuc2Zvcm1zIGl0IHRvIGEgZ2VuZXJhbCBkYXRhQmFzZSAqREZfdG90YWxfY29tcGxldGUuY3N2KiBhbmQgKkRGX2ZpbmFsVGltZV9jb21wbGV0ZS5jc3YqLiBJdCBpcyBub3QgbmVjZXNzYXJ5IHRvIHJ1biBpdCBpZiBvbmUgc3RhcnRzIGZyb20gdGhvc2UgY3N2LiBJdCBvbmx5IHdvcmtzIGlmIHdlIGhhdmUgZG93bmxvYWRlZCB0aGUgb3V0cHV0IG9mIHRoZSBzdXBlckNvbXB1dGVyIGluIHRoZSAqKkRGX3RvdGFsKiogYW5kICoqREZfZmluYWxUaW1lKiogZGlyZWN0b3JpZXMuCgoxLiBQcm9jZWR1cmUgdG8gcmVkdWNlIHRoZSBudW1iZXIgb2Ygc3RlcHMgZm9yIHZpc3VhbGl6YXRpb24uIFJ1biBvbmx5IG9uY2UuIAoKCjIuIE1lcmdlIGFsbCBkYXRhIGZyYW1lcyB0byBhIGJpZyBkYXRhIGZyYW1lIGZvciB2aXN1YWxpemF0aW9ucwoKCmBgYHtyfQojZW50ZXIgdGhlIGZpbGUgd2l0aCBhbGwgdGhlIG5ldyByZWR1Y2VkIGRhdGEgZnJhbWVzIGFuZCBtZXJnZSB0aGVtIAoKc2V0d2QoIi4uLy4uL2RhdGFQYXR1bmdfZGVzY2FyZ2Fkby9zYWxpZGEvREZfc3BhdGlhbEF2ZXJhZ2UvIikKbGlicmFyeShwbHlyKQpERl9zcGF0aWFsIDwtIGxkcGx5KGxpc3QuZmlsZXMoKSwgcmVhZC5jc3YsIGhlYWRlcj1UUlVFKQojIGl0IGlzIGltcG9ydGFudCB0byBkZXRhY2ggcGx5ciBmb3IgZHBseXIgdG8gYmUgdXNlZApkZXRhY2gocGFja2FnZTpwbHlyKQpgYGAKYGBge3J9CndyaXRlLmNzdihERl9zcGF0aWFsLCAiLi4vLi4vZGF0YS9ERl9zcGF0aWFsQXZlcmFnZV9jb21wbGV0ZS5jc3YiLCByb3cubmFtZXMgPSBGQUxTRSkKYGBgCgoKYGBge3J9CiNlbnRlciB0aGUgZmlsZSB3aXRoIGFsbCB0aGUgbmV3IHJlZHVjZWQgZGF0YSBmcmFtZXMgYW5kIG1lcmdlIHRoZW0gCgoKc2V0d2QoIi4uLy4uL2RhdGFQYXR1bmdfZGVzY2FyZ2Fkby9zYWxpZGEvREZfbXVlc3RyYXNQYXRoLyIpCmxpYnJhcnkocGx5cikKREZfc2FtcGxlIDwtIGxkcGx5KGxpc3QuZmlsZXMoKSwgcmVhZC5jc3YsIGhlYWRlcj1UUlVFKQojIGl0IGlzIGltcG9ydGFudCB0byBkZXRhY2ggcGx5ciBmb3IgZHBseXIgdG8gYmUgdXNlZApkZXRhY2gocGFja2FnZTpwbHlyKQpgYGAKYGBge3J9CndyaXRlLmNzdihERl9zYW1wbGUsICIuLi8uLi9kYXRhL0RGX211ZXN0cmFzUGF0aF9jb21wbGV0ZS5jc3YiLCByb3cubmFtZXMgPSBGQUxTRSkKYGBgCgpgYGB7cn0KI2VudGVyIHRoZSBmaWxlIHdpdGggYWxsIHRoZSBuZXcgcmVkdWNlZCBkYXRhIGZyYW1lcyBhbmQgbWVyZ2UgdGhlbSAKbGlicmFyeShkcGx5cikKbGlicmFyeSh0aWR5dmVyc2UpCgpzZXR3ZCgiLi4vLi4vZGF0YVBhdHVuZ19kZXNjYXJnYWRvL3NhbGlkYS9ERl90b3RhbC8iKQpsaWJyYXJ5KHBseXIpCkRGX3RvdGFsIDwtIGxkcGx5KGxpc3QuZmlsZXMoKSwgcmVhZC5jc3YsIGhlYWRlcj1UUlVFKQojIGl0IGlzIGltcG9ydGFudCB0byBkZXRhY2ggcGx5ciBmb3IgZHBseXIgdG8gYmUgdXNlZApkZXRhY2gocGFja2FnZTpwbHlyKQoKREZfdG90YWwgPC0gREZfdG90YWwgJT4lCiAgZmlsdGVyKCFpcy5uYShEaXN0YW5jZVcpKSAlPiUKICBmaWx0ZXIoUmVwICVpbiUgYygwLDEsMiwzLDQsNSkpCgojJT4lCiAjIGZpbHRlcihSZXAgJWluJSBjKDAsMSwyLDMsNCw1LDYsNyw4LDksMTApKQpgYGAKYGBge3J9CndyaXRlLmNzdihERl90b3RhbCwgIi4uLy4uL2RhdGEvREZfdG90YWxfVEYuY3N2Iiwgcm93Lm5hbWVzID0gRkFMU0UpCmBgYAoKCgoKCmBgYHtyfQojZW50ZXIgdGhlIGZpbGUgd2l0aCBhbGwgdGhlIG5ldyByZWR1Y2VkIGRhdGEgZnJhbWVzIGFuZCBtZXJnZSB0aGVtIAoKI3NldHdkKCIuL0RGX3RvdGFsLyIpCiNsaWJyYXJ5KHBseXIpCiNERl90b3RhbF9jb21wbGV0ZSA8LSBsZHBseShsaXN0LmZpbGVzKCksIHJlYWQuY3N2LCBoZWFkZXI9VFJVRSkKIyBpdCBpcyBpbXBvcnRhbnQgdG8gZGV0YWNoIHBseXIgZm9yIGRwbHlyIHRvIGJlIHVzZWQKI2RldGFjaChwYWNrYWdlOnBseXIpCmBgYApgYGB7cn0KI3dyaXRlLmNzdihERl90b3RhbF9jb21wbGV0ZSwgIi4uLy4uL2RhdGEvREZfdG90YWxfY29tcGxldGUuY3N2Iiwgcm93Lm5hbWVzID0gRkFMU0UpCmBgYAoKCgoK</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiUiBOb3RlYm9vayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKRXhwbGFuYXRpb246IFRoaXMgY29kZSB1c2VzIHRoZSBzdXBlckNvbXB1dGVyJ3Mgb3V0cHV0IGFuZCB0cmFuc2Zvcm1zIGl0IHRvIGEgZ2VuZXJhbCBkYXRhQmFzZSAqREZfdG90YWxfY29tcGxldGUuY3N2KiBhbmQgKkRGX2ZpbmFsVGltZV9jb21wbGV0ZS5jc3YqLiBJdCBpcyBub3QgbmVjZXNzYXJ5IHRvIHJ1biBpdCBpZiBvbmUgc3RhcnRzIGZyb20gdGhvc2UgY3N2LiBJdCBvbmx5IHdvcmtzIGlmIHdlIGhhdmUgZG93bmxvYWRlZCB0aGUgb3V0cHV0IG9mIHRoZSBzdXBlckNvbXB1dGVyIGluIHRoZSAqKkRGX3RvdGFsKiogYW5kICoqREZfZmluYWxUaW1lKiogZGlyZWN0b3JpZXMuCgoxLiBQcm9jZWR1cmUgdG8gcmVkdWNlIHRoZSBudW1iZXIgb2Ygc3RlcHMgZm9yIHZpc3VhbGl6YXRpb24uIFJ1biBvbmx5IG9uY2UuIAoKCjIuIE1lcmdlIGFsbCBkYXRhIGZyYW1lcyB0byBhIGJpZyBkYXRhIGZyYW1lIGZvciB2aXN1YWxpemF0aW9ucwoKCmBgYHtyfQojZW50ZXIgdGhlIGZpbGUgd2l0aCBhbGwgdGhlIG5ldyByZWR1Y2VkIGRhdGEgZnJhbWVzIGFuZCBtZXJnZSB0aGVtIAoKc2V0d2QoIi4uLy4uL2RhdGFQYXR1bmdfZGVzY2FyZ2Fkby9zYWxpZGEvREZfc3BhdGlhbEF2ZXJhZ2UvIikKbGlicmFyeShwbHlyKQpERl9zcGF0aWFsIDwtIGxkcGx5KGxpc3QuZmlsZXMoKSwgcmVhZC5jc3YsIGhlYWRlcj1UUlVFKQojIGl0IGlzIGltcG9ydGFudCB0byBkZXRhY2ggcGx5ciBmb3IgZHBseXIgdG8gYmUgdXNlZApkZXRhY2gocGFja2FnZTpwbHlyKQpgYGAKYGBge3J9CndyaXRlLmNzdihERl9zcGF0aWFsLCAiLi4vLi4vZGF0YS9ERl9zcGF0aWFsQXZlcmFnZV9jb21wbGV0ZS5jc3YiLCByb3cubmFtZXMgPSBGQUxTRSkKYGBgCgoKYGBge3J9CiNlbnRlciB0aGUgZmlsZSB3aXRoIGFsbCB0aGUgbmV3IHJlZHVjZWQgZGF0YSBmcmFtZXMgYW5kIG1lcmdlIHRoZW0gCgoKc2V0d2QoIi4uLy4uL2RhdGFQYXR1bmdfZGVzY2FyZ2Fkby9zYWxpZGEvREZfbXVlc3RyYXNQYXRoLyIpCmxpYnJhcnkocGx5cikKREZfc2FtcGxlIDwtIGxkcGx5KGxpc3QuZmlsZXMoKSwgcmVhZC5jc3YsIGhlYWRlcj1UUlVFKQojIGl0IGlzIGltcG9ydGFudCB0byBkZXRhY2ggcGx5ciBmb3IgZHBseXIgdG8gYmUgdXNlZApkZXRhY2gocGFja2FnZTpwbHlyKQpgYGAKYGBge3J9CndyaXRlLmNzdihERl9zYW1wbGUsICIuLi8uLi9kYXRhL0RGX211ZXN0cmFzUGF0aF9jb21wbGV0ZS5jc3YiLCByb3cubmFtZXMgPSBGQUxTRSkKYGBgCgpgYGB7cn0KI2VudGVyIHRoZSBmaWxlIHdpdGggYWxsIHRoZSBuZXcgcmVkdWNlZCBkYXRhIGZyYW1lcyBhbmQgbWVyZ2UgdGhlbSAKbGlicmFyeShkcGx5cikKbGlicmFyeSh0aWR5dmVyc2UpCgpzZXR3ZCgiLi4vLi4vZGF0YVBhdHVuZ19kZXNjYXJnYWRvL3NhbGlkYS9ERl90b3RhbC8iKQpsaWJyYXJ5KHBseXIpCkRGX3RvdGFsIDwtIGxkcGx5KGxpc3QuZmlsZXMoKSwgcmVhZC5jc3YsIGhlYWRlcj1UUlVFKQojIGl0IGlzIGltcG9ydGFudCB0byBkZXRhY2ggcGx5ciBmb3IgZHBseXIgdG8gYmUgdXNlZApkZXRhY2gocGFja2FnZTpwbHlyKQoKI0RGX3RvdGFsIDwtIERGX3RvdGFsICU+JQogIyBmaWx0ZXIoIWlzLm5hKERpc3RhbmNlVykpIAoKREZfdG90YWxfc2hvcnQgPC0gREZfdG90YWwgJT4lCiAgI2ZpbHRlcighaXMubmEoRGlzdGFuY2VXKSkgJT4lCiAgZmlsdGVyKFJlcCAlaW4lIGMoMCwxLDIsMyw0LDUpKQoKIyU+JQogIyBmaWx0ZXIoUmVwICVpbiUgYygwLDEsMiwzLDQsNSw2LDcsOCw5LDEwKSkKYGBgCmBgYHtyfQp3cml0ZS5jc3YoREZfdG90YWwsICIuLi8uLi9kYXRhL0RGX3RvdGFsX1RGLmNzdiIsIHJvdy5uYW1lcyA9IEZBTFNFKQp3cml0ZS5jc3YoREZfdG90YWxfc2hvcnQsICIuLi8uLi9kYXRhL0RGX3RvdGFsX1RGX3Nob3J0LmNzdiIsIHJvdy5uYW1lcyA9IEZBTFNFKQoKYGBgCgoKCgoKYGBge3J9CiNlbnRlciB0aGUgZmlsZSB3aXRoIGFsbCB0aGUgbmV3IHJlZHVjZWQgZGF0YSBmcmFtZXMgYW5kIG1lcmdlIHRoZW0gCgojc2V0d2QoIi4vREZfdG90YWwvIikKI2xpYnJhcnkocGx5cikKI0RGX3RvdGFsX2NvbXBsZXRlIDwtIGxkcGx5KGxpc3QuZmlsZXMoKSwgcmVhZC5jc3YsIGhlYWRlcj1UUlVFKQojIGl0IGlzIGltcG9ydGFudCB0byBkZXRhY2ggcGx5ciBmb3IgZHBseXIgdG8gYmUgdXNlZAojZGV0YWNoKHBhY2thZ2U6cGx5cikKYGBgCmBgYHtyfQojd3JpdGUuY3N2KERGX3RvdGFsX2NvbXBsZXRlLCAiLi4vLi4vZGF0YS9ERl90b3RhbF9jb21wbGV0ZS5jc3YiLCByb3cubmFtZXMgPSBGQUxTRSkKYGBgCgoKCgo=</div>
 
 
 

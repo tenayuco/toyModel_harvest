@@ -42,7 +42,7 @@ Fixed parameters
 
 Tmax = 12  #ESTE ESEL CA;MIBO NUEBO por szatch
 dimIni = [100, 100]
-iniInf = [0.85, 0, 0.15]
+iniInf = [0.8, 0, 0.2]
 modeArr = "random"
 #harvest = "closeness"
 contactoDis = 1.5 #meters
