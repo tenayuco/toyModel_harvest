@@ -20,7 +20,7 @@ colorRedes <- c("black", "black","darkred")
 #take the dataframe
 
 #DF_TOTAL <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_total_TF.csv", header = TRUE)
-rerunAna <- 0
+rerunAna <- 1
 
 if (rerunAna == 1){
 
@@ -212,7 +212,7 @@ FIG_REDES <- melt_DF_POST_RES %>%
   labs(x ="Density (Plants/ha)", y="Magnitude", shape= "Legend", linetype= "Legend", color= "Legend")
 
   
-ggsave(FIG_REDES,filename=paste("../../output/graficas/NETWORKS", "redesAna", ".pdf", sep=""),  height = 8, width = 24) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_REDES,filename=paste("../../output/graficas/NETWORKS/", "redesAna", ".pdf", sep=""),  height = 8, width = 24) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 

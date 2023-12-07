@@ -192,6 +192,7 @@ CheckPoweRlaw <- function(
   return(results)
 }
 
+#DF_SAM <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_muestrasPath_complete.csv", header = TRUE)
 
 
 DF_SAM <- read.csv("../../data/DF_muestrasPath_complete.csv", header = TRUE)
@@ -290,7 +291,7 @@ for (nP in unique(DF_TOTAL_AG_SHORT$numPlants)){
     
     jpeg(paste("../../output/graficas/SUP_FIG/dist_","numPlants_", nP, "coffee maturation_", pC, ".jpg"), width = 7, height = 6, unit="in", res=300)
     #par(mar = c(0.3, 0.3, 0.3, 0.3))
-    plot(m2, ylab = "CDF", xlim=c(0.1,110), col= alpha(1, 0.4), main=paste(nP, "Plants/ha", pC))
+    plot(m2, xlab= "size step (m)",  ylab = "CDF", xlim=c(0.1,110), col= alpha(1, 0.4), main=paste(nP, "Plants/ha", pC))
     lines(m1, col=1, lty= 1, lwd= 2)
     lines(m2, col = 2, lty = 2, lwd= 2)
     lines(m3, col = 3, lty = 3, lwd= 2)
@@ -299,7 +300,7 @@ for (nP in unique(DF_TOTAL_AG_SHORT$numPlants)){
                                  paste("LogNormal ", "mu=", round(m3$pars[1],2), 
                                         ", sigma=", round(m3$pars[2],2))),
            col=c(1,2,3),
-          lty=c(1,2,3), cex=0.8)
+          lty=c(1,2,3), cex=1.2)
     dev.off()
     
     }

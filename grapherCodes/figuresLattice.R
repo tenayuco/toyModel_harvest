@@ -195,6 +195,7 @@ FIG_DIF_CONTROL_H2 <- DF_MODvsCON_GEN %>%
   ggtitle("")+
   facet_wrap(~numPlants, nrow = 1, strip.position = "bottom")+
   scale_fill_manual(values = groupColors2)+ 
+  ylim(0, 18)+
   theme_bw() +
   theme(text = element_text(size = 20),
         axis.text.x = element_blank(),

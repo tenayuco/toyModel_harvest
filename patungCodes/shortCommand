@@ -1,38 +1,48 @@
+
+INSTRUCTIVO CORTO PARA REPRODUCIR CODIGO. 
+
+Usar dos terminales (una de patung y otra de tu compu)
+
+---------------------------------------------------
+TERMINAL 1
+##ENTRAR A PATUNG
+
 ssh emilio@patung.lancis.ecologia.unam.mx
 
 Si estas en lancis, cambia todo de emilio@patung.lancis.ecologia.unam.mx a emilio@192.168.1.10
 
-condor_rm emilio para quitar los jobs
+graciaspatung en nahuaaa
+-------------------------------------------------
 
-----------
+TERMINAL 1 - PATUNG
+
+#BORRAR CARPETAS PREVIAS
+
+
+cd toyModelHarvest
+
 rm -r bitacora/ initialConditions/ nwg/ salida/ 
 
 rm creator_CI_patung.py shortCommand creator_SubmitFile.py readme_toyModel execute_toyModel_pat.py submit_file_toyModel.sub listCI.txt
 
 (remove code if necessary)
--------------
 
+#ACTIVAR AMBIENTE VIRTUAL
 
-graciaspatung en nahuaaa
-
-cd toyModelHarvest
 source venv3/bin/activate  #ver si este es el bueno
 
+---------------------------------------------------------
+TERMINAL 2- TU COMPU
 
+#SUBE Y BAJAS CODIGOS DE PATUNG A TU COMPU
 
---------------------
-Sube y baja codigos
-
-desde tu compu:
-
+SUBIR
 scp -r /home/emilio/archivosTrabajandose/toyModelHarvest/src/patungCodes/* emilio@patung.lancis.ecologia.unam.mx:/srv/home/emilio/toyModelHarvest/
 
 bajar:
 
 scp -r emilio@patung.lancis.ecologia.unam.mx:/srv/home/emilio/toyModelHarvest/salida /home/emilio/archivosTrabajandose/toyModelHarvest/dataPatung_descargado
 
-
---------------------
 
 VERSION LANCIS
 
@@ -42,26 +52,26 @@ bajar:
 
 scp -r emilio@192.168.1.10:/srv/home/emilio/toyModelHarvest/salida /home/emilio/archivosTrabajandose/toyModelHarvest/dataPatung_descargado
 
-
-
-
 ----------------
+TERMINAL 1- PATUNG
 
-Create all the files and subfiles within the supercomputer
+SI YA ESTAS EN LA CARPETA TOYMODEL
+# CREAR FILES Y SUBFILES
 
 chmod +x execute_toyModel_pat.py; mkdir bitacora salida initialConditions nwg; cd salida/ ; mkdir DF_total DF_spatialAverage DF_muestrasPath ; cd ..;  mv __init__.py ./nwg/ 
 
 python3 creator_CI_patung.py; cd initialConditions/ ; ls -R > ../listCI.txt ; cd .. ; sed -i '1d' listCI.txt; python3 creator_SubmitFile.py  
 
-----
+# CORRER JOBS EN PATUNG
 
 condor_submit submit_file_toyModel.sub
 condor_q
 
-----
+#COSAS ADICIONALES PATUNG
 
-Cosas adicionales patung
+#VER AVANCES PATUNG
 
+condor_q
 condor_q -nobatch
 
 te ayuda a ver los ids de los jobs que siguen corriendo (no los agrupa)
@@ -72,31 +82,31 @@ te ayuda a ver los nombres de las computadoras en uso
 
 y despues de que tienes los ids de los jobs, te vas a la bitacora, y ahi puedes ver el log para ver en que computadora esta corriendo
 
+condor_rm emilio 
+
+para quitar los jobs
 -----------------
+#DENTRO DE LA BITACORA (CD)
+
+
+grep -il "ERROR" *
 
 Para ever si algun archivo tiene error en la bitacora
 
-grep -il "ERROR" *
-------------
-para ver si alguno corre en alguna maquina
 
 grep -il "kat15" *
 
-si alguna no esta jalando, se puede quitar en el creador submit
+para ver si alguno corre en alguna maquina
 
+si alguna no esta jalando, se puede quitar en el creador submit
 
 para enlistar el numero de archivos en una carpeta
 
 ls -1 | wc -l
 
 ----
+#SALIRSE DE PATUNG
 exit
-
-
-
-
-
-
 
 
 
