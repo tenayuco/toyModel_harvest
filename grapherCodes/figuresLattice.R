@@ -274,9 +274,8 @@ ggsave(FIGNUE, filename= "../../output/graficas/SUP_FIG/SIvsRust.png",  height =
 
 ##################PATHS###############3
 
-
+#DF_SAM<- read.csv("../archivosTrabajandose/toyModelHarvest/data/DF_muestrasPath_complete.csv")
 DF_SAM <- read.csv("../../data/DF_muestrasPath_complete.csv", header = TRUE)
-#DF_SAM <-read.csv("archivosTrabajandose/toyModelHarvest/data/DF_muestrasPath_complete.csv")
 #nP <- 2000
 #nW <- "1 worker"
 ###########Plo
@@ -539,14 +538,33 @@ DF_ARRANGED <- DF_TOTAL %>%
   filter(!is.na(DistanceW))%>%
   filter(DistanceW != 0)%>%  #aqui perdemos un porcentaje del total
   filter(numWorkers== "1 worker")%>%
-  select(HarvestStep, DistanceW, Rep, numPlants, HarvestModel, porcionCosecha)
+  select(HarvestStep, DistanceW, Rep, numPlants, HarvestModel, porcionCosecha)%>%
+  dplyr::mutate(pasoLargo =   round(as.integer(DistanceW/18)/(DistanceW/18))) #truco para que todo valga 1 si es mayor a 18 reportado así como salto laog
 
 DF_CUM <- DF_ARRANGED %>%
   group_by(Rep, numPlants, HarvestModel, porcionCosecha)%>%
   arrange(numPlants, HarvestModel, porcionCosecha, Rep, HarvestStep) %>% 
-  dplyr::mutate(cs = cumsum(DistanceW))
+  dplyr::mutate(cs = cumsum(DistanceW))%>% 
+  dplyr::mutate(cumPasoLargo = cumsum(pasoLargo))
 
 DF_CUM$PerStep <- 2* DF_CUM$HarvestStep/DF_CUM$numPlants *100
+
+DF_CUM$ArbNoCos <- DF_CUM$numPlants - DF_CUM$HarvestStep
+
+DF_CUM_A <- DF_CUM %>%
+  filter(porcionCosecha == "Asynchronous") %>%
+  mutate(ArbNoCos = ArbNoCos - (numPlants/2))
+
+DF_CUM_S <- DF_CUM%>%
+  filter(porcionCosecha == "Synchronous")
+
+DF_CUM <- rbind(DF_CUM_A, DF_CUM_S)
+  
+rm(DF_CUM_A)
+rm(DF_CUM_S)
+
+DF_CUM$PerCos <- 100 -(DF_CUM$ArbNoCos/DF_CUM$numPlants *100)
+
 
 FIG_CUM <- DF_CUM %>%
   filter(Rep ==0)%>%
@@ -565,7 +583,18 @@ FIG_CUM <- DF_CUM %>%
 ggsave(FIG_CUM,filename=paste("../../output/graficas/SUP_FIG/", "FIG_PROGRESSION.png", sep=""),  height = 10, width = 15)
 
 
-
+FIG_CUM_PASOSL <- DF_CUM %>%
+  filter(Rep ==0)%>%
+  filter(numPlants== 2000 | numPlants== 500| numPlants== 5000)%>%
+  #filter(numPlants== 2000)%>%
+  ggplot(aes(x= PerCos, y = cumPasoLargo)) +
+  geom_line()+
+  facet_grid(porcionCosecha ~numPlants) +
+  theme_bw() +
+  #geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= 0.025, size = 0.2, color= "Black")+
+  theme(text = element_text(size = 25))+
+  theme(strip.background = element_rect(fill = "white"))+ 
+  labs(x= "% Trees without coffee", y= "Number of large steps (>18 m)", color= "Rust")
 
 
 
