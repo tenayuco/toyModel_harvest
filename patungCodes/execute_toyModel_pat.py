@@ -63,13 +63,15 @@ timeHarvest = condiciones[4]
 
 
 ###
-harvestSteps = int(round(numPlants)/numWorkers) ##*Entero en este quito el 2 PERO SOLO FUNCIOMA PARA EL SICRN
 
 #harvestSteps = int(round(numPlants/2)/numWorkers) ##*Entero hace que nunca hagas mas de la mitad. Tendria que sobrar 1 planta
 #see full documentation, in each step, 25 trees per worker
 
 
 hlPlants = round(numPlants*condiciones[5])  #es decir, condiciones 6, es sea 1, sea 2. 
+
+harvestSteps = int(round(hlPlants)/numWorkers) ##*Entero a ver si esto funciona, espara que los harvest steps no sean los mismos.
+
 
 simID = condiciones[6]
 

@@ -539,7 +539,7 @@ DF_ARRANGED <- DF_TOTAL %>%
   filter(DistanceW != 0)%>%  #aqui perdemos un porcentaje del total
   filter(numWorkers== "1 worker")%>%
   select(HarvestStep, DistanceW, Rep, numPlants, HarvestModel, porcionCosecha)%>%
-  dplyr::mutate(pasoLargo =   round(as.integer(DistanceW/18)/(DistanceW/18))) #truco para que todo valga 1 si es mayor a 18 reportado así como salto laog
+  dplyr::mutate(pasoLargo =   round(as.integer(DistanceW/25)/(DistanceW/25))) #truco para que todo valga 1 si es mayor a 18 reportado así como salto laog
 
 DF_CUM <- DF_ARRANGED %>%
   group_by(Rep, numPlants, HarvestModel, porcionCosecha)%>%
@@ -587,14 +587,14 @@ FIG_CUM_PASOSL <- DF_CUM %>%
   filter(Rep ==0)%>%
   filter(numPlants== 2000 | numPlants== 500| numPlants== 5000)%>%
   #filter(numPlants== 2000)%>%
-  ggplot(aes(x= PerCos, y = cumPasoLargo)) +
+  ggplot(aes(x= PerCos, y = cumPasoLargo, col= porcionCosecha)) +
   geom_line()+
-  facet_grid(porcionCosecha ~numPlants) +
+  facet_grid(~numPlants) +
   theme_bw() +
   #geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= 0.025, size = 0.2, color= "Black")+
   theme(text = element_text(size = 25))+
   theme(strip.background = element_rect(fill = "white"))+ 
-  labs(x= "% Trees without coffee", y= "Number of large steps (>18 m)", color= "Rust")
+  labs(x= "% Trees without coffee", y= "Number of large steps (>18 m)", color= "Fruit Maturation")
 
 
 
