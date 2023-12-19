@@ -296,15 +296,19 @@ def HM_general(old_DF, dic_Harvest, dic_Simulation):
             tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["HarvestStep"]] = conteoTemp 
             tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["DistanceW"]] = UH_DIN.iloc[0]["Distance"]  
             
-
-            if royaDestino == 0:  #esto para asegurar que no fuera una planta infectada (0.75 o 1 o 0.5)
-                if royaOrigen == 1:
-                    tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["Rust"]] = 0.25 
+            
+            
+            if conteoTemp > (hSteps/2):#para que solo infecte después de haber cosechado la mitad (solo quiero ver el asincronico)
+            
+                if royaDestino == 0:  #esto para asegurar que no fuera una planta infectada (0.75 o 1 o 0.5)
+                    if royaOrigen == 1:
+                        tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["Rust"]] = 0.25 
+                    else:
+                        pass
                 else:
                     pass
             else:
                 pass
-             
     return(tempDF)
 
     

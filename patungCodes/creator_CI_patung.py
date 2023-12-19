@@ -42,8 +42,8 @@ tiemposHarvest= [5]
 #workers = [1,5,8]
 workers = [1,5]  #articulo ESteli, pero mejor buscar los extremos.  #toca ir hasta el 8!!!!
 modelSwitch = ["control", "closeness"]
-porcionCosecha = [0.5,1]
-#porcionCosecha = [1]
+#porcionCosecha = [0.5,1]
+porcionCosecha = [1]
 
 
 """

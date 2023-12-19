@@ -274,7 +274,7 @@ ggsave(FIGNUE, filename= "../../output/graficas/SUP_FIG/SIvsRust.png",  height =
 
 ##################PATHS###############3
 
-#DF_SAM<- read.csv("../archivosTrabajandose/toyModelHarvest/data/DF_muestrasPath_complete.csv")
+#DF_SAM<- read.csv("./archivosTrabajandose/toyModelHarvest/data/DF_muestrasPath_complete.csv")
 DF_SAM <- read.csv("../../data/DF_muestrasPath_complete.csv", header = TRUE)
 #nP <- 2000
 #nW <- "1 worker"
