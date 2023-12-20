@@ -454,7 +454,7 @@ FIG_PASOS_C <- DF_TOTAL_TEMP %>%
   xlim(0, 7.1)+
   scale_fill_manual(values = colorsDis)+
   geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= max(DF_TOTAL_TEMP$Frec)), size = 0.2, color= "Black")+
-  annotate(geom="text", x=3.75, y=max(DF_TOTAL_TEMP$Frec)-0.003, label="Max. contact \ndispersal distance",
+  annotate(geom="text", x=4.75, y=max(DF_TOTAL_TEMP$Frec)-0.003, label="Max. contact \ndispersal distance",
            color="black",
            size =8)+
   geom_segment(aes(x=2, y=max(DF_TOTAL_TEMP$Frec), xend=1.52, yend=max(DF_TOTAL_TEMP$Frec)-0.001), 
@@ -611,6 +611,10 @@ FIG_CUM <- DF_CUM %>%
   #geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= 0.025, size = 0.2, color= "Black")+
   theme(text = element_text(size = 25))+
   theme(strip.background = element_rect(fill = "white"))+ 
+  theme(
+    strip.background = element_blank(),
+    strip.text.x = element_blank()
+  )+
   labs(x= "% Trajectory traveled", y= "Size of step", color= "Rust")
 
 
