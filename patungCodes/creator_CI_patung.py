@@ -40,10 +40,11 @@ numberPlants = [500, 1000, 2000, 3000, 5000]
 tiemposHarvest= [5] 
 #tiemposHarvest= [0,1,2] 
 #workers = [1,5,8]
-workers = [1,5]  #articulo ESteli, pero mejor buscar los extremos.  #toca ir hasta el 8!!!!
+workers = [1]  #articulo ESteli, pero mejor buscar los extremos.  #toca ir hasta el 8!!!!
 modelSwitch = ["control", "closeness"]
 #porcionCosecha = [0.5,1]
-porcionCosecha = [1]
+#porcionCosecha = [1]
+porcionCosecha = ["A", "S_I", "S_F"] #asincronico, sincronico inicia y sincronico final 
 
 
 """

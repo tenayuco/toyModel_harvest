@@ -227,7 +227,10 @@ def HM_general(old_DF, dic_Harvest, dic_Simulation):
     
     tempDF = old_DF
     hSteps= dic_Harvest["harvest_Steps"]-1 #hago el -1 para que sean n pasos contando el 0
+    
     numW = dic_Harvest["num_Workers"]
+    
+    modeloH = dic_Harvest["model_harvest"]
     
     
     UN_HARV = tempDF.loc[tempDF["FruitLoad"] != 0]  ##IN both scenario, we star at a random plant, to have the same random stat
@@ -296,9 +299,22 @@ def HM_general(old_DF, dic_Harvest, dic_Simulation):
             tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["HarvestStep"]] = conteoTemp 
             tempDF.loc[tempDF.ID.isin(UH_DIN.ID), ["DistanceW"]] = UH_DIN.iloc[0]["Distance"]  
             
+            #esta es la linea para diferenciar los modelos
             
             
-            if conteoTemp > (hSteps/2):#para que solo infecte después de haber cosechado la mitad (solo quiero ver el asincronico)
+            infectar= 0
+            
+            if modeloH == "S_I":
+                if conteoTemp <(hSteps/2):
+                    infectar = 1
+            elif modeloH == "S_F":
+                if conteoTemp >(hSteps/2):
+                    infectar = 1
+            elif modeloH == "A":
+                infectar =1
+            
+                
+            if infectar ==1: #para que solo infecte después de haber cosechado la mitad (solo quiero ver el asincronico)
             
                 if royaDestino == 0:  #esto para asegurar que no fuera una planta infectada (0.75 o 1 o 0.5)
                     if royaOrigen == 1:

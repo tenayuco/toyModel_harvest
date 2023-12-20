@@ -7,10 +7,11 @@ library(reshape2)
 mycols <- c("#021128","#1b4a64", "#3585a0", "#759580", "#c78f34", "#fd9706","#fdb81c","#fbdb30")
 mycols3c <- c("#fdb81c", "#759580", "#1b4a64")
 
-groupColors <- c("#1b4a64", '#56B4E9', "#759580", "#fd9706", "#fbdb30", "#111111")
 groupColors2 <- c("#fd9706", "#1b4a64",'#56B4E9', "#555555")#ESTE ES CEMTAL
 groupColors3 <- c("white", "#fd9706", "#1b4a64" )
-groupColors4 <- c("black", "#fd9706", "#1b4a64" )
+groupColors <- c("white", "#fd9706", "#1b4a64", '#56B4E9', "#759580", "#fd9706", "#fbdb30", "#111111")
+
+groupColors4 <- c("black", "#fd9706", "#1b4a64" , '#56B4E9')
 
 colorsDis <- c("#B87400","white")
 colorsDis2 <- c("#B87400","#555555")
@@ -76,7 +77,7 @@ FIG_RUST <- DF_AV%>%
   geom_boxplot(color= "black", aes(fill= as.character(porcionCosecha)))+ 
   ggtitle("")+
   facet_wrap(~ numPlants, nrow=1, labeller = label_both)+
-  scale_fill_manual(values = groupColors3)+
+  scale_fill_manual(values = groupColors)+
   theme_bw() +
   theme(text = element_text(size = 25))+
   theme(strip.background = element_rect(fill = "white"))+ 
@@ -92,9 +93,9 @@ FIG_SLI_time <- DF_AV_AVR %>%
   filter(HarvestTime ==5|HarvestTime =="control")%>% 
   filter(numPlants == 500 | numPlants == 2000 |numPlants == 5000)%>% 
   
-  mutate(porcionCosecha = (ifelse(porcionCosecha == "control", "No harvesting (control)", porcionCosecha)))%>% 
-  mutate(porcionCosecha = (ifelse(porcionCosecha == "0.5", "With large steps", porcionCosecha)))%>% 
-  mutate(porcionCosecha = (ifelse(porcionCosecha == "1", "Without large steps", porcionCosecha)))%>% 
+  mutate(porcionCosecha = (ifelse(porcionCosecha == "control", " No harvesting (control)", porcionCosecha)))%>% 
+ # mutate(porcionCosecha = (ifelse(porcionCosecha == "0.5", "With large steps", porcionCosecha)))%>% 
+#  mutate(porcionCosecha = (ifelse(porcionCosecha == "1", "Without large steps", porcionCosecha)))%>% 
   
   ggplot(aes(x= Time, color= as.character(porcionCosecha) ,fill= as.character(porcionCosecha)))+
   geom_line(size= 1.5, aes(y= AverageRust))+
@@ -185,11 +186,11 @@ filter(porcionCosecha != "control")
 
 FIG_DIF_CONTROL_H2 <- DF_MODvsCON_GEN %>%
   filter(Time == timeMAX)%>%
-  filter(numWorkers == 1)%>%
+ # filter(numWorkers == 1)%>%
   filter(numPlants!=4000)%>%
-  mutate(porcionCosecha = (ifelse(porcionCosecha == "control", "No harvesting (control)", porcionCosecha)))%>% 
-  mutate(porcionCosecha = (ifelse(porcionCosecha == "0.5", "With large steps", porcionCosecha)))%>% 
-  mutate(porcionCosecha = (ifelse(porcionCosecha == "1", "Without large steps", porcionCosecha)))%>% 
+  mutate(porcionCosecha = (ifelse(porcionCosecha == "control", " No harvesting (control)", porcionCosecha)))%>% 
+ # mutate(porcionCosecha = (ifelse(porcionCosecha == "0.5", "With large steps", porcionCosecha)))%>% 
+#  mutate(porcionCosecha = (ifelse(porcionCosecha == "1", "Without large steps", porcionCosecha)))%>% 
   ggplot(aes(x= as.factor(HarvestTime), y= ModCo_Rust))+
   geom_boxplot(color = "black", aes(fill= porcionCosecha), position = "dodge")+ 
   ggtitle("")+
@@ -286,11 +287,23 @@ DF_SAM$numWorkers[DF_SAM$numWorkers =="1"] <- "1 worker"
 DF_SAM$numWorkers[DF_SAM$numWorkers =="5"] <- "5 workers" 
 
 
+##aqui un filtro de la si y sf
 
+DF_SAM_SI <- DF_SAM %>% filter(porcionCosecha == "S_I")
+DF_SAM_SF <- DF_SAM %>% filter(porcionCosecha == "S_F")
+DF_SAM_A <- DF_SAM %>% filter(porcionCosecha == "A")
+
+DF_SAM_SI <- DF_SAM_SI %>%
+  filter(HarvestStep < numPlants/(2*numWorkers)) # aver esto debe ser menor a 125 (la mitad de su jornada)
+
+DF_SAM_SF <- DF_SAM_SF %>%
+  filter(HarvestStep >= numPlants/(2*numWorkers)) # aver esto debe ser menor a 125 (la mitad de su jornada)
+
+DF_SAM <- rbind(DF_SAM_A, DF_SAM_SF, DF_SAM_SI)
 
 FIG_PATH_GEN<- DF_SAM %>% 
     filter(Rep == 0)%>%
-    #filter(numWorkers ==nW)%>%
+   # filter(WorkerID == "W_0")%>%
     filter(numPlants == 500 |numPlants == 2000 | numPlants == 5000)%>% #solo un ejepmplo
     filter(WorkerID != 0)%>% 
     arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
@@ -298,9 +311,9 @@ FIG_PATH_GEN<- DF_SAM %>%
     ggplot(aes(x= X, y = Y, group=WorkerID)) +
     geom_path(aes(col= WorkerID),size=1)+
     geom_point(size=1)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
-    #scale_color_viridis_c()+
-    scale_color_manual(values = mycols)+
-    facet_grid(numPlants~porcionCosecha*numWorkers) +
+    scale_color_viridis_d()+
+    #scale_color_manual(values = mycols)+
+    facet_grid(numPlants~porcionCosecha) +
     theme(panel.spacing = unit(0.8, "lines"), text = element_text(size = 15))+
     theme_bw()+
     theme(strip.background = element_rect(fill = "white"))+ 
@@ -332,7 +345,7 @@ DF_TOTAL$Infection[DF_TOTAL$Rust =="0.5"] <- "New Infection"
 FIG_PATH_2000_W1_V1<- DF_TOTAL %>% 
   #filter(HarvestStep <160)%>% #ultimo 160 plantas de ahi
   filter(Rep == 2)%>%
-  filter(numWorkers =="1 worker")%>%
+ # filter(numWorkers =="1 worker")%>%
   filter(numPlants == 2000)%>% #solo un ejepmplo
   filter(WorkerID != 0)%>% 
   arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!

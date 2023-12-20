@@ -58,7 +58,7 @@ in condiciones
 rep = condiciones[0]
 numPlants = condiciones[1]
 harvest = condiciones[2] 
-numWorkers = condiciones[3]
+
 timeHarvest = condiciones[4]
 
 
@@ -68,7 +68,15 @@ timeHarvest = condiciones[4]
 #see full documentation, in each step, 25 trees per worker
 
 
-hlPlants = round(numPlants*condiciones[5])  #es decir, condiciones 6, es sea 1, sea 2. 
+if(condiciones[5] == "A"):
+    hlPlants = round(numPlants*0.5)
+else:
+    hlPlants = round(numPlants*1)
+
+numWorkers = round(hlPlants/250) # para que siempre sea 1 dia de trbajo, 250 por trabajador
+
+#condiciones[3]  ##queda como 1 este ya no se usa
+
 
 harvestSteps = int(round(hlPlants)/numWorkers) ##*Entero a ver si esto funciona, espara que los harvest steps no sean los mismos.
 
@@ -78,7 +86,7 @@ simID = condiciones[6]
 
 
 dicLattice = {"dim_Ini": dimIni, "ini_Inf": iniInf, "mode_Arr": modeArr, "num_Plants": numPlants}
-dicHarvest = {"har_vest": harvest, "num_Workers": numWorkers, "harvest_Steps": harvestSteps, "hl_Plants":hlPlants, "time_Harvest":timeHarvest}
+dicHarvest = {"har_vest": harvest, "num_Workers": numWorkers, "harvest_Steps": harvestSteps, "hl_Plants":hlPlants, "time_Harvest":timeHarvest, "model_harvest": condiciones[5]}
 dicSimulation = {"rep_":rep, "T_max": Tmax, "contactDistance":contactoDis}
 
 
@@ -130,10 +138,9 @@ liga1 = patungDirectory + "/salida/DF_muestrasPath/"  #mkdir salida/matricesGene
 
 
 if harvest != "control":
-    if numWorkers == 1 or numWorkers ==5:
-        if timeHarvest == 5:
-            DF_sample = DF.loc[(DF["Time"] == 5.5)].copy()  #agarro 5.5 porque es justo despues de la cosecha
-            DF_sample.to_csv(liga1+ "DF_muestrasPath_%s.csv" %(args.code)) #these are for the path examples
+    if timeHarvest == 5:
+        DF_sample = DF.loc[(DF["Time"] == 5.5)].copy()  #agarro 5.5 porque es justo despues de la cosecha
+        DF_sample.to_csv(liga1+ "DF_muestrasPath_%s.csv" %(args.code)) #these are for the path examples
                 
             
 liga3 = patungDirectory + "/salida/DF_total/"
