@@ -20,7 +20,7 @@ colorRedes <- c("black", "black","darkred")
 #take the dataframe
 
 #DF_TOTAL <- read.csv("archivosTrabajandose/toyModelHarvest/data/DF_total_TF.csv", header = TRUE)
-rerunAna <- 1
+rerunAna <- 0
 
 if (rerunAna == 1){
 
@@ -32,29 +32,34 @@ DF_TOTAL$X.1 <- NULL
 DF_TOTAL$FruitLoad <- NULL
 DF_TOTAL$TotalHarvest <- NULL
 
-#filter conditions that are unused 
-DF_TOTAL<- DF_TOTAL %>%
-  filter(numWorkers != 5)%>%
-  filter(numPlants != 4000)
- # filter(Rep ==0) #prueba
 
 ##aqui deberiamos tener
 
 #  (1 harTime x  2 porCose  + 1 control) x (500+1000+2000+3000+5000) x N rep 
    # 3 * 11500 * 6
 
-DF_TOTAL$porcionCosecha[DF_TOTAL$HarvestModel =="control"] <- 99
+#DF_TOTAL$porcionCosecha[DF_TOTAL$HarvestModel =="control"] <- 99
 
 ###############################
 
 
 
+# DF_NEW<-  DF_TOTAL%>%
+#   group_by(X, Y, Rep, numPlants)%>% #son las vairables que quedan y sobre esos escenarios, vamos a hacer las diferencias entre modelos
+#   summarise(NUEVA_RUST = (Rust - Rust[HarvestModel=="control"]), 
+#             porcionCosecha = (porcionCosecha- porcionCosecha[HarvestModel=="control"]) +99)%>%
+#   filter(porcionCosecha <98)%>% #para quitar las lineas del control
+#   filter(NUEVA_RUST ==1)
+# 
+
 DF_NEW<-  DF_TOTAL%>%
   group_by(X, Y, Rep, numPlants)%>% #son las vairables que quedan y sobre esos escenarios, vamos a hacer las diferencias entre modelos
   summarise(NUEVA_RUST = (Rust - Rust[HarvestModel=="control"]), 
-            porcionCosecha = (porcionCosecha- porcionCosecha[HarvestModel=="control"]) +99)%>%
-  filter(porcionCosecha <98)%>% #para quitar las lineas del control
+            porcionCosecha = porcionCosecha
+            )%>%
+  filter(porcionCosecha != 1)%>% #para quitar las lineas del control
   filter(NUEVA_RUST ==1)
+
 
 
 #nP =5000
@@ -215,7 +220,7 @@ FIG_REDES <- melt_DF_POST_RES %>%
   labs(x ="Density (Plants/ha)", y="Magnitude", shape= "Legend", linetype= "Legend", color= "Legend")
 
   
-ggsave(FIG_REDES,filename=paste("../../output/graficas/NETWORKS/", "redesAna", ".pdf", sep=""),  height = 8, width = 24) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_REDES,filename=paste("../../output/graficas/NETWORKS/", "redesAna", ".pdf", sep=""),  height = 8, width = 30) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 
