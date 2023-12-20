@@ -154,8 +154,11 @@ DF_POST_RES <- DF_POST %>%
 
 #DF_POST_RES$N_REDES_NOR <- DF_POST_RES$N_REDES/DF_POST_RES$numPlants*100 
 
-DF_POST_RES$porcionCosecha[DF_POST_RES$porcionCosecha =="0.5"] <- "Asynchronous"
-DF_POST_RES$porcionCosecha[DF_POST_RES$porcionCosecha =="1"] <- "Synchronous"
+DF_POST_RES$porcionCosecha[DF_POST_RES$porcionCosecha =="A"] <- "Asynchronous"
+DF_POST_RES$porcionCosecha[DF_POST_RES$porcionCosecha =="S_F"] <- "Synchronous Final" 
+DF_POST_RES$porcionCosecha[DF_POST_RES$porcionCosecha =="S_I"] <- "Synchronous  Initial" 
+
+
 
 melt_mean <- DF_POST_RES %>%
   select(numPlants, porcionCosecha, N_REDES_mean, T_REDES_mean, MUL_N_T_mean)%>%

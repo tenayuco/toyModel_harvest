@@ -7,11 +7,11 @@ library(reshape2)
 mycols <- c("#021128","#1b4a64", "#3585a0", "#759580", "#c78f34", "#fd9706","#fdb81c","#fbdb30")
 mycols3c <- c("#fdb81c", "#759580", "#1b4a64")
 
-groupColors2 <- c("#fd9706", "#1b4a64",'#56B4E9', "#555555")#ESTE ES CEMTAL
+groupColors2 <- c("#1b4a64", "#fd9706", "#fbdb30", "white")#ESTE ES CEMTAL
 groupColors3 <- c("white", "#fd9706", "#1b4a64" )
-groupColors <- c("white", "#fd9706", "#1b4a64", '#56B4E9', "#759580", "#fd9706", "#fbdb30", "#111111")
+groupColors <- c("#1b4a64", "#fd9706", "#fbdb30", "white", "#fd9706", "#fbdb30", "#111111")
 
-groupColors4 <- c("black", "#fd9706", "#1b4a64" , '#56B4E9')
+groupColors4 <- c("#1b4a64", "#fd9706", "#fbdb30", "black")
 
 colorsDis <- c("#B87400","white")
 colorsDis2 <- c("#B87400","#555555")
@@ -35,8 +35,10 @@ DF_AV$porcionCosecha[DF_AV$HarvestModel =="control"] <- "control"
 #DF_AV$numWorkers[DF_AV$HarvestModel =="control"] <- "NoH" 
 
 
-#DF_AV$porcionCosecha[DF_AV$porcionCosecha =="0.5"] <- "Asynchronous"
-#DF_AV$porcionCosecha[DF_AV$porcionCosecha =="1"] <- "Synchronous" 
+DF_AV$porcionCosecha[DF_AV$porcionCosecha =="A"] <- " Asynchronous"
+DF_AV$porcionCosecha[DF_AV$porcionCosecha =="S_F"] <- " Synchronous Final" 
+DF_AV$porcionCosecha[DF_AV$porcionCosecha =="S_I"] <- " Synchronous  Initial" 
+
 
 DF_AV$HarvestModel[DF_AV$HarvestModel =="control"] <- "control"
 DF_AV$HarvestModel[DF_AV$HarvestModel =="closeness"] <- "harvest"
@@ -93,18 +95,21 @@ FIG_SLI_time <- DF_AV_AVR %>%
   filter(HarvestTime ==5|HarvestTime =="control")%>% 
   filter(numPlants == 500 | numPlants == 2000 |numPlants == 5000)%>% 
   
-  mutate(porcionCosecha = (ifelse(porcionCosecha == "control", " No harvesting (control)", porcionCosecha)))%>% 
+  mutate(porcionCosecha = (ifelse(porcionCosecha == "control", "No harvesting (control)", porcionCosecha)))%>% 
  # mutate(porcionCosecha = (ifelse(porcionCosecha == "0.5", "With large steps", porcionCosecha)))%>% 
 #  mutate(porcionCosecha = (ifelse(porcionCosecha == "1", "Without large steps", porcionCosecha)))%>% 
   
-  ggplot(aes(x= Time, color= as.character(porcionCosecha) ,fill= as.character(porcionCosecha)))+
-  geom_line(size= 1.5, aes(y= AverageRust))+
+  ggplot(aes(x= Time, color= as.character(porcionCosecha) ,
+             fill= as.character(porcionCosecha)
+             ))+
+  geom_line(size= 1, aes(y= AverageRust))+
   #geom_point(aes(y= AverageRust, color= as.character(porcionCosecha)), size= 2)+
-  geom_ribbon(aes( 
-                  ymin=AverageRust-SD_Rust, ymax=AverageRust+SD_Rust),alpha=0.5) +
+  geom_ribbon(color= "black", aes( 
+                  ymin=AverageRust-SD_Rust, ymax=AverageRust+SD_Rust, linetype= as.character(porcionCosecha)),alpha=0.8) +
   ggtitle("")+
   facet_wrap(~ numPlants, nrow =1)+
   theme(panel.spacing = unit(1, "cm"))+
+  
   scale_fill_manual(values = groupColors4)+
   scale_color_manual(values = groupColors4)+
   theme_bw()+
@@ -112,7 +117,7 @@ FIG_SLI_time <- DF_AV_AVR %>%
   theme(strip.background = element_rect(fill = "white"))+
   theme(panel.spacing = unit(1, "cm"))+
   #theme(legend.position = "none")
-  labs(x= "Time step (t)", y= "Average Rust (%)", color= "Harvesting scenario", fill= "Harvesting scenario")
+  labs(x= "Time step (t)", y= "Average Rust (%)", color= "Harvesting scenario", fill= "Harvesting scenario", linetype="Harvesting scenario" )
 ggsave(FIG_SLI_time,filename=paste("../../output/graficas/SUP_FIG/", "rust_time_abs", ".png", sep=""),  height = 5, width = 16) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc)
 
 ### now we are going to see the differences between the model and control and between models for each repetition
@@ -192,10 +197,11 @@ FIG_DIF_CONTROL_H2 <- DF_MODvsCON_GEN %>%
  # mutate(porcionCosecha = (ifelse(porcionCosecha == "0.5", "With large steps", porcionCosecha)))%>% 
 #  mutate(porcionCosecha = (ifelse(porcionCosecha == "1", "Without large steps", porcionCosecha)))%>% 
   ggplot(aes(x= as.factor(HarvestTime), y= ModCo_Rust))+
-  geom_boxplot(color = "black", aes(fill= porcionCosecha), position = "dodge")+ 
+  geom_boxplot(color = "black", aes(fill= porcionCosecha, linetype= porcionCosecha), position = "dodge")+ 
   ggtitle("")+
   facet_wrap(~numPlants, nrow = 1, strip.position = "bottom")+
   scale_fill_manual(values = groupColors2)+ 
+  #scale_linetype_manual(values= c(2,4,1,5))+
   ylim(0, 18)+
   theme_bw() +
   theme(text = element_text(size = 20),
@@ -205,7 +211,7 @@ FIG_DIF_CONTROL_H2 <- DF_MODvsCON_GEN %>%
   theme(strip.background = element_blank())+
   theme(panel.spacing = unit(0, "cm"))+
   #theme(legend.position = "none")+
-  labs(x= "Density (Plants/ha)", y= "Rust Increase (Scenario-Control)", fill= "Harvesting Scenario")
+  labs(x= "Density (Plants/ha)", y= "Rust Increase (Scenario-Control)", fill= "Harvesting Scenario", linetype="Harvesting Scenario" )
 
 ggsave(FIG_DIF_CONTROL_H2,filename="../../output/graficas/DIF_RUST/ModelvsControl_harvest4_numW1.png",  height = 5, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
@@ -281,10 +287,10 @@ DF_SAM <- read.csv("../../data/DF_muestrasPath_complete.csv", header = TRUE)
 #nW <- "1 worker"
 ###########Plo
 
-DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="0.5"] <- "Asynchronous"
-DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="1"] <- "Synchronous" 
-DF_SAM$numWorkers[DF_SAM$numWorkers =="1"] <- "1 worker" 
-DF_SAM$numWorkers[DF_SAM$numWorkers =="5"] <- "5 workers" 
+
+
+#DF_SAM$numWorkers[DF_SAM$numWorkers =="1"] <- "1 worker" 
+#DF_SAM$numWorkers[DF_SAM$numWorkers =="5"] <- "5 workers" 
 
 
 ##aqui un filtro de la si y sf
@@ -300,6 +306,10 @@ DF_SAM_SF <- DF_SAM_SF %>%
   filter(HarvestStep >= numPlants/(2*numWorkers)) # aver esto debe ser menor a 125 (la mitad de su jornada)
 
 DF_SAM <- rbind(DF_SAM_A, DF_SAM_SF, DF_SAM_SI)
+
+DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="A"] <- "Asynchronous"
+DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="S_I"] <- "Synchronous  Initial" 
+DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="S_F"] <- "Synchronous Final" 
 
 FIG_PATH_GEN<- DF_SAM %>% 
     filter(Rep == 0)%>%
@@ -357,7 +367,7 @@ FIG_PATH_2000_W1_V1<- DF_TOTAL %>%
   scale_color_manual(values = colorsDis2)+
   theme(panel.spacing = unit(0.8, "lines"))+
   theme_bw()+
-  facet_wrap(~porcionCosecha, nrow = 2) +
+  facet_wrap(~porcionCosecha, nrow = 3) +
   theme(text = element_text(size = 20))+
   theme(legend.position = "none") +
   theme(
@@ -372,20 +382,23 @@ ggsave(FIG_PATH_2000_W1_V1,filename=paste("../../output/graficas/PATH/", "path_p
 
 
 FIG_PATH_3000_W1_V2<- DF_TOTAL %>% 
-  filter(HarvestStep >((numPlants/2)-160))%>% #ultimo 100 plantas de ahi
+  #filter(HarvestStep <160)%>% #ultimo 160 plantas de ahi
   filter(Rep == 2)%>%
-  filter(numWorkers =="1 worker")%>%
-  filter(numPlants == 3000)%>% #solo un ejepmplo
-  filter(WorkerID != 0)%>% 
+  # filter(numWorkers =="1 worker")%>%
+  filter(numPlants ==2000)%>% #solo un ejepmplo
+  filter(WorkerID == "W_2")%>% 
   arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
   rowwise() %>% 
-  ggplot(aes(x= X, y = Y , group=WorkerID)) + #agregie la multiplicacion para rotar todo
-  geom_path(color = "#555555",size=1.5, alpha= 0.8)+
+  ggplot(aes(x= X, y = Y, group=WorkerID)) +
+  geom_path(aes(col= as.character(Infection)),size=1.5, alpha= 0.8)+
   geom_point(size=1.5)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
+  #scale_color_viridis_c()+
+  scale_color_manual(values = colorsDis2)+
   theme(panel.spacing = unit(0.8, "lines"))+
   theme_bw()+
-  facet_wrap(~porcionCosecha, nrow = 2) +
+  facet_wrap(~porcionCosecha, nrow = 3) +
   theme(text = element_text(size = 20))+
+  theme(legend.position = "none") +
   theme(
     strip.background = element_blank(),
     strip.text.x = element_blank()
@@ -415,8 +428,7 @@ DF_TOTAL_AG$logFrec <- log(DF_TOTAL_AG$Frec)
 
 DF_TOTAL_AG_SHORT <- DF_TOTAL_AG %>%
   filter(!is.na(DistanceW))%>%
-  filter(DistanceW != 0)%>%  #aqui perdemos un porcentaje del total
-  filter(numWorkers== "1 worker")
+  filter(DistanceW != 0)
 
 
 for (nP in unique(DF_TOTAL_AG_SHORT$numPlants)){
@@ -439,7 +451,7 @@ FIG_PASOS_G <- DF_TOTAL_TEMP %>%
 FIG_PASOS_C <- DF_TOTAL_TEMP %>%
   ggplot(aes(x= DistanceW, y = Frec)) +
   geom_point(aes(fill= as.character(Infection)), color= "black",  shape=21, size=5, stroke=1,alpha= 0.7)+
-  xlim(0, 5.1)+
+  xlim(0, 7.1)+
   scale_fill_manual(values = colorsDis)+
   geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= max(DF_TOTAL_TEMP$Frec)), size = 0.2, color= "Black")+
   annotate(geom="text", x=3.75, y=max(DF_TOTAL_TEMP$Frec)-0.003, label="Max. contact \ndispersal distance",
@@ -469,8 +481,8 @@ FIG_PASOS_LOG <- DF_TOTAL_AG_SHORT %>%
  # filter(Rust == 0.5)%>%  
   filter(numPlants== 2000 | numPlants== 500| numPlants== 5000)%>%
   ggplot(aes(x= logDistanceW, y = logFrec)) +
-  geom_jitter(aes(color= as.character(Infection)), alpha=0.7, size= 1.5)+
-  scale_color_manual(values = colorsDis)+
+  geom_jitter(aes(fill= as.character(Infection)), color= "black",  shape=21, size=1.5, stroke=1,alpha= 0.7)+
+  scale_fill_manual(values = colorsDis)+
   facet_grid(porcionCosecha ~numPlants) +
   theme_bw() +
   geom_segment(aes(x=log(1.5), y=-11, xend= log(1.5), yend=-2), size = 0.2, color= "Black")+
@@ -525,10 +537,10 @@ DF_SUM_AG$FrecSumREL <-  (DF_SUM_AG$FrecSum /(DF_SUM_AG$numPlants*length(unique(
 
 FIG_W_DEN <- DF_SUM_AG %>%
   filter(Infection == "New Infection")%>%
-  filter(numWorkers == "1 worker")%>%
+  #filter(numWorkers == "1 worker")%>%
   filter(LIM_1.5 == ">=1.5")%>%
-  mutate(porcionCosecha = (ifelse(porcionCosecha == "Asynchronous", "With large steps", porcionCosecha)))%>% 
-  mutate(porcionCosecha = (ifelse(porcionCosecha == "Synchronous", "Without large steps", porcionCosecha)))%>% 
+ # mutate(porcionCosecha = (ifelse(porcionCosecha == "Asynchronous", "With large steps", porcionCosecha)))%>% 
+  #mutate(porcionCosecha = (ifelse(porcionCosecha == "Synchronous", "Without large steps", porcionCosecha)))%>% 
   ggplot(aes(x = numPlants, y = FrecSumREL))+
   geom_line(aes(group = porcionCosecha))+
  #stat_summary(fun = , na.rm = TRUE, color = 'darkblue', geom ='line')+
@@ -549,8 +561,10 @@ ggsave(FIG_W_DEN,filename=paste("../../output/graficas/SUP_FIG/", "FIG_W_DEN.png
 
 DF_ARRANGED <- DF_TOTAL %>%
   filter(!is.na(DistanceW))%>%
+  filter(Rep ==2)%>%
+  
   filter(DistanceW != 0)%>%  #aqui perdemos un porcentaje del total
-  filter(numWorkers== "1 worker")%>%
+  #filter(numWorkers== "1 worker")%>%
   select(HarvestStep, DistanceW, Rep, numPlants, HarvestModel, porcionCosecha)%>%
   dplyr::mutate(pasoLargo =   round(as.integer(DistanceW/25)/(DistanceW/25))) #truco para que todo valga 1 si es mayor a 18 reportado así como salto laog
 
@@ -560,28 +574,35 @@ DF_CUM <- DF_ARRANGED %>%
   dplyr::mutate(cs = cumsum(DistanceW))%>% 
   dplyr::mutate(cumPasoLargo = cumsum(pasoLargo))
 
-DF_CUM$PerStep <- 2* DF_CUM$HarvestStep/DF_CUM$numPlants *100
+
+DF_CUM$PerStep <- 100*DF_CUM$HarvestStep/250
 
 DF_CUM$ArbNoCos <- DF_CUM$numPlants - DF_CUM$HarvestStep
 
 DF_CUM_A <- DF_CUM %>%
-  filter(porcionCosecha == "Asynchronous") %>%
-  mutate(ArbNoCos = ArbNoCos - (numPlants/2))
+  filter(porcionCosecha == "Asynchronous")
 
-DF_CUM_S <- DF_CUM%>%
-  filter(porcionCosecha == "Synchronous")
+DF_CUM_SI <- DF_CUM%>%
+  filter(porcionCosecha == "Synchronous  Initial")
 
-DF_CUM <- rbind(DF_CUM_A, DF_CUM_S)
-  
+DF_CUM_SF <- DF_CUM%>%
+  filter(porcionCosecha == "Synchronous Final")
+
+
+DF_CUM <- rbind(DF_CUM_A, DF_CUM_SI, DF_CUM_SF)
+
+
 rm(DF_CUM_A)
-rm(DF_CUM_S)
+rm(DF_CUM_SI)
+rm(DF_CUM_SF)
+
 
 DF_CUM$PerCos <- 100 -(DF_CUM$ArbNoCos/DF_CUM$numPlants *100)
 
 
 FIG_CUM <- DF_CUM %>%
-  filter(Rep ==0)%>%
-  filter(numPlants== 2000 | numPlants== 500| numPlants== 5000)%>%
+  filter(Rep ==2)%>%
+ # filter(numPlants== 2000)%>%
   #filter(numPlants== 2000)%>%
   ggplot(aes(x= PerStep, y = DistanceW)) +
   geom_line()+
@@ -593,22 +614,39 @@ FIG_CUM <- DF_CUM %>%
   labs(x= "% Trajectory traveled", y= "Size of step", color= "Rust")
 
 
-ggsave(FIG_CUM,filename=paste("../../output/graficas/SUP_FIG/", "FIG_PROGRESSION.png", sep=""),  height = 10, width = 15)
+ggsave(FIG_CUM,filename=paste("../../output/graficas/SUP_FIG/", "FIG_PROGRESSION.png", sep=""),  height = 10, width = 20)
 
 
-FIG_CUM_PASOSL <- DF_CUM %>%
-  filter(Rep ==0)%>%
-  filter(numPlants== 2000 | numPlants== 500| numPlants== 5000)%>%
-  #filter(numPlants== 2000)%>%
-  ggplot(aes(x= PerCos, y = cumPasoLargo, col= porcionCosecha)) +
+
+FIG_CUM <- DF_CUM %>%
+  filter(Rep ==2)%>%
+  filter(numPlants== 2000)%>%
+  ggplot(aes(x= PerStep, y = DistanceW)) +
   geom_line()+
-  facet_grid(~numPlants) +
+  facet_grid(porcionCosecha ~numPlants) +
   theme_bw() +
   #geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= 0.025, size = 0.2, color= "Black")+
   theme(text = element_text(size = 25))+
   theme(strip.background = element_rect(fill = "white"))+ 
-  labs(x= "% Trees without coffee", y= "Number of large steps (>18 m)", color= "Fruit Maturation")
+  labs(x= "% Trajectory traveled", y= "Size of step", color= "Rust")
 
+
+ggsave(FIG_CUM,filename=paste("../../output/graficas/PATH/", "FIG_PROGRESSION_2000.png", sep=""),  height = 10, width = 5)
+
+
+#FIG_CUM_PASOSL <- DF_CUM %>%
+ # filter(Rep ==2)%>%
+  #filter(numPlants== 2000) %>%
+  #filter(numPlants== 2000)%>%
+  # ggplot(aes(x= PerCos, y = cumPasoLargo, col= porcionCosecha)) +
+  # geom_line()+
+  # facet_grid(~numPlants) +
+  # theme_bw() +
+  # #geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= 0.025, size = 0.2, color= "Black")+
+  # theme(text = element_text(size = 25))+
+  # theme(strip.background = element_rect(fill = "white"))+ 
+  # labs(x= "% Trees without coffee", y= "Number of large steps (>18 m)", color= "Fruit Maturation")
+  # 
 
 
 # 
