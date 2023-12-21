@@ -135,30 +135,30 @@ densidades = length(unique(DF_AV$numPlants))
 # 1500 rows with a new variabe
 
 
-DF_MODELS <- DF_AV %>%
-  filter(HarvestModel != "control")%>%  #we remove the contorl, we do not need it. 
-  filter(Time == timeMAX)%>%
-  group_by(Rep, numPlants, numWorkers, HarvestTime) %>%  #we add all the variables we dont add the ID, we remove it
-  summarise(DifRust = diff(Rust)*(-1), PercIncrease = (-1)* 100*diff(Rust)/Rust[porcionCosecha==1])
-
-
-FIG_DIF_MODELS <- DF_MODELS%>%
-  filter(numWorkers ==1)%>%
-  filter(numPlants!=4000)%>%
-  ggplot(aes(x= as.factor(numPlants), y= DifRust))+
-  geom_boxplot(color= "black", aes(fill= as.character(numPlants)))+ 
-  ggtitle("")+
-  #facet_wrap(~numPlants, nrow=2)+
-  scale_fill_grey()+
-  geom_segment(aes(x=0, y=0, xend= 6, yend=0), size = 0.2, color= "DarkRed")+
-  theme_bw() +
-  theme(legend.position = "none")+
-  theme(text = element_text(size = 25))+
-  theme(strip.background = element_rect(fill = "white"))+ 
-  labs(x= "Density (Plants/ha)", y= "Average Rust Difference (A-S)")
-
-ggsave(FIG_DIF_MODELS,filename="../../output/graficas/DIF_RUST/dif_models.png",  height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-
+# DF_MODELS <- DF_AV %>%
+#   filter(HarvestModel != "control")%>%  #we remove the contorl, we do not need it. 
+#   filter(Time == timeMAX)%>%
+#   group_by(Rep, numPlants, numWorkers, HarvestTime) %>%  #we add all the variables we dont add the ID, we remove it
+#   summarise(DifRust = diff(Rust)*(-1), PercIncrease = (-1)* 100*diff(Rust)/Rust[porcionCosecha==1])
+# 
+# 
+# FIG_DIF_MODELS <- DF_MODELS%>%
+#   filter(numWorkers ==1)%>%
+#   filter(numPlants!=4000)%>%
+#   ggplot(aes(x= as.factor(numPlants), y= DifRust))+
+#   geom_boxplot(color= "black", aes(fill= as.character(numPlants)))+ 
+#   ggtitle("")+
+#   #facet_wrap(~numPlants, nrow=2)+
+#   scale_fill_grey()+
+#   geom_segment(aes(x=0, y=0, xend= 6, yend=0), size = 0.2, color= "DarkRed")+
+#   theme_bw() +
+#   theme(legend.position = "none")+
+#   theme(text = element_text(size = 25))+
+#   theme(strip.background = element_rect(fill = "white"))+ 
+#   labs(x= "Density (Plants/ha)", y= "Average Rust Difference (A-S)")
+# 
+# ggsave(FIG_DIF_MODELS,filename="../../output/graficas/DIF_RUST/dif_models.png",  height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+# 
 
 
 
@@ -323,7 +323,7 @@ FIG_PATH_GEN<- DF_SAM %>%
     geom_point(size=1)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
     scale_color_viridis_d()+
     #scale_color_manual(values = mycols)+
-    facet_grid(numPlants~porcionCosecha) +
+    facet_grid(porcionCosecha ~numPlants) +
     theme(panel.spacing = unit(0.8, "lines"), text = element_text(size = 15))+
     theme_bw()+
     theme(strip.background = element_rect(fill = "white"))+ 
@@ -376,12 +376,12 @@ FIG_PATH_2000_W1_V1<- DF_TOTAL %>%
   )+ 
   labs(x= "X (m)", y= "Y (m)", col= "Rust")
 
-ggsave(FIG_PATH_2000_W1_V1,filename=paste("../../output/graficas/PATH/", "path_plants_2000_w1_todos.png", sep=""),  height = 10, width = 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_PATH_2000_W1_V1,filename=paste("../../output/graficas/PATH/", "path_plants_2000_w1_todos.png", sep=""),  height = 10, width = 4.5) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 
 
-FIG_PATH_3000_W1_V2<- DF_TOTAL %>% 
+FIG_PATH_2000_W1_V2<- DF_TOTAL %>% 
   #filter(HarvestStep <160)%>% #ultimo 160 plantas de ahi
   filter(Rep == 2)%>%
   # filter(numWorkers =="1 worker")%>%
@@ -405,7 +405,7 @@ FIG_PATH_3000_W1_V2<- DF_TOTAL %>%
   )+ 
   labs(x= "X (m)", y= "Y (m)", col= "Rust")
 
-ggsave(FIG_PATH_3000_W1_V2,filename=paste("../../output/graficas/PATH/", "path_plants_3000_w1_ultimo_160.png", sep=""),  height = 10, width = 5.5) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_PATH_2000_W1_V2,filename=paste("../../output/graficas/PATH/", "path_plants_3000_1Worker.png", sep=""),  height = 10, width = 4.5) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 #
@@ -441,6 +441,7 @@ FIG_PASOS_G <- DF_TOTAL_TEMP %>%
   ggplot(aes(x= DistanceW, y = Frec)) +
   geom_point(aes(fill= as.character(Infection)), color= "black",  shape=21, size=5, stroke=1, alpha= 0.7)+
   xlim(0, 110)+
+  ylim(0, 0.05)+
   scale_fill_manual(values =colorsDis)+
   theme_bw() +
   theme(text = element_text(size = 30))+
@@ -452,12 +453,13 @@ FIG_PASOS_C <- DF_TOTAL_TEMP %>%
   ggplot(aes(x= DistanceW, y = Frec)) +
   geom_point(aes(fill= as.character(Infection)), color= "black",  shape=21, size=5, stroke=1,alpha= 0.7)+
   xlim(0, 7.1)+
+  ylim(0, 0.05)+
   scale_fill_manual(values = colorsDis)+
-  geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= max(DF_TOTAL_TEMP$Frec)), size = 0.2, color= "Black")+
-  annotate(geom="text", x=4.75, y=max(DF_TOTAL_TEMP$Frec)-0.003, label="Max. contact \ndispersal distance",
+  geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= 0.05), size = 0.2, color= "Black")+
+  annotate(geom="text", x=4.75, y=0.04, label="Max. contact \ndispersal distance",
            color="black",
            size =8)+
-  geom_segment(aes(x=2, y=max(DF_TOTAL_TEMP$Frec), xend=1.52, yend=max(DF_TOTAL_TEMP$Frec)-0.001), 
+  geom_segment(aes(x=2, y=0.04, xend=1.52, yend=0.04-0.001), 
                arrow = arrow(length=unit(.2, 'cm')))+
     theme_bw() +
   theme(text = element_text(size = 30))+
@@ -561,32 +563,34 @@ ggsave(FIG_W_DEN,filename=paste("../../output/graficas/SUP_FIG/", "FIG_W_DEN.png
 
 DF_ARRANGED <- DF_TOTAL %>%
   filter(!is.na(DistanceW))%>%
-  filter(Rep ==2)%>%
-  
+ # filter(Rep ==2)%>%
+  #filter(WorkerID == "W_2")%>%
   filter(DistanceW != 0)%>%  #aqui perdemos un porcentaje del total
   #filter(numWorkers== "1 worker")%>%
-  select(HarvestStep, DistanceW, Rep, numPlants, HarvestModel, porcionCosecha)%>%
+  select(HarvestStep, DistanceW, Rep, numPlants, HarvestModel, porcionCosecha, WorkerID, Infection)%>%
   dplyr::mutate(pasoLargo =   round(as.integer(DistanceW/25)/(DistanceW/25))) #truco para que todo valga 1 si es mayor a 18 reportado así como salto laog
 
 DF_CUM <- DF_ARRANGED %>%
   group_by(Rep, numPlants, HarvestModel, porcionCosecha)%>%
-  arrange(numPlants, HarvestModel, porcionCosecha, Rep, HarvestStep) %>% 
+  arrange(numPlants, HarvestModel, porcionCosecha, Rep, HarvestStep, WorkerID) %>% 
   dplyr::mutate(cs = cumsum(DistanceW))%>% 
   dplyr::mutate(cumPasoLargo = cumsum(pasoLargo))
 
 
-DF_CUM$PerStep <- 100*DF_CUM$HarvestStep/250
+#DF_CUM$PerStep <- 100*DF_CUM$HarvestStep/250
 
-DF_CUM$ArbNoCos <- DF_CUM$numPlants - DF_CUM$HarvestStep
-
+#
 DF_CUM_A <- DF_CUM %>%
-  filter(porcionCosecha == "Asynchronous")
+  filter(porcionCosecha == "Asynchronous") %>%
+  mutate(PerStep = 100*HarvestStep/250)
 
 DF_CUM_SI <- DF_CUM%>%
-  filter(porcionCosecha == "Synchronous  Initial")
+  filter(porcionCosecha == "Synchronous  Initial")%>%
+  mutate(PerStep = 100*HarvestStep/250)
 
 DF_CUM_SF <- DF_CUM%>%
-  filter(porcionCosecha == "Synchronous Final")
+  filter(porcionCosecha == "Synchronous Final")%>%
+  mutate(PerStep = 100*HarvestStep/250-100)
 
 
 DF_CUM <- rbind(DF_CUM_A, DF_CUM_SI, DF_CUM_SF)
@@ -596,46 +600,50 @@ rm(DF_CUM_A)
 rm(DF_CUM_SI)
 rm(DF_CUM_SF)
 
+DF_CUM$ArbNoCos <- DF_CUM$numPlants - DF_CUM$HarvestStep
 
 DF_CUM$PerCos <- 100 -(DF_CUM$ArbNoCos/DF_CUM$numPlants *100)
 
 
 FIG_CUM <- DF_CUM %>%
-  filter(Rep ==2)%>%
- # filter(numPlants== 2000)%>%
+  #filter(Rep ==2)%>%
+  #filter(WorkerID == "W_2")%>%
   #filter(numPlants== 2000)%>%
   ggplot(aes(x= PerStep, y = DistanceW)) +
-  geom_line()+
+  geom_line(aes(color= as.factor(Rep), group= WorkerID))+
   facet_grid(porcionCosecha ~numPlants) +
   theme_bw() +
+  scale_color_viridis_d()+
   #geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= 0.025, size = 0.2, color= "Black")+
   theme(text = element_text(size = 25))+
   theme(strip.background = element_rect(fill = "white"))+ 
-  theme(
-    strip.background = element_blank(),
-    strip.text.x = element_blank()
-  )+
-  labs(x= "% Trajectory traveled", y= "Size of step", color= "Rust")
+  theme(legend.position = "None")+
+  labs(x= "% Harvested trees", y= "Size of step per worker")
 
 
 ggsave(FIG_CUM,filename=paste("../../output/graficas/SUP_FIG/", "FIG_PROGRESSION.png", sep=""),  height = 10, width = 20)
 
 
 
-FIG_CUM <- DF_CUM %>%
+FIG_CUM_2000 <- DF_CUM %>%
   filter(Rep ==2)%>%
+ # filter(WorkerID == )%>%
   filter(numPlants== 2000)%>%
   ggplot(aes(x= PerStep, y = DistanceW)) +
-  geom_line()+
-  facet_grid(porcionCosecha ~numPlants) +
+  geom_line(aes(group = WorkerID, color = Infection))+
+  facet_wrap(~porcionCosecha, nrow = 3) +
   theme_bw() +
+  scale_color_manual(values = colorsDis2)+
   #geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= 0.025, size = 0.2, color= "Black")+
   theme(text = element_text(size = 25))+
-  theme(strip.background = element_rect(fill = "white"))+ 
-  labs(x= "% Trajectory traveled", y= "Size of step", color= "Rust")
+  theme(
+    strip.background = element_blank(),
+    strip.text.x = element_blank()
+  )+
+  labs(x= "% Harvested trees", y= "Size of step per worker", color= "Rust")
 
 
-ggsave(FIG_CUM,filename=paste("../../output/graficas/PATH/", "FIG_PROGRESSION_2000.png", sep=""),  height = 10, width = 5)
+ggsave(FIG_CUM_2000,filename=paste("../../output/graficas/PATH/", "FIG_PROGRESSION_2000.png", sep=""),  height = 12, width = 9 )
 
 
 #FIG_CUM_PASOSL <- DF_CUM %>%

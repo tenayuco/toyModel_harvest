@@ -70,10 +70,11 @@ timeHarvest = condiciones[4]
 
 if(condiciones[5] == "A"):
     hlPlants = round(numPlants*0.5)
+    numWorkers = round(hlPlants/250)
 else:
     hlPlants = round(numPlants*1)
+    numWorkers = round(hlPlants/500)  # asi van a quedar el mismo numbero por esecnario! 
 
-numWorkers = round(hlPlants/250) # para que siempre sea 1 dia de trbajo, 250 por trabajador
 
 #condiciones[3]  ##queda como 1 este ya no se usa
 
