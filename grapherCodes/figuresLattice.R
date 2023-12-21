@@ -470,7 +470,8 @@ FIG_PASOS_C <- DF_TOTAL_TEMP %>%
   )
   #labs(fill= "Rust", x= "Step length", y= "Proportion of Steps")
 
-FIG_INSIDE <- FIG_PASOS_G + annotation_custom(ggplotGrob(FIG_PASOS_C), xmin = 15, xmax = 80, ymin = max(DF_TOTAL_TEMP$Frec)/3, ymax = max(DF_TOTAL_TEMP$Frec))
+#FIG_INSIDE <- FIG_PASOS_G + annotation_custom(ggplotGrob(FIG_PASOS_C), xmin = 15, xmax = 80, ymin = max(DF_TOTAL_TEMP$Frec)/3, ymax = max(DF_TOTAL_TEMP$Frec))
+FIG_INSIDE <- FIG_PASOS_G + annotation_custom(ggplotGrob(FIG_PASOS_C), xmin = 15, xmax = 80, ymin = 0.01, ymax = 0.04) #este solo funcion para el n=2000, el de arriba es mas general!! (ver versiones previas de ste codigo)
 
 ggsave(FIG_INSIDE,filename=paste("../../output/graficas/PATH/", "DisPasos_INSIDE_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
