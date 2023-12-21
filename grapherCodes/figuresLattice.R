@@ -386,11 +386,11 @@ FIG_PATH_2000_W1_V2<- DF_TOTAL %>%
   filter(Rep == 2)%>%
   # filter(numWorkers =="1 worker")%>%
   filter(numPlants ==2000)%>% #solo un ejepmplo
-  filter(WorkerID == "W_2")%>% 
+  filter(WorkerID == "W_1")%>% 
   arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
   rowwise() %>% 
   ggplot(aes(x= X, y = Y, group=WorkerID)) +
-  geom_path(aes(col= as.character(Infection)),size=1.5, alpha= 0.8)+
+  geom_path(col= "black",size=1.5, alpha= 0.7)+
   geom_point(size=1.5)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
   #scale_color_viridis_c()+
   scale_color_manual(values = colorsDis2)+
@@ -405,7 +405,7 @@ FIG_PATH_2000_W1_V2<- DF_TOTAL %>%
   )+ 
   labs(x= "X (m)", y= "Y (m)", col= "Rust")
 
-ggsave(FIG_PATH_2000_W1_V2,filename=paste("../../output/graficas/PATH/", "path_plants_3000_1Worker.png", sep=""),  height = 10, width = 4.5) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_PATH_2000_W1_V2,filename=paste("../../output/graficas/PATH/", "path_plants_2000_1Worker.png", sep=""),  height = 10, width = 4.5) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 #
@@ -641,10 +641,10 @@ FIG_CUM_2000 <- DF_CUM %>%
     strip.background = element_blank(),
     strip.text.x = element_blank()
   )+
-  labs(x= "% Harvested trees", y= "Size of step per worker", color= "Rust")
+  labs(x= "% Harvested trees", y= "Step length per worker (m)", color= "Rust")
 
 
-ggsave(FIG_CUM_2000,filename=paste("../../output/graficas/PATH/", "FIG_PROGRESSION_2000.png", sep=""),  height = 12, width = 9 )
+ggsave(FIG_CUM_2000,filename=paste("../../output/graficas/PATH/", "FIG_PROGRESSION_2000.png", sep=""),  height = 12, width = 8.5 )
 
 
 #FIG_CUM_PASOSL <- DF_CUM %>%
