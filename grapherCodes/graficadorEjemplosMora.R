@@ -56,19 +56,23 @@ rm(DF_HARVEST_GAMMA_H)
 
 #cambiams por E de ecolo
 DF_HARVEST_GAMMA$Finca[DF_HARVEST_GAMMA$Finca== "H"] <- "C"
-DF_HARVEST_GAMMA$Finca[DF_HARVEST_GAMMA$Finca== "I"] <- " O"
+DF_HARVEST_GAMMA$Finca[DF_HARVEST_GAMMA$Finca== "I"] <- "A"
 
 
 
 DF_HARVEST_GAMMA_2<- DF_HARVEST_GAMMA %>% 
   unite("Finca_ID", c(Finca, ID_POR_FINCA), remove = F) %>% 
-  filter(Finca_ID %in% c(" O_1", "C_2", "C_5"))
+  filter(Finca_ID %in% c("C_4", "C_1", "A_3"))
 
+DF_HARVEST_GAMMA_2$Finca_ID[DF_HARVEST_GAMMA_2$Finca_ID== "C_4"] <- "C_ 4"
 
 DF_HARVEST_RESUMEN <- DF_HARVEST_GAMMA_2 %>%
   group_by(Finca, ID_POR_FINCA)%>%
   summarise(observation = sum(conteo)) %>%
   unite("Finca_ID", c(Finca, ID_POR_FINCA))
+
+DF_HARVEST_RESUMEN$Finca_ID[DF_HARVEST_RESUMEN$Finca_ID== "C_4"] <- "C_ 4"
+
 
 
 
@@ -80,8 +84,8 @@ FIG_MAP_GAMMA_EX <- DF_HARVEST_GAMMA_2 %>%
   geom_path(aes(col= as.factor(Finca), group = (Finca_ID)), size= 1.5)+
   geom_point(size=1.5, aes(fill= "Tree"))+ # es importante que sea path, porque así lo hace según coo estan ordenados los
   scale_color_manual(values= mycols3c)+
-  xlim(0,110)+
-  ylim(0,110)+
+  xlim(0,100)+
+  ylim(0,130)+
   facet_wrap(~Finca_ID, ncol = 1)+
   theme_bw()+
   theme(
@@ -90,12 +94,14 @@ FIG_MAP_GAMMA_EX <- DF_HARVEST_GAMMA_2 %>%
   )+
   theme(legend.position = "None")+
   theme(text = element_text(size = 20))+
-  geom_text(x = 90, y = 10, aes(label = observation), data = DF_HARVEST_RESUMEN, size= 5)+
-  geom_text(x = 80, y = 10, label= "N =", size= 5)+
+  geom_text(x = 85, y = 80, aes(label = observation), data = DF_HARVEST_RESUMEN, size= 5)+
+  geom_text(x = 70, y = 80, label= "N =", size= 5)+
+  theme(text = element_text(size = 20))+
   #theme(strip.background =element_rect(fill="white"))+
   #theme(strip.background = element_blank(), panel.spacing = unit(0.8, "lines"), text = element_text(size = 15))+
   labs(x= "X (m)", y= "Y (m)", col= "Plantation", fill= "")
 
 
-#ggsave(FIG_MAP_GAMMA_EX, filename= "/home/emilio/archivosTrabajandose/harvestDistribution/distributionAnalisis/output/finalFigures/mapHarvest_.png", height = 12, width = 10, device = "png")
-ggsave(FIG_MAP_GAMMA_EX, filename= "../../output/graficas/mapHarvest_examples.png", height = 12, width = 5, device = "png")
+#ggsave(FIG_MAP_GAMMA_EX, filename= "/home/emilio/archivosTrabajandose/toyModelHarvest/output/graficas/mapHarvest_ex.png", height = 12, width = 5, device = "png")
+
+ggsave(FIG_MAP_GAMMA_EX, filename= "../../output/graficas/mapHarvest_examples.png", height = 10, width = 4.5, device = "png")

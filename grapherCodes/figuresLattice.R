@@ -352,7 +352,7 @@ DF_TOTAL$Infection[DF_TOTAL$Rust =="1"] <- "No Infection"
 DF_TOTAL$Infection[DF_TOTAL$Rust =="0"] <- "No Infection"
 DF_TOTAL$Infection[DF_TOTAL$Rust =="0.5"] <- "New Infection"
 
-FIG_PATH_2000_W1_V1<- DF_TOTAL %>% 
+FIG_PATH_2000_todos<- DF_TOTAL %>% 
   #filter(HarvestStep <160)%>% #ultimo 160 plantas de ahi
   filter(Rep == 2)%>%
  # filter(numWorkers =="1 worker")%>%
@@ -376,12 +376,12 @@ FIG_PATH_2000_W1_V1<- DF_TOTAL %>%
   )+ 
   labs(x= "X (m)", y= "Y (m)", col= "Rust")
 
-ggsave(FIG_PATH_2000_W1_V1,filename=paste("../../output/graficas/PATH/", "path_plants_2000_w1_todos.png", sep=""),  height = 10, width = 4.5) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_PATH_2000_todos,filename=paste("../../output/graficas/PATH/", "path_plants_2000_w1_todos.png", sep=""),  height = 10, width = 4.5) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 
 
-FIG_PATH_2000_W1_V2<- DF_TOTAL %>% 
+FIG_PATH_2000_W1<- DF_TOTAL %>% 
   #filter(HarvestStep <160)%>% #ultimo 160 plantas de ahi
   filter(Rep == 2)%>%
   # filter(numWorkers =="1 worker")%>%
@@ -405,7 +405,7 @@ FIG_PATH_2000_W1_V2<- DF_TOTAL %>%
   )+ 
   labs(x= "X (m)", y= "Y (m)", col= "Rust")
 
-ggsave(FIG_PATH_2000_W1_V2,filename=paste("../../output/graficas/PATH/", "path_plants_2000_1Worker.png", sep=""),  height = 10, width = 4.5) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_PATH_2000_W1,filename=paste("../../output/graficas/PATH/", "path_plants_2000_1Worker.png", sep=""),  height = 10, width = 4.5) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 #
