@@ -32,26 +32,7 @@ DF_TOTAL$X.1 <- NULL
 DF_TOTAL$FruitLoad <- NULL
 DF_TOTAL$TotalHarvest <- NULL
 
-
-##aqui deberiamos tener
-
-#  (1 harTime x  2 porCose  + 1 control) x (500+1000+2000+3000+5000) x N rep 
-   # 3 * 11500 * 6
-
-#DF_TOTAL$porcionCosecha[DF_TOTAL$HarvestModel =="control"] <- 99
-
-###############################
-
-
-
-# DF_NEW<-  DF_TOTAL%>%
-#   group_by(X, Y, Rep, numPlants)%>% #son las vairables que quedan y sobre esos escenarios, vamos a hacer las diferencias entre modelos
-#   summarise(NUEVA_RUST = (Rust - Rust[HarvestModel=="control"]), 
-#             porcionCosecha = (porcionCosecha- porcionCosecha[HarvestModel=="control"]) +99)%>%
-#   filter(porcionCosecha <98)%>% #para quitar las lineas del control
-#   filter(NUEVA_RUST ==1)
-# 
-
+ 
 DF_NEW<-  DF_TOTAL%>%
   group_by(X, Y, Rep, numPlants)%>% #son las vairables que quedan y sobre esos escenarios, vamos a hacer las diferencias entre modelos
   summarise(NUEVA_RUST = (Rust - Rust[HarvestModel=="control"]), 
@@ -186,6 +167,7 @@ write.csv(melt_DF_POST_RES, "../../data/baseDatosREDES.csv")
 
 }
 
+#melt_DF_POST_RES <- read.csv("archivosTrabajandose/toyModelHarvest/data/baseDatosREDES.csv", header = TRUE)
 
 melt_DF_POST_RES <- read.csv("../../data/baseDatosREDES.csv", header = TRUE)
 
@@ -206,11 +188,12 @@ FIG_REDES <- melt_DF_POST_RES %>%
   geom_line(size=1, aes(color = variable_mean, linetype = variable_mean, group=variable_mean))+
   geom_errorbar(size=0.5, aes( 
     ymin=value_mean-value_sd, ymax=value_mean+value_sd, color = variable_mean)) +
-  geom_point(size= 4, aes(color = variable_mean, shape= variable_mean), fill="white", stroke= 1)+
+  geom_point(size= 6, aes(color = variable_mean, shape= variable_mean), fill="white", stroke= 1)+
   scale_shape_manual(values = c(21, 24, 22))+
   scale_color_manual(values = colorRedes)+
   scale_linetype_manual(values = c(1,1,2))+
-  facet_wrap(~porcionCosecha, scales = "free_y")+
+  #facet_wrap(~porcionCosecha, scales = "free_y")+
+  facet_wrap(~porcionCosecha)+
   theme_bw()+
   theme(text = element_text(size = 25), 
         legend.key.size=unit(1,"cm"))+
