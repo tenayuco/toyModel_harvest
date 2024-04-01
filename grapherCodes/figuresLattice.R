@@ -235,63 +235,63 @@ FIG_DIF_CONTROL_H2 <- DF_MODvsCON_GEN %>%
 
 ggsave(FIG_DIF_CONTROL_H2,filename="../../output/graficas/DIF_RUST/ModelvsControl_harvest4_numW1.png",  height = 5, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
-
-FIG_DIF_CONTROL_ALL <- DF_MODvsCON_GEN %>%
-  filter(Time == timeMAX)%>%
-  filter(numPlants!=4000)%>%
-  filter(porcionCosecha != "control")%>%
-  filter(numWorkers != "NoH")%>%
-  ggplot(aes(x= as.character(porcionCosecha), y= ModCo_Rust))+
-  geom_boxplot(color = "black", aes(fill= interaction(as.character(numWorkers), porcionCosecha)))+ 
-  ggtitle("")+
-  theme(text = element_text(size = 25))+
-  facet_wrap(~numPlants, nrow=1)+
-  scale_fill_manual(values = groupColors)+ 
-  theme_bw() +
-  theme(text = element_text(size = 20))+
-  theme(strip.background = element_rect(fill = "white"))+ 
-  theme(legend.position = "none")+
-  labs(x= "Coffee maturation", y= "% Rust (Scenario-Control)", fill= "Coffee Maturation", title= "AverageHarvestTime")
+# 
+# FIG_DIF_CONTROL_ALL <- DF_MODvsCON_GEN %>%
+#   filter(Time == timeMAX)%>%
+#   filter(numPlants!=4000)%>%
+#   filter(porcionCosecha != "control")%>%
+#   filter(numWorkers != "NoH")%>%
+#   ggplot(aes(x= as.character(porcionCosecha), y= ModCo_Rust))+
+#   geom_boxplot(color = "black", aes(fill= interaction(as.character(numWorkers), porcionCosecha)))+ 
+#   ggtitle("")+
+#   theme(text = element_text(size = 25))+
+#   facet_wrap(~numPlants, nrow=1)+
+#   scale_fill_manual(values = groupColors)+ 
+#   theme_bw() +
+#   theme(text = element_text(size = 20))+
+#   theme(strip.background = element_rect(fill = "white"))+ 
+#   theme(legend.position = "none")+
+#   labs(x= "Coffee maturation", y= "% Rust (Scenario-Control)", fill= "Coffee Maturation", title= "AverageHarvestTime")
 
 
 #ggsave(FIG_DIF_CONTROL_ALL,filename="../../output/graficas/SUP_FIG/ModelvsControl_allHar_numW1.png",  height = 8, width = 16) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
-
-#ahora viene la comparacion entre la diferencia maxima vs el control, en relacion con como estaba al inicio
-
-DF_MODvsCON_GEN$SI <- (DF_MODvsCON_GEN$Rust/100)*(1- (DF_MODvsCON_GEN$Rust/100))
-
-DF_MODvsCON_GEN$HarvestVsFinal <- 0
-DF_MODvsCON_GEN$HarvestVsFinal[DF_MODvsCON_GEN$Time == 12] <- 1
-
-DF_TEM_0 <- DF_MODvsCON_GEN %>%
-filter(HarvestVsFinal ==0)
-
-DF_TEM_1 <- DF_MODvsCON_GEN %>%
-  filter(HarvestVsFinal ==1) 
-
-DF_TEM_0$ModCo_Rust <- NULL
-DF_TEM_0$Per_Rust <- NULL
-DF_TEM_1$Rust <- NULL
-DF_TEM_1$SI <- NULL
-DF_FR_THR <- merge(DF_TEM_0, DF_TEM_1, by = c("Rep", "numPlants", "porcionCosecha", "HarvestTime", "numWorkers"))
-
-
-FIGNUE <-DF_FR_THR %>% 
-  filter(numWorkers == 1)%>%
-  ggplot(aes(x= as.factor(numPlants) , y = SI))+
-  geom_boxplot(color = "black", aes(fill= porcionCosecha))+ 
-  ggtitle("")+
-  facet_wrap(~HarvestTime, nrow=1)+
-  scale_fill_manual(values = groupColors2)+ 
-  theme_bw() +
-  theme(text = element_text(size = 25))+
-  theme(strip.background = element_rect(fill = "white"))+ 
-  #theme(legend.position = "none")+
-  labs(x= "Plants/ha", y= "S.I", fill= "Coffee maturation")
-
-ggsave(FIGNUE, filename= "../../output/graficas/SUP_FIG/SIvsRust.png",  height = 8, width = 20) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-
+# 
+# #ahora viene la comparacion entre la diferencia maxima vs el control, en relacion con como estaba al inicio
+# 
+# DF_MODvsCON_GEN$SI <- (DF_MODvsCON_GEN$Rust/100)*(1- (DF_MODvsCON_GEN$Rust/100))
+# 
+# DF_MODvsCON_GEN$HarvestVsFinal <- 0
+# DF_MODvsCON_GEN$HarvestVsFinal[DF_MODvsCON_GEN$Time == 12] <- 1
+# 
+# DF_TEM_0 <- DF_MODvsCON_GEN %>%
+# filter(HarvestVsFinal ==0)
+# 
+# DF_TEM_1 <- DF_MODvsCON_GEN %>%
+#   filter(HarvestVsFinal ==1) 
+# 
+# DF_TEM_0$ModCo_Rust <- NULL
+# DF_TEM_0$Per_Rust <- NULL
+# DF_TEM_1$Rust <- NULL
+# DF_TEM_1$SI <- NULL
+# DF_FR_THR <- merge(DF_TEM_0, DF_TEM_1, by = c("Rep", "numPlants", "porcionCosecha", "HarvestTime", "numWorkers"))
+# 
+# 
+# FIGNUE <-DF_FR_THR %>% 
+#   filter(numWorkers == 1)%>%
+#   ggplot(aes(x= as.factor(numPlants) , y = SI))+
+#   geom_boxplot(color = "black", aes(fill= porcionCosecha))+ 
+#   ggtitle("")+
+#   facet_wrap(~HarvestTime, nrow=1)+
+#   scale_fill_manual(values = groupColors2)+ 
+#   theme_bw() +
+#   theme(text = element_text(size = 25))+
+#   theme(strip.background = element_rect(fill = "white"))+ 
+#   #theme(legend.position = "none")+
+#   labs(x= "Plants/ha", y= "S.I", fill= "Coffee maturation")
+# 
+# ggsave(FIGNUE, filename= "../../output/graficas/SUP_FIG/SIvsRust.png",  height = 8, width = 20) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+# 
 
 
 
