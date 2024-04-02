@@ -499,6 +499,58 @@ ggsave(FIG_INSIDE,filename=paste("../../output/graficas/PATH/", "DisPasos_INSIDE
 }
 
 
+########################AQUI VAMOS a METER EL HISTOGRMA CON LA INFECION ABRIL 24######
+
+DF_TOTAL_TEMP <- DF_TOTAL_AG_SHORT %>%
+  filter((numPlants== 2000) & (porcionCosecha == "Asynchronous"))
+
+
+FIG_PASOS_G <- DF_TOTAL_TEMP %>%
+  ggplot(aes(x= DistanceW)) +
+  #geom_histogram(, binwidth = 1) +
+  geom_histogram(color= "black", aes(fill= as.character(Infection), y = after_stat(count / sum(count))),binwidth=1.5) +
+  #geom_point(aes(fill= as.character(Infection)), color= "black",  shape=21, size=5, stroke=1, alpha= 0.7)+
+  xlim(0, 110)+
+  #ylim(0, 0.05)+
+  scale_fill_manual(values =colorsDis2)+
+  theme_bw() +
+  theme(text = element_text(size = 30))+
+  theme(strip.background = element_rect(fill = "white"))+ 
+  scale_alpha(guide = 'none')+
+  labs(fill= "Rust", x= "Step length (m)", y= "Proportion of Steps")
+
+
+
+for (nP in unique(DF_TOTAL_AG_SHORT$numPlants)){
+  for (pC in unique(DF_TOTAL_AG_SHORT$porcionCosecha)){
+    
+    DF_TOTAL_TEMP <- DF_TOTAL_AG_SHORT %>%
+      filter((numPlants== nP) & (porcionCosecha == pC))
+    
+    FIG_HIST_G <- DF_TOTAL_TEMP %>%
+      ggplot(aes(x= DistanceW)) +
+      #geom_histogram(, binwidth = 1) +
+      geom_histogram(color= "black", aes(fill= as.character(Infection), y = after_stat(count / sum(count))),binwidth=1.5) +
+      #geom_point(aes(fill= as.character(Infection)), color= "black",  shape=21, size=5, stroke=1, alpha= 0.7)+
+      xlim(0, 110)+
+      ylim(0, 0.2)+
+      scale_fill_manual(values =colorsDis)+
+      theme_bw() +
+      theme(text = element_text(size = 30))+
+      theme(strip.background = element_rect(fill = "white"))+ 
+      scale_alpha(guide = 'none')+
+      labs(fill= "Rust", x= "Step length (m)", y= "Proportion of Steps")
+    
+  
+  #  ggsave(FIG_HIST_G,filename=paste("../../output/graficas/PATH/", "DisHIST_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+    ggsave(FIG_HIST_G,filename=paste("archivosTrabajandose/toyModelHarvest/output/graficas/PATH/", "DisHIST_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+    
+  }
+}
+
+
+########################################################################################33
+
 
 FIG_PASOS_LOG <- DF_TOTAL_AG_SHORT %>%
  # filter(Rust == 0.5)%>%  
