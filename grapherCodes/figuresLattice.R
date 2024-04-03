@@ -299,7 +299,7 @@ ggsave(FIG_DIF_CONTROL_H2,filename="../../output/graficas/DIF_RUST/ModelvsContro
 
 
 
-##################PATHS###############3
+##################PATHS###############3NUEA BASE DE DATOS#############3
 
 #DF_SAM<- read.csv("./archivosTrabajandose/toyModelHarvest/data/DF_muestrasPath_complete.csv")
 DF_SAM <- read.csv("../../data/DF_muestrasPath_complete.csv", header = TRUE)
@@ -307,13 +307,6 @@ DF_SAM <- read.csv("../../data/DF_muestrasPath_complete.csv", header = TRUE)
 #nW <- "1 worker"
 ###########Plo
 
-
-
-#DF_SAM$numWorkers[DF_SAM$numWorkers =="1"] <- "1 worker" 
-#DF_SAM$numWorkers[DF_SAM$numWorkers =="5"] <- "5 workers" 
-
-
-##aqui un filtro de la si y sf
 
 DF_SAM_SI <- DF_SAM %>% filter(porcionCosecha == "S_I")
 DF_SAM_SF <- DF_SAM %>% filter(porcionCosecha == "S_F")
@@ -365,8 +358,14 @@ DF_TOTAL = DF_SAM %>%
 
 DF_TOTAL$Conteo <- 1
 #DF_TOTAL <- DF_TOTAL %>% filter(DistanceW > 1.5)  ##ESTO ES TRAMPA, perp vamos a ver
-DF_TOTAL$DistanceW <- round(DF_TOTAL$DistanceW,1) 
+DF_TOTAL$DistanceW <- round(DF_TOTAL$DistanceW)  
 
+
+DF_TOTAL <- DF_TOTAL %>%
+  filter(!is.na(DistanceW))%>%
+  filter(DistanceW != 0)
+
+####3
 DF_TOTAL$Infection <- 0
 DF_TOTAL$Infection[DF_TOTAL$Rust =="1"] <- "No Infection" 
 DF_TOTAL$Infection[DF_TOTAL$Rust =="0"] <- "No Infection"
@@ -432,115 +431,102 @@ ggsave(FIG_PATH_2000_W1,filename=paste("../../output/graficas/PATH/", "path_plan
 #DF_PRUEBA_1 <- DF_TOTAL %>%
  # filter(SimID == 1)
 
+
 DF_TOTAL_AG <- DF_TOTAL %>%
-  group_by(HarvestModel, numPlants, numWorkers,  Infection, DistanceW, HarvestTime, porcionCosecha, SimID) %>%
+  group_by(HarvestModel, numPlants, numWorkers,  Infection, DistanceW, HarvestTime, porcionCosecha, SimID, Rep) %>%
   summarise(FrecAbs =sum(Conteo))
 
+DF_TOTAL_AG$Frec <- 2* DF_TOTAL_AG$FrecAbs/(DF_TOTAL_AG$numPlants)
+#el 2 es porque realmente es la mitad del numbero de plantas
+
+
+DF_TOTAL_AG <- DF_TOTAL_AG %>%
+  group_by(HarvestModel, numPlants, numWorkers,  Infection, DistanceW, HarvestTime, porcionCosecha, SimID) %>%
+  summarise(MeanFrec =mean(Frec), sdFrec =sd(Frec))
+  
 #el numero de lineas depende de cuanta distancias difeentes tenga
 
-DF_TOTAL_AG$Frec <- 2* DF_TOTAL_AG$FrecAbs/(DF_TOTAL_AG$numPlants*length(unique(DF_TOTAL$Rep)))
 
 #DF_PRUEBA_2 <- DF_TOTAL_AG %>% filter(SimID == 1)  #esto es solo para ver que lo este haciendo bien
 #sum(DF_PRUEBA_2$Frec) #esta suma debe ser plantas/2 *numrepe, la abs debe ser igual a 1
 
-DF_TOTAL_AG$logDistanceW <- log(DF_TOTAL_AG$DistanceW)
-DF_TOTAL_AG$logFrec <- log(DF_TOTAL_AG$Frec)
 
-DF_TOTAL_AG_SHORT <- DF_TOTAL_AG %>%
-  filter(!is.na(DistanceW))%>%
-  filter(DistanceW != 0)
-
-
-for (nP in unique(DF_TOTAL_AG_SHORT$numPlants)){
-  for (pC in unique(DF_TOTAL_AG_SHORT$porcionCosecha)){
-
-DF_TOTAL_TEMP <- DF_TOTAL_AG_SHORT %>%
-  filter((numPlants== nP) & (porcionCosecha == pC))
-      
-FIG_PASOS_G <- DF_TOTAL_TEMP %>%
-  ggplot(aes(x= DistanceW, y = Frec)) +
-  geom_point(aes(fill= as.character(Infection)), color= "black",  shape=21, size=5, stroke=1, alpha= 0.7)+
-  xlim(0, 110)+
-  ylim(0, 0.05)+
-  scale_fill_manual(values =colorsDis)+
-  theme_bw() +
-  theme(text = element_text(size = 30))+
-  theme(strip.background = element_rect(fill = "white"))+ 
-  scale_alpha(guide = 'none')+
-  labs(fill= "Rust", x= "Step length (m)", y= "Proportion of Steps")
-
-FIG_PASOS_C <- DF_TOTAL_TEMP %>%
-  ggplot(aes(x= DistanceW, y = Frec)) +
-  geom_point(aes(fill= as.character(Infection)), color= "black",  shape=21, size=5, stroke=1,alpha= 0.7)+
-  xlim(0, 7.1)+
-  ylim(0, 0.05)+
-  scale_fill_manual(values = colorsDis)+
-  geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= 0.05), size = 0.2, color= "Black")+
-  annotate(geom="text", x=4.75, y=0.04, label="Max. contact \ndispersal distance",
-           color="black",
-           size =8)+
-  geom_segment(aes(x=2, y=0.04, xend=1.52, yend=0.04-0.001), 
-               arrow = arrow(length=unit(.2, 'cm')))+
-    theme_bw() +
-  theme(text = element_text(size = 30))+
-  theme(strip.background = element_rect(fill = "white"))+ 
-  theme(legend.position = "None")+
-  theme(axis.title.x=element_blank(), #remove x axis labels
-        axis.title.y=element_blank(),  #remove y axis labels
-  )
-  #labs(fill= "Rust", x= "Step length", y= "Proportion of Steps")
-
-#FIG_INSIDE <- FIG_PASOS_G + annotation_custom(ggplotGrob(FIG_PASOS_C), xmin = 15, xmax = 80, ymin = max(DF_TOTAL_TEMP$Frec)/3, ymax = max(DF_TOTAL_TEMP$Frec))
-FIG_INSIDE <- FIG_PASOS_G + annotation_custom(ggplotGrob(FIG_PASOS_C), xmin = 15, xmax = 80, ymin = 0.01, ymax = 0.04) #este solo funcion para el n=2000, el de arriba es mas general!! (ver versiones previas de ste codigo)
-
-ggsave(FIG_INSIDE,filename=paste("../../output/graficas/PATH/", "DisPasos_INSIDE_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-
-  }
-}
 
 
 ########################AQUI VAMOS a METER EL HISTOGRMA CON LA INFECION ABRIL 24######
 
-DF_TOTAL_TEMP <- DF_TOTAL_AG_SHORT %>%
-  filter((numPlants== 2000) & (porcionCosecha == "Asynchronous"))
+DF_TOTAL_TEMP <- DF_TOTAL_AG %>%
+  filter((numPlants== 2000) & (porcionCosecha == "Synchronous  Initial"))
+
+DF_TOTAL_TEMP <- DF_TOTAL_TEMP %>%
+  group_by(Infection) %>%
+  mutate(FrecCUM = cumsum(MeanFrec))
+
+##aqui un truco para no graficar el que no genera nueva infectin para la escala
+
+DF_TOTAL_TEMP$FrecCUM[DF_TOTAL_TEMP$Infection == "No Infection"] <- NA
 
 
-FIG_PASOS_G <- DF_TOTAL_TEMP %>%
+FIG_HIST_G <- DF_TOTAL_TEMP %>%
+  #filter(Infection == "New Infection")%>%
   ggplot(aes(x= DistanceW)) +
-  #geom_histogram(, binwidth = 1) +
-  geom_histogram(color= "black", aes(fill= as.character(Infection), y = after_stat(count / sum(count))),binwidth=1.5) +
-  #geom_point(aes(fill= as.character(Infection)), color= "black",  shape=21, size=5, stroke=1, alpha= 0.7)+
+  geom_col(aes(y = MeanFrec, fill= as.character(Infection)),
+             color= "black", position = "stack")+
+ # geom_histogram(color= "black", aes(fill= as.character(Infection), y = after_stat(count / sum(count))),binwidth=1) +
+  
+  geom_line(aes(y= FrecCUM, group= as.character(Infection)), color= "black",  size=2)+
+  geom_line(aes(y= FrecCUM, color= as.character(Infection)), size=1)+
   xlim(0, 110)+
-  #ylim(0, 0.05)+
-  scale_fill_manual(values =colorsDis2)+
+ # ylim(0, 0.2)+
+  scale_fill_manual(values =colorsDis)+
+  scale_color_manual(values =colorsDis)+
   theme_bw() +
   theme(text = element_text(size = 30))+
+  theme(legend.position = "none")+
   theme(strip.background = element_rect(fill = "white"))+ 
   scale_alpha(guide = 'none')+
   labs(fill= "Rust", x= "Step length (m)", y= "Proportion of Steps")
 
 
 
-for (nP in unique(DF_TOTAL_AG_SHORT$numPlants)){
-  for (pC in unique(DF_TOTAL_AG_SHORT$porcionCosecha)){
+for (nP in unique(DF_TOTAL_AG$numPlants)){
+  for (pC in unique(DF_TOTAL_AG$porcionCosecha)){
     
-    DF_TOTAL_TEMP <- DF_TOTAL_AG_SHORT %>%
+    DF_TOTAL_TEMP <- DF_TOTAL_AG %>%
       filter((numPlants== nP) & (porcionCosecha == pC))
     
+    
+    DF_TOTAL_TEMP <- DF_TOTAL_TEMP %>%
+      group_by(Infection) %>%
+      mutate(FrecCUM = cumsum(MeanFrec))
+    
+    ##aqui un truco para no graficar el que no genera nueva infectin para la escala
+    
+    DF_TOTAL_TEMP$FrecCUM[DF_TOTAL_TEMP$Infection == "No Infection"] <- NA
+    
+    
     FIG_HIST_G <- DF_TOTAL_TEMP %>%
+      #filter(Infection == "New Infection")%>%
       ggplot(aes(x= DistanceW)) +
-      #geom_histogram(, binwidth = 1) +
-      geom_histogram(color= "black", aes(fill= as.character(Infection), y = after_stat(count / sum(count))),binwidth=1.5) +
-      #geom_point(aes(fill= as.character(Infection)), color= "black",  shape=21, size=5, stroke=1, alpha= 0.7)+
+      geom_col(aes(y = MeanFrec, fill= as.character(Infection)),
+               color= "black", position = "stack")+
+      # geom_histogram(color= "black", aes(fill= as.character(Infection), y = after_stat(count / sum(count))),binwidth=1) +
+      
+      geom_line(aes(y= FrecCUM, group= as.character(Infection)), color= "black",  size=2)+
+      geom_line(aes(y= FrecCUM, color= as.character(Infection)), size=1)+
       xlim(0, 110)+
-      ylim(0, 0.2)+
+      ylim(0, 0.45)+
       scale_fill_manual(values =colorsDis)+
+      scale_color_manual(values =colorsDis)+
       theme_bw() +
       theme(text = element_text(size = 30))+
+      theme(legend.position = "none")+
       theme(strip.background = element_rect(fill = "white"))+ 
       scale_alpha(guide = 'none')+
       labs(fill= "Rust", x= "Step length (m)", y= "Proportion of Steps")
     
+    
+
   
   #  ggsave(FIG_HIST_G,filename=paste("../../output/graficas/PATH/", "DisHIST_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
     ggsave(FIG_HIST_G,filename=paste("archivosTrabajandose/toyModelHarvest/output/graficas/PATH/", "DisHIST_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
@@ -549,7 +535,59 @@ for (nP in unique(DF_TOTAL_AG_SHORT$numPlants)){
 }
 
 
+
+#esto puede ya no funcionar porque estoy corriendo nuevas####
+for (nP in unique(DF_TOTAL_AG$numPlants)){
+  for (pC in unique(DF_TOTAL_AG$porcionCosecha)){
+    
+    DF_TOTAL_TEMP <- DF_TOTAL_AG %>%
+      filter((numPlants== nP) & (porcionCosecha == pC))
+    
+    FIG_PASOS_G <- DF_TOTAL_TEMP %>%
+      ggplot(aes(x= DistanceW, y = Frec)) +
+      geom_point(aes(fill= as.character(Infection)), color= "black",  shape=21, size=5, stroke=1, alpha= 0.7)+
+      xlim(0, 110)+
+      ylim(0, 0.05)+
+      scale_fill_manual(values =colorsDis)+
+      theme_bw() +
+      theme(text = element_text(size = 30))+
+      theme(strip.background = element_rect(fill = "white"))+ 
+      scale_alpha(guide = 'none')+
+      labs(fill= "Rust", x= "Step length (m)", y= "Proportion of Steps")
+    
+    FIG_PASOS_C <- DF_TOTAL_TEMP %>%
+      ggplot(aes(x= DistanceW, y = Frec)) +
+      geom_point(aes(fill= as.character(Infection)), color= "black",  shape=21, size=5, stroke=1,alpha= 0.7)+
+      xlim(0, 7.1)+
+      ylim(0, 0.05)+
+      scale_fill_manual(values = colorsDis)+
+      geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= 0.05), size = 0.2, color= "Black")+
+      annotate(geom="text", x=4.75, y=0.04, label="Max. contact \ndispersal distance",
+               color="black",
+               size =8)+
+      geom_segment(aes(x=2, y=0.04, xend=1.52, yend=0.04-0.001), 
+                   arrow = arrow(length=unit(.2, 'cm')))+
+      theme_bw() +
+      theme(text = element_text(size = 30))+
+      theme(strip.background = element_rect(fill = "white"))+ 
+      theme(legend.position = "None")+
+      theme(axis.title.x=element_blank(), #remove x axis labels
+            axis.title.y=element_blank(),  #remove y axis labels
+      )
+    #labs(fill= "Rust", x= "Step length", y= "Proportion of Steps")
+    
+    #FIG_INSIDE <- FIG_PASOS_G + annotation_custom(ggplotGrob(FIG_PASOS_C), xmin = 15, xmax = 80, ymin = max(DF_TOTAL_TEMP$Frec)/3, ymax = max(DF_TOTAL_TEMP$Frec))
+    FIG_INSIDE <- FIG_PASOS_G + annotation_custom(ggplotGrob(FIG_PASOS_C), xmin = 15, xmax = 80, ymin = 0.01, ymax = 0.04) #este solo funcion para el n=2000, el de arriba es mas general!! (ver versiones previas de ste codigo)
+    
+    ggsave(FIG_INSIDE,filename=paste("../../output/graficas/PATH/", "DisPasos_INSIDE_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+    
+  }
+}
+####hasta aca#####
+
 ########################################################################################33
+#DF_TOTAL_AG$logDistanceW <- log(DF_TOTAL_AG$DistanceW)
+#DF_TOTAL_AG$logFrec <- log(DF_TOTAL_AG$Frec)
 
 
 FIG_PASOS_LOG <- DF_TOTAL_AG_SHORT %>%
