@@ -430,3 +430,14 @@ if (wholePlot ==1){
 AHORA TODA ESTA SECCIón viene para algo más.. 
 
 
+
+####para volvero codigo plano (y poderlo correr desde la terminal)
+
+```{r}
+library(knitr)
+purl("../../src/grapherCodes/figuresLattice.Rmd", output= "../../src/grapherCodes/figuresLattice.R")
+
+```
+
+
+
