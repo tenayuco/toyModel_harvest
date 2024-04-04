@@ -365,6 +365,7 @@ DF_TOTAL <- DF_TOTAL %>%
   filter(!is.na(DistanceW))%>%
   filter(DistanceW != 0)
 
+
 ####3
 DF_TOTAL$Infection <- 0
 DF_TOTAL$Infection[DF_TOTAL$Rust =="1"] <- "No Infection" 
@@ -432,6 +433,9 @@ ggsave(FIG_PATH_2000_W1,filename=paste("../../output/graficas/PATH/", "path_plan
  # filter(SimID == 1)
 
 
+
+
+
 DF_TOTAL_AG <- DF_TOTAL %>%
   group_by(HarvestModel, numPlants, numWorkers,  Infection, DistanceW, HarvestTime, porcionCosecha, SimID, Rep) %>%
   summarise(FrecAbs =sum(Conteo))
@@ -477,7 +481,7 @@ FIG_HIST_G <- DF_TOTAL_TEMP %>%
   geom_line(aes(y= FrecCUM, group= as.character(Infection)), color= "black",  size=2)+
   geom_line(aes(y= FrecCUM, color= as.character(Infection)), size=1)+
   xlim(0, 110)+
- # ylim(0, 0.2)+
+  ylim(0, 0.45)+
   scale_fill_manual(values =colorsDis)+
   scale_color_manual(values =colorsDis)+
   theme_bw() +
@@ -486,6 +490,10 @@ FIG_HIST_G <- DF_TOTAL_TEMP %>%
   theme(strip.background = element_rect(fill = "white"))+ 
   scale_alpha(guide = 'none')+
   labs(fill= "Rust", x= "Step length (m)", y= "Proportion of Steps")
+
+
+
+
 
 
 
@@ -515,7 +523,7 @@ for (nP in unique(DF_TOTAL_AG$numPlants)){
       geom_line(aes(y= FrecCUM, group= as.character(Infection)), color= "black",  size=2)+
       geom_line(aes(y= FrecCUM, color= as.character(Infection)), size=1)+
       xlim(0, 110)+
-      ylim(0, 0.45)+
+      ylim(0, 0.43)+
       scale_fill_manual(values =colorsDis)+
       scale_color_manual(values =colorsDis)+
       theme_bw() +
@@ -544,7 +552,7 @@ for (nP in unique(DF_TOTAL_AG$numPlants)){
       filter((numPlants== nP) & (porcionCosecha == pC))
     
     FIG_PASOS_G <- DF_TOTAL_TEMP %>%
-      ggplot(aes(x= DistanceW, y = Frec)) +
+      ggplot(aes(x= DistanceW, y = MeanFrec)) +
       geom_point(aes(fill= as.character(Infection)), color= "black",  shape=21, size=5, stroke=1, alpha= 0.7)+
       xlim(0, 110)+
       ylim(0, 0.05)+
@@ -556,7 +564,7 @@ for (nP in unique(DF_TOTAL_AG$numPlants)){
       labs(fill= "Rust", x= "Step length (m)", y= "Proportion of Steps")
     
     FIG_PASOS_C <- DF_TOTAL_TEMP %>%
-      ggplot(aes(x= DistanceW, y = Frec)) +
+      ggplot(aes(x= DistanceW, y = MeanFrec)) +
       geom_point(aes(fill= as.character(Infection)), color= "black",  shape=21, size=5, stroke=1,alpha= 0.7)+
       xlim(0, 7.1)+
       ylim(0, 0.05)+
@@ -579,7 +587,8 @@ for (nP in unique(DF_TOTAL_AG$numPlants)){
     #FIG_INSIDE <- FIG_PASOS_G + annotation_custom(ggplotGrob(FIG_PASOS_C), xmin = 15, xmax = 80, ymin = max(DF_TOTAL_TEMP$Frec)/3, ymax = max(DF_TOTAL_TEMP$Frec))
     FIG_INSIDE <- FIG_PASOS_G + annotation_custom(ggplotGrob(FIG_PASOS_C), xmin = 15, xmax = 80, ymin = 0.01, ymax = 0.04) #este solo funcion para el n=2000, el de arriba es mas general!! (ver versiones previas de ste codigo)
     
-    ggsave(FIG_INSIDE,filename=paste("../../output/graficas/PATH/", "DisPasos_INSIDE_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+   #ggsave(FIG_INSIDE,filename=paste("../../output/graficas/PATH/", "DisPasos_INSIDE_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+    ggsave(FIG_INSIDE,filename=paste("archivosTrabajandose/toyModelHarvest/output/graficas/PATH/", "DisPasos_INSIDE_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
     
   }
 }
