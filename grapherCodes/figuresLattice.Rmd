@@ -52,24 +52,29 @@ DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="A"] <- "Asynchronous"
 DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="S_I"] <- "Synchronous  Initial" 
 DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="S_F"] <- "Synchronous Final" 
 
+DF_SAM$DistanceW <- sqrt(DF_SAM$DistanceW)  #esto porque estaba al cuadrado los datos
+
+
 ```
 
 
 
 ```{r}
-DF_SAM$DistanceW <- sqrt(DF_SAM$DistanceW)
 
 DF_TOTAL = DF_SAM %>%
   filter(Time ==5.5)
 
 DF_TOTAL$Conteo <- 1
-#DF_TOTAL <- DF_TOTAL %>% filter(DistanceW > 1.5)  ##ESTO ES TRAMPA, perp vamos a ver
-DF_TOTAL$DistanceW <- round(DF_TOTAL$DistanceW)  
+#prueba s
+#DF_TOTAL$DistanceW <- sqrt(DF_TOTAL$DistanceW) 
+
 
 
 DF_TOTAL <- DF_TOTAL %>%
   filter(!is.na(DistanceW))%>%
   filter(DistanceW != 0)
+
+DF_TOTAL$DistanceW <- round(DF_TOTAL$DistanceW,0)  
 
 
 ####3
@@ -78,6 +83,17 @@ DF_TOTAL$Infection[DF_TOTAL$Rust =="1"] <- "No Infection"
 DF_TOTAL$Infection[DF_TOTAL$Rust =="0"] <- "No Infection"
 DF_TOTAL$Infection[DF_TOTAL$Rust =="0.5"] <- "New Infection"
 
+
+
+DF_TOTAL_PROXY <- DF_TOTAL %>%
+  filter(porcionCosecha == "Asynchronous")%>%
+  filter(numPlants == 2000)%>%
+  filter(Infection == "New Infection")%>%
+  filter(Rep %in% c(0,1,2))%>%
+  filter(DistanceW <2.1)
+
+
+#DF_TOTAL <- DF_TOTAL_PROXY
 ```
 
 
@@ -176,9 +192,11 @@ DF_TOTAL_AG$Frec <- 2* DF_TOTAL_AG$FrecAbs/(DF_TOTAL_AG$numPlants)
 #el 2 es porque realmente es la mitad del numbero de plantas
 
 
+rep <- length(unique(DF_TOTAL_AG$Rep))
+
 DF_TOTAL_AG <- DF_TOTAL_AG %>%
   group_by(HarvestModel, numPlants, numWorkers,  Infection, DistanceW, HarvestTime, porcionCosecha, SimID) %>%
-  summarise(MeanFrec =mean(Frec), sdFrec =sd(Frec))
+  summarise(MeanFrec =sum(Frec)/rep)
 
 
 DF_TOTAL_AG <- DF_TOTAL_AG %>%
@@ -189,7 +207,7 @@ Aqui tenemos un chunk de prueba
 
 ```{r}
 DF_TOTAL_TEMP <- DF_TOTAL_AG %>%
-  filter((numPlants== 2000) & (porcionCosecha == "Synchronous  Initial"))
+  filter((numPlants== 2000) & (porcionCosecha == "Asynchronous"))
 
 #DF_TOTAL_TEMP <- DF_TOTAL_TEMP %>%
  # group_by(Infection) %>%
@@ -209,8 +227,8 @@ FIG_HIST_G <- DF_TOTAL_TEMP %>%
   
   geom_line(aes(y= FrecCUM, group= as.character(Infection)), color= "black",  size=2)+
   geom_line(aes(y= FrecCUM, color= as.character(Infection)), size=1)+
-  xlim(0, 110)+
-  ylim(0, 0.45)+
+  #xlim(0, 110)+
+  #ylim(0, 0.45)+
   scale_fill_manual(values =colorsDis)+
   scale_color_manual(values =colorsDis)+
   theme_bw() +
@@ -286,8 +304,27 @@ DF_MAX_INF <- DF_TOTAL_AG %>%
 
 
 ```{r}
-FIG_W_DEN <- DF_MAX_INF %>%
-  ggplot(aes(x = numPlants, y = MaxFrec))+
+DF_SUPER_AG <- DF_TOTAL %>%
+  group_by(numPlants, numWorkers,  Infection, porcionCosecha, Rep) %>%
+  summarise(FrecAbs =sum(Conteo))
+
+DF_SUPER_AG$Frec <- 2* DF_SUPER_AG$FrecAbs/(DF_SUPER_AG$numPlants)
+#el 2 es porque realmente es la mitad del numbero de plantas
+
+
+DF_SUPER_AG <- DF_SUPER_AG%>%
+  group_by(numPlants, numWorkers,  Infection, porcionCosecha) %>%
+  summarise(MeanFrec =mean(Frec), sdFrec =sd(Frec))
+
+```
+
+
+
+
+```{r}
+FIG_W_DEN <- DF_SUPER_AG%>%
+  filter(Infection == "New Infection")%>%
+  ggplot(aes(x = numPlants, y = MeanFrec))+
   geom_line(aes(group = porcionCosecha))+
   
   geom_point(aes(fill= as.character(porcionCosecha), shape= as.character(porcionCosecha)), color= "black", size=5, stroke=1, alpha= 1)+
@@ -374,8 +411,8 @@ FIG_CUM_2000 <- DF_CUM %>%
   filter(numPlants== 2000)%>%
   ggplot(aes(x= PerArbBerry, y = DistanceW)) +
   geom_line(aes(group = WorkerID, color = Infection))+
-  #facet_wrap(~porcionCosecha, nrow = 3, scales = "free_x") +
-  facet_wrap(~porcionCosecha, nrow = 3) +
+  facet_wrap(~porcionCosecha, nrow = 3, scales = "free_x") +
+  #facet_wrap(~porcionCosecha, nrow = 3) +
 
   theme_bw() +
   scale_color_manual(values = colorsDis2)+

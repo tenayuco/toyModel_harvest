@@ -1,4 +1,4 @@
-## -----------------------------------------------------------------------------
+## ------------------------------------------------------------------------------------
 library(ggplot2)
 library(viridis)
 library(dplyr)
@@ -19,7 +19,7 @@ colorsDis3 <- c("#111111","#8B0000","#fd9706")
 
 
 
-## -----------------------------------------------------------------------------
+## ------------------------------------------------------------------------------------
 #DF_SAM<- read.csv("./archivosTrabajandose/toyModelHarvest/data/DF_muestrasPath_complete.csv")
 DF_SAM <- read.csv("../../data/DF_muestrasPath_complete.csv", header = TRUE)
 #nP <- 2000
@@ -43,10 +43,11 @@ DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="A"] <- "Asynchronous"
 DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="S_I"] <- "Synchronous  Initial" 
 DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="S_F"] <- "Synchronous Final" 
 
-
-
-## -----------------------------------------------------------------------------
 DF_SAM$DistanceW <- sqrt(DF_SAM$DistanceW)
+
+
+
+## ------------------------------------------------------------------------------------
 
 DF_TOTAL = DF_SAM %>%
   filter(Time ==5.5)
@@ -69,7 +70,18 @@ DF_TOTAL$Infection[DF_TOTAL$Rust =="0.5"] <- "New Infection"
 
 
 
-## -----------------------------------------------------------------------------
+DF_TOTAL_PROXY <- DF_TOTAL %>%
+  filter(porcionCosecha == "Asynchronous")%>%
+  filter(numPlants == 2000)%>%
+  filter(Infection == "New Infection")%>%
+  filter(Rep %in% c(0,1,2))%>%
+  filter(DistanceW %in% seq(1:10))
+
+
+#DF_TOTAL <- DF_TOTAL_PROXY
+
+
+## ------------------------------------------------------------------------------------
 FIG_PATH_GEN<- DF_TOTAL %>% 
     filter(Rep == 0)%>%
     filter(numPlants == 500 |numPlants == 2000 | numPlants == 5000)%>% #solo un ejepmplo
@@ -93,7 +105,7 @@ FIG_PATH_GEN<- DF_TOTAL %>%
 
 
 
-## -----------------------------------------------------------------------------
+## ------------------------------------------------------------------------------------
 FIG_PATH_2000_todos<- DF_TOTAL %>% 
   #filter(HarvestStep <160)%>% #ultimo 160 plantas de ahi
   filter(Rep == 2)%>%
@@ -123,7 +135,7 @@ ggsave(FIG_PATH_2000_todos,filename=paste("../../output/graficas/PATH/", "path_p
 
 
 
-## -----------------------------------------------------------------------------
+## ------------------------------------------------------------------------------------
 FIG_PATH_2000_W1<- DF_TOTAL %>% 
   #filter(HarvestStep <160)%>% #ultimo 160 plantas de ahi
   filter(Rep == 2)%>%
@@ -152,7 +164,7 @@ ggsave(FIG_PATH_2000_W1,filename=paste("../../output/graficas/PATH/", "path_plan
 
 
 
-## -----------------------------------------------------------------------------
+## ------------------------------------------------------------------------------------
 DF_TOTAL_AG <- DF_TOTAL %>%
   group_by(HarvestModel, numPlants, numWorkers,  Infection, DistanceW, HarvestTime, porcionCosecha, SimID, Rep) %>%
   summarise(FrecAbs =sum(Conteo))
@@ -161,9 +173,11 @@ DF_TOTAL_AG$Frec <- 2* DF_TOTAL_AG$FrecAbs/(DF_TOTAL_AG$numPlants)
 #el 2 es porque realmente es la mitad del numbero de plantas
 
 
+rep <- length(unique(DF_TOTAL_AG$Rep))
+
 DF_TOTAL_AG <- DF_TOTAL_AG %>%
   group_by(HarvestModel, numPlants, numWorkers,  Infection, DistanceW, HarvestTime, porcionCosecha, SimID) %>%
-  summarise(MeanFrec =mean(Frec), sdFrec =sd(Frec))
+  summarise(MeanFrec =sum(Frec)/rep)
 
 
 DF_TOTAL_AG <- DF_TOTAL_AG %>%
@@ -171,9 +185,9 @@ DF_TOTAL_AG <- DF_TOTAL_AG %>%
   mutate(FrecCUM = cumsum(MeanFrec))
 
 
-## -----------------------------------------------------------------------------
+## ------------------------------------------------------------------------------------
 DF_TOTAL_TEMP <- DF_TOTAL_AG %>%
-  filter((numPlants== 2000) & (porcionCosecha == "Synchronous  Initial"))
+  filter((numPlants== 2000) & (porcionCosecha == "Asynchronous"))
 
 #DF_TOTAL_TEMP <- DF_TOTAL_TEMP %>%
  # group_by(Infection) %>%
@@ -206,7 +220,7 @@ FIG_HIST_G <- DF_TOTAL_TEMP %>%
 
 
 
-## -----------------------------------------------------------------------------
+## ------------------------------------------------------------------------------------
 for (nP in unique(DF_TOTAL_AG$numPlants)){
   for (pC in unique(DF_TOTAL_AG$porcionCosecha)){
     
@@ -247,7 +261,7 @@ for (nP in unique(DF_TOTAL_AG$numPlants)){
 
   
   #  ggsave(FIG_HIST_G,filename=paste("../../output/graficas/PATH/", "DisHIST_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-    ggsave(FIG_HIST_G,filename=paste("../../output/graficas/PATH/", "DisHIST_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+    ggsave(FIG_HIST_G,filename=paste("../../output/graficas/PATH/", "DisHIST_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
     
   }
 }
@@ -255,7 +269,7 @@ for (nP in unique(DF_TOTAL_AG$numPlants)){
 
 
 
-## -----------------------------------------------------------------------------
+## ------------------------------------------------------------------------------------
 
 DF_MAX_INF <- DF_TOTAL_AG %>%
   filter(Infection == "New Infection")%>%
@@ -264,9 +278,25 @@ DF_MAX_INF <- DF_TOTAL_AG %>%
   
 
 
-## -----------------------------------------------------------------------------
-FIG_W_DEN <- DF_MAX_INF %>%
-  ggplot(aes(x = numPlants, y = MaxFrec))+
+## ------------------------------------------------------------------------------------
+DF_SUPER_AG <- DF_TOTAL %>%
+  group_by(numPlants, numWorkers,  Infection, porcionCosecha, Rep) %>%
+  summarise(FrecAbs =sum(Conteo))
+
+DF_SUPER_AG$Frec <- 2* DF_SUPER_AG$FrecAbs/(DF_SUPER_AG$numPlants)
+#el 2 es porque realmente es la mitad del numbero de plantas
+
+
+DF_SUPER_AG <- DF_SUPER_AG%>%
+  group_by(numPlants, numWorkers,  Infection, porcionCosecha) %>%
+  summarise(MeanFrec =mean(Frec), sdFrec =sd(Frec))
+
+
+
+## ------------------------------------------------------------------------------------
+FIG_W_DEN <- DF_SUPER_AG%>%
+  filter(Infection == "New Infection")%>%
+  ggplot(aes(x = numPlants, y = MeanFrec))+
   geom_line(aes(group = porcionCosecha))+
   
   geom_point(aes(fill= as.character(porcionCosecha), shape= as.character(porcionCosecha)), color= "black", size=5, stroke=1, alpha= 1)+
@@ -282,7 +312,7 @@ ggsave(FIG_W_DEN,filename=paste("../../output/graficas/SUP_FIG/", "FIG_W_DEN.png
 
 
 
-## -----------------------------------------------------------------------------
+## ------------------------------------------------------------------------------------
 DF_ARRANGED <- DF_TOTAL %>%
   select(HarvestStep, DistanceW, Rep, numPlants, HarvestModel, porcionCosecha, WorkerID, Infection, numWorkers)%>%
   dplyr::mutate(pasoLargo =   round(as.integer(DistanceW/25)/(DistanceW/25))) #truco para que todo valga 1 si es mayor a 18 reportado así como salto laog
@@ -352,8 +382,8 @@ FIG_CUM_2000 <- DF_CUM %>%
   filter(numPlants== 2000)%>%
   ggplot(aes(x= PerArbBerry, y = DistanceW)) +
   geom_line(aes(group = WorkerID, color = Infection))+
-  #facet_wrap(~porcionCosecha, nrow = 3, scales = "free_x") +
-  facet_wrap(~porcionCosecha, nrow = 3) +
+  facet_wrap(~porcionCosecha, nrow = 3, scales = "free_x") +
+  #facet_wrap(~porcionCosecha, nrow = 3) +
 
   theme_bw() +
   scale_color_manual(values = colorsDis2)+
@@ -371,7 +401,7 @@ ggsave(FIG_CUM_2000,filename=paste("../../output/graficas/PATH/", "FIG_PROGRESSI
 
 
 
-## -----------------------------------------------------------------------------
+## ------------------------------------------------------------------------------------
 
 wholePlot <- 0
 
@@ -405,7 +435,7 @@ if (wholePlot ==1){
 
 
 
-## -----------------------------------------------------------------------------
+## ------------------------------------------------------------------------------------
 DF_AV <- read.csv("../../data/DF_spatialAverage_complete.csv", header = TRUE)
 
 #we change control model to "no har"
@@ -435,7 +465,7 @@ DF_AV$Rust <- DF_AV$Rust*100 #lo pasamos a un porcentage de infeccion para tener
 # 15000  rows
 
 
-## -----------------------------------------------------------------------------
+## ------------------------------------------------------------------------------------
 #here we summarize or average between all repetition- So
 #DF_AV_MOD_AVR should be 15000/30 = 500 (combinations)
 
@@ -445,7 +475,7 @@ DF_AV_AVR <- DF_AV %>%
 
 
 
-## -----------------------------------------------------------------------------
+## ------------------------------------------------------------------------------------
 ############FIRST FIGURES, time seires, final time, control paarte
 #these figures are only plotted without the number of workers that did not show a relevant difference
 # so we are plotting only the last time == 12
@@ -474,7 +504,7 @@ ggsave(FIG_RUST,filename=paste("../../output/graficas/SUP_FIG/", "rust_plants_ab
 #
 
 
-## -----------------------------------------------------------------------------
+## ------------------------------------------------------------------------------------
 FIG_SLI_time <- DF_AV_AVR %>% 
   filter(numWorkers !=5)%>% 
   filter(HarvestTime ==5|HarvestTime =="control")%>% 
@@ -502,7 +532,7 @@ ggsave(FIG_SLI_time,filename=paste("../../output/graficas/SUP_FIG/", "rust_time_
 
 
 
-## -----------------------------------------------------------------------------
+## ------------------------------------------------------------------------------------
 
 densidades = length(unique(DF_AV$numPlants))
 
@@ -551,7 +581,7 @@ rm(DF_AvsSF, DF_AvsSI, DF_SFvsSI)
 
 
 
-## -----------------------------------------------------------------------------
+## ------------------------------------------------------------------------------------
 FIG_DIF_MODELS <- DF_MODELS%>%
   ggplot(aes(x= as.factor(numPlants), y= PerIncrease))+
   geom_boxplot(color= "black", aes(fill= DIF))+
@@ -569,7 +599,7 @@ ggsave(FIG_DIF_MODELS,filename="../../output/graficas/DIF_RUST/dif_models.png", 
 
 
 
-## -----------------------------------------------------------------------------
+## ------------------------------------------------------------------------------------
 DF_MODvsCON_GEN <- DF_AV %>%
   filter(Time == HarvestTime |Time == timeMAX) %>%
   group_by(Rep, numPlants)%>% #son las vairables que quedan y sobre esos escenarios, vamos a hacer las diferencias entre modelos
@@ -586,13 +616,13 @@ DF_MODvsCON_GEN <- DF_AV %>%
 
 
 
-## -----------------------------------------------------------------------------
+## ------------------------------------------------------------------------------------
 DF_MODvsCON_GEN <- DF_MODvsCON_GEN%>%
 filter(porcionCosecha != "control")
 
 
 
-## -----------------------------------------------------------------------------
+## ------------------------------------------------------------------------------------
 FIG_DIF_CONTROL_H2 <- DF_MODvsCON_GEN %>%
   filter(Time == timeMAX)%>%
  # filter(numWorkers == 1)%>%
@@ -621,8 +651,8 @@ ggsave(FIG_DIF_CONTROL_H2,filename="../../output/graficas/DIF_RUST/ModelvsContro
 
 
 
-## -----------------------------------------------------------------------------
-#library(knitr)
-#purl("../../src/grapherCodes/figuresLattice.Rmd", output= "../../src/grapherCodes/figuresLattice.R")
+## ------------------------------------------------------------------------------------
+library(knitr)
+purl("../../src/grapherCodes/figuresLattice.Rmd", output= "../../src/grapherCodes/figuresLattice.R")
 
 
