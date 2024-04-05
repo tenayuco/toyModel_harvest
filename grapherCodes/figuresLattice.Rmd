@@ -265,7 +265,7 @@ for (nP in unique(DF_TOTAL_AG$numPlants)){
 
   
   #  ggsave(FIG_HIST_G,filename=paste("../../output/graficas/PATH/", "DisHIST_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-    ggsave(FIG_HIST_G,filename=paste("../../output/graficas/PATH/", "DisHIST_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+    ggsave(FIG_HIST_G,filename=paste("../../output/graficas/PATH/", "DisHIST_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
     
   }
 }
