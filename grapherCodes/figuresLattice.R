@@ -39,11 +39,22 @@ DF_SAM_SF <- DF_SAM_SF %>%
 
 DF_SAM <- rbind(DF_SAM_A, DF_SAM_SF, DF_SAM_SI)
 
+
+#aqui quitamos el SF, para la version más sencilla 
+
+
+DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="S_F"] <- "Synchronous Final" 
+
+
 DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="A"] <- "Asynchronous"
 DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="S_I"] <- "Synchronous  Initial" 
 DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="S_F"] <- "Synchronous Final" 
 
-DF_SAM$DistanceW <- sqrt(DF_SAM$DistanceW)
+DF_SAM <- DF_SAM %>%
+  filter(porcionCosecha != "Synchronous Final")
+
+DF_SAM$DistanceW <- sqrt(DF_SAM$DistanceW)  #esto porque estaba al cuadrado los datos
+
 
 
 
@@ -52,14 +63,20 @@ DF_SAM$DistanceW <- sqrt(DF_SAM$DistanceW)
 DF_TOTAL = DF_SAM %>%
   filter(Time ==5.5)
 
+rep <- length(unique(DF_TOTAL$Rep))
+
+
 DF_TOTAL$Conteo <- 1
-#DF_TOTAL <- DF_TOTAL %>% filter(DistanceW > 1.5)  ##ESTO ES TRAMPA, perp vamos a ver
-DF_TOTAL$DistanceW <- round(DF_TOTAL$DistanceW)  
+#prueba s
+DF_TOTAL$DistanceW <- sqrt(DF_TOTAL$DistanceW) 
+
 
 
 DF_TOTAL <- DF_TOTAL %>%
   filter(!is.na(DistanceW))%>%
   filter(DistanceW != 0)
+
+DF_TOTAL$DistanceW <- round(DF_TOTAL$DistanceW,1)  
 
 
 ####3
@@ -74,8 +91,8 @@ DF_TOTAL_PROXY <- DF_TOTAL %>%
   filter(porcionCosecha == "Asynchronous")%>%
   filter(numPlants == 2000)%>%
   filter(Infection == "New Infection")%>%
-  filter(Rep %in% c(0,1,2))%>%
-  filter(DistanceW %in% seq(1:10))
+  filter(Rep %in% c(0,1,2,3,4,5))%>%
+  filter(DistanceW <1.1)
 
 
 #DF_TOTAL <- DF_TOTAL_PROXY
@@ -173,7 +190,6 @@ DF_TOTAL_AG$Frec <- 2* DF_TOTAL_AG$FrecAbs/(DF_TOTAL_AG$numPlants)
 #el 2 es porque realmente es la mitad del numbero de plantas
 
 
-rep <- length(unique(DF_TOTAL_AG$Rep))
 
 DF_TOTAL_AG <- DF_TOTAL_AG %>%
   group_by(HarvestModel, numPlants, numWorkers,  Infection, DistanceW, HarvestTime, porcionCosecha, SimID) %>%
@@ -187,7 +203,7 @@ DF_TOTAL_AG <- DF_TOTAL_AG %>%
 
 ## ------------------------------------------------------------------------------------
 DF_TOTAL_TEMP <- DF_TOTAL_AG %>%
-  filter((numPlants== 2000) & (porcionCosecha == "Asynchronous"))
+  filter((numPlants== 2000) & (porcionCosecha == "Synchronous  Initial"))
 
 #DF_TOTAL_TEMP <- DF_TOTAL_TEMP %>%
  # group_by(Infection) %>%
@@ -207,8 +223,8 @@ FIG_HIST_G <- DF_TOTAL_TEMP %>%
   
   geom_line(aes(y= FrecCUM, group= as.character(Infection)), color= "black",  size=2)+
   geom_line(aes(y= FrecCUM, color= as.character(Infection)), size=1)+
-  xlim(0, 110)+
-  ylim(0, 0.45)+
+  #xlim(0, 110)+
+  #ylim(0, 0.45)+
   scale_fill_manual(values =colorsDis)+
   scale_color_manual(values =colorsDis)+
   theme_bw() +
@@ -216,7 +232,7 @@ FIG_HIST_G <- DF_TOTAL_TEMP %>%
   theme(legend.position = "none")+
   theme(strip.background = element_rect(fill = "white"))+ 
   scale_alpha(guide = 'none')+
-  labs(fill= "Rust", x= "Step length (m)", y= "Proportion of Steps")
+      labs(fill= "Rust", x= bquote('Step length' ~ (m^{1/2})), y= "Proportion of Steps")
 
 
 
@@ -246,8 +262,8 @@ for (nP in unique(DF_TOTAL_AG$numPlants)){
       
       geom_line(aes(y= FrecCUM, group= as.character(Infection)), color= "black",  size=2)+
       geom_line(aes(y= FrecCUM, color= as.character(Infection)), size=1)+
-      xlim(0, 110)+
-      ylim(0, 0.45)+
+      xlim(0, 10.5)+
+      ylim(0, 0.16)+
       scale_fill_manual(values =colorsDis)+
       scale_color_manual(values =colorsDis)+
       theme_bw() +
@@ -255,7 +271,7 @@ for (nP in unique(DF_TOTAL_AG$numPlants)){
       theme(legend.position = "none")+
       theme(strip.background = element_rect(fill = "white"))+ 
       scale_alpha(guide = 'none')+
-      labs(fill= "Rust", x= "Step length (m)", y= "Proportion of Steps")
+      labs(fill= "Rust", x= bquote('Step length' ~ (m^{1/2})), y= "Proportion of Steps")
     
     
 
