@@ -12,7 +12,7 @@ mycols <- c("#021128","#1b4a64", "#3585a0", "#759580", "#c78f34", "#fd9706","#fd
 mycols3a <-c("#021128", "#fd9706", "#1b4a64", "#759580")
 mycols3b <-c("#1b4a64", "#fdb81c", "#759580")
 mycols3c <- c("#759580", "#1b4a64","#fdb81c")
-groupColors2 <- c("#fd9706", "#1b4a64",'#56B4E9', "#555555")
+groupColors2 <- c("#1b4a64", "#fd9706", "#fbdb30", "white")#ESTE ES CEMTAL
 colorRedes <- c("black", "black","darkred")
 
 
@@ -188,44 +188,64 @@ write.csv(melt_DF_POST_RES, "../../data/baseDatosREDES_N.csv")
 
 #melt_DF_POST_RES <- read.csv("archivosTrabajandose/toyModelHarvest/data/baseDatosREDES_N.csv", header = TRUE)
 
-melt_DF_POST_RES <- read.csv("../../data/baseDatosREDES.csv", header = TRUE)
+melt_DF_POST_RES <- read.csv("../../data/baseDatosREDES_N.csv", header = TRUE)
 
 
 #cambiar antes a caracter
 melt_DF_POST_RES$variable_mean  <- as.character(melt_DF_POST_RES$variable_mean)
 
 
-melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "N_REDES_mean"] <- "i. Normalized infected networks AH"
-melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "T_REDES_mean"] <- "ii. Mean size of infected networks AH"
-melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "MUL_N_T_mean"] <- "iii. Estimated proportion of infected plants AH (i x ii)"
+melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "N_REDES_mean"] <- "i. Infected networks AH/total plants"
+melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "T_REDES_mean"] <- "ii. Plants per infected network AH"
+melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "MUL_N_T_mean"] <- "iii. Estimated infected plants AH/total plants (i x ii)"
+
 
 
 
 FIG_REDES <- melt_DF_POST_RES %>% 
-#  filter(comPuesta =="no")%>% 
+  #  filter(comPuesta =="no")%>% 
   ggplot(aes(x= numPlants, y= value_mean))+
-  geom_line(size=1, aes(color = variable_mean, linetype = variable_mean, group=variable_mean))+
+  geom_line(size=1, aes(linetype = porcionCosecha, group=porcionCosecha), color= "black")+
   geom_errorbar(size=0.5, aes( 
-    ymin=value_mean-value_sd, ymax=value_mean+value_sd, color = variable_mean)) +
-  geom_point(size= 6, aes(color = variable_mean, shape= variable_mean), fill="white", stroke= 1)+
+    ymin=value_mean-value_sd, ymax=value_mean+value_sd), color= "black") +
+  geom_point(size= 6, aes(fill = porcionCosecha, shape= porcionCosecha), color="black", stroke= 1)+
+  scale_fill_manual(values = groupColors2)+
   scale_shape_manual(values = c(21, 24, 22))+
-  scale_color_manual(values = colorRedes)+
+  #scale_color_manual(values = colorRedes)+
   scale_linetype_manual(values = c(1,1,2))+
-  facet_wrap(~porcionCosecha* variable_mean, scales = "free_y")+
+  facet_wrap(~variable_mean, scales = "free_y")+
   theme_bw()+
   theme(text = element_text(size = 25), 
         legend.key.size=unit(1,"cm"))+
   theme(strip.background = element_rect(colour= "black",
                                         fill="white"))+
   #theme(legend.position = "none") +
-  labs(x ="Density (Plants/ha)", y="Magnitude", shape= "Legend", linetype= "Legend", color= "Legend")
+  labs(x ="Density (Plants/ha)", y="Magnitude", shape= "Legend", linetype= "Legend", fill= "Legend")
 
-  
+
 ggsave(FIG_REDES,filename=paste("../../output/graficas/NETWORKS/", "redesAna2", ".pdf", sep=""),  height = 8, width = 30) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_REDES,filename=paste("../../output/graficas/NETWORKS/", "redesAna2", ".png", sep=""),  height = 8, width = 30) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 
-
+# FIG_REDES_VIEJA <- melt_DF_POST_RES %>% 
+# #  filter(comPuesta =="no")%>% 
+#   ggplot(aes(x= numPlants, y= value_mean))+
+#   geom_line(size=1, aes(color = variable_mean, linetype = variable_mean, group=variable_mean))+
+#   geom_errorbar(size=0.5, aes( 
+#     ymin=value_mean-value_sd, ymax=value_mean+value_sd, color = variable_mean)) +
+#   geom_point(size= 6, aes(color = variable_mean, shape= variable_mean), fill="white", stroke= 1)+
+#   scale_shape_manual(values = c(21, 24, 22))+
+#   scale_color_manual(values = colorRedes)+
+#   scale_linetype_manual(values = c(1,1,2))+
+#   facet_wrap(~porcionCosecha* variable_mean, scales = "free_y")+
+#   theme_bw()+
+#   theme(text = element_text(size = 25), 
+#         legend.key.size=unit(1,"cm"))+
+#   theme(strip.background = element_rect(colour= "black",
+#                                         fill="white"))+
+#   #theme(legend.position = "none") +
+#   labs(x ="Density (Plants/ha)", y="Magnitude", shape= "Legend", linetype= "Legend", color= "Legend")
 
 
 
