@@ -26,6 +26,9 @@ if (rerunAna == 1){
 
 DF_TOTAL <- read.csv("../../data/DF_total_TF.csv", header = TRUE)
 
+DF_TOTAL <- DF_TOTAL %>% 
+  filter(porcionCosecha != "S_F")
+
 
 #remove unuses colunmns
 DF_TOTAL$X.1 <- NULL
@@ -43,9 +46,9 @@ DF_NEW<-  DF_TOTAL%>%
 
 
 
-#nP =5000
+#nP =2000
 #rP = 0
-#pC = 1
+#pC = "A"
 
 
 #columns = c("Rep", "numPlants",  "porcionCosecha",  "N_REDES",  "T_REDES" , "MAX_T_REDES") 
@@ -92,31 +95,47 @@ colnames(DF_POST) = columns
    # image(adj_matrix)
     plot_graph <- graph.adjacency(adj_matrix,mode="undirected")
     #Pull out cluster IDs and put them in the data set
-    groups <- unlist(clusters(plot_graph)[1])
-    DF_TEMP$cluster <- groups
-    #Add degree to our data set too
-    DF_TEMP$degree <- degree(plot_graph)
-    #Assign a color to each group
-    numeroRedes <- max(groups) #esto el numero de nuevos 
-    tamanioRedes <- mean(degree(plot_graph))  #esto saca la media ponderada  
-    maxTamRedes <- max(degree(plot_graph))
     
     zippin <-layout.fruchterman.reingold(plot_graph)
     zippin[,1] <- DF_TEMP$X
     zippin[,2] <- DF_TEMP$Y
     
-
+    groups <- unlist(clusters(plot_graph)[1])
+    DF_TEMP$cluster <- groups
+    #Add degree to our data set too
     
+    
+    
+    DF_TEMP$CONTEO <- 1
+    #aqui saque el grado a mano
     DF_TEMP <- DF_TEMP %>%
+      group_by(Rep, numPlants, NUEVA_RUST, porcionCosecha, cluster)%>%
+      summarise(degree = sum(CONTEO)) 
+    
+    #DF_TEMP$degree <- degree(plot_graph)
+    #Assign a color to each group
+    numeroRedes <- max(DF_TEMP$cluster) #esto el numero de nuevos 
+    
+    tamanioRedes <- mean(DF_TEMP$degree)
+    maxTamRedes <- max(DF_TEMP$degree)
+    #tamanioRedes <- mean(degree(plot_graph))  #esto saca la media ponderada  
+    #maxTamRedes <- max(degree(plot_graph))
+    
+    
+    DF_RES <- DF_TEMP %>%
       select(Rep, numPlants, porcionCosecha)
     
-    DF_TEMP$N_REDES <- (2* numeroRedes/DF_TEMP$numPlants)*10
-    DF_TEMP$T_REDES <- tamanioRedes
-    DF_TEMP$MAX_T_REDES <-  maxTamRedes
-    DF_TEMP$MUL_N_T <- DF_TEMP$N_REDES*DF_TEMP$T_REDES
+    DF_RES <-  head(DF_RES, 1)
+
+    
+    DF_RES$N_REDES <- (numeroRedes/DF_RES$numPlants)
+    DF_RES$T_REDES <- tamanioRedes
+    DF_RES$MAX_T_REDES <-  maxTamRedes
+    
+    DF_RES$MUL_N_T <- (DF_RES$N_REDES*DF_RES$T_REDES)
     
     
-    DF_POST <- rbind(DF_POST, DF_TEMP)
+    DF_POST <- rbind(DF_POST, DF_RES)
     
     }
   }
@@ -126,9 +145,9 @@ colnames(DF_POST) = columns
 
 
 
-DF_POST <- DF_POST %>%
-  group_by(Rep, numPlants, porcionCosecha)%>%
-  summarise_all(mean)
+#DF_POST <- DF_POST %>%
+#  group_by(Rep, numPlants, porcionCosecha)%>%
+#  summarise_all(mean)
 
 #falta afinar este resultado!! en realidad el punto es que por cada repeticin haga la multi y desues sacamos des estandarss
 
@@ -141,8 +160,8 @@ DF_POST_RES <- DF_POST %>%
 #DF_POST_RES$N_REDES_NOR <- DF_POST_RES$N_REDES/DF_POST_RES$numPlants*100 
 
 DF_POST_RES$porcionCosecha[DF_POST_RES$porcionCosecha =="A"] <- "Asynchronous"
-DF_POST_RES$porcionCosecha[DF_POST_RES$porcionCosecha =="S_F"] <- "Synchronous Final" 
-DF_POST_RES$porcionCosecha[DF_POST_RES$porcionCosecha =="S_I"] <- "Synchronous  Initial" 
+#DF_POST_RES$porcionCosecha[DF_POST_RES$porcionCosecha =="S_F"] <- "Synchronous Final" 
+DF_POST_RES$porcionCosecha[DF_POST_RES$porcionCosecha =="S_I"] <- "Synchronous" 
 
 
 
@@ -163,11 +182,11 @@ melt_DF_POST_RES$comPuesta[melt_DF_POST_RES$variable_mean == "MUL_N_T_mean"] <- 
 
 
 
-write.csv(melt_DF_POST_RES, "../../data/baseDatosREDES.csv")
+write.csv(melt_DF_POST_RES, "../../data/baseDatosREDES_N.csv")
 
 }
 
-#melt_DF_POST_RES <- read.csv("archivosTrabajandose/toyModelHarvest/data/baseDatosREDES.csv", header = TRUE)
+#melt_DF_POST_RES <- read.csv("archivosTrabajandose/toyModelHarvest/data/baseDatosREDES_N.csv", header = TRUE)
 
 melt_DF_POST_RES <- read.csv("../../data/baseDatosREDES.csv", header = TRUE)
 
@@ -176,7 +195,7 @@ melt_DF_POST_RES <- read.csv("../../data/baseDatosREDES.csv", header = TRUE)
 melt_DF_POST_RES$variable_mean  <- as.character(melt_DF_POST_RES$variable_mean)
 
 
-melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "N_REDES_mean"] <- "i. Proportion of infected networks AH (x10)"
+melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "N_REDES_mean"] <- "i. Normalized infected networks AH"
 melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "T_REDES_mean"] <- "ii. Mean size of infected networks AH"
 melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "MUL_N_T_mean"] <- "iii. Estimated proportion of infected plants AH (i x ii)"
 
@@ -192,8 +211,7 @@ FIG_REDES <- melt_DF_POST_RES %>%
   scale_shape_manual(values = c(21, 24, 22))+
   scale_color_manual(values = colorRedes)+
   scale_linetype_manual(values = c(1,1,2))+
-  #facet_wrap(~porcionCosecha, scales = "free_y")+
-  facet_wrap(~porcionCosecha)+
+  facet_wrap(~porcionCosecha* variable_mean, scales = "free_y")+
   theme_bw()+
   theme(text = element_text(size = 25), 
         legend.key.size=unit(1,"cm"))+
@@ -203,7 +221,7 @@ FIG_REDES <- melt_DF_POST_RES %>%
   labs(x ="Density (Plants/ha)", y="Magnitude", shape= "Legend", linetype= "Legend", color= "Legend")
 
   
-ggsave(FIG_REDES,filename=paste("../../output/graficas/NETWORKS/", "redesAna", ".pdf", sep=""),  height = 8, width = 30) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_REDES,filename=paste("../../output/graficas/NETWORKS/", "redesAna2", ".pdf", sep=""),  height = 8, width = 30) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 
