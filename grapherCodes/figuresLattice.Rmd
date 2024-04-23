@@ -253,13 +253,15 @@ FIG_HIST_G <- DF_TOTAL_TEMP %>%
 
 
 
-FIG_INF <- DF_TOTAL_TEMP %>%
+FIG_INF <- DF_TOTAL_AG %>%
   filter(Infection == "New Infection")%>%
+    filter((numPlants== 500) | (numPlants== 2000) |(numPlants== 5000) )%>%
+
   ggplot(aes(x= DistanceW)) +
     geom_line(aes(y= FrecCUM, group =SimID), color= "black", size=2)+
   geom_line(aes(y= FrecCUM, color=porcionCosecha, group =SimID), 
             size=1)+
-  #xlim(0, 5)+
+  xlim(0, 10)+
   #ylim(0, 0.45)+
   facet_wrap(~numPlants)+
   scale_color_manual(values =groupColors4)+
@@ -271,7 +273,7 @@ FIG_INF <- DF_TOTAL_TEMP %>%
       labs(fill= "Rust", x= bquote('Step length' ~ (m^{1/2})), y= "Proportion of Steps")
 
 
-
+ ggsave(FIG_INF,filename=paste("../../output/graficas/DIF_RUST/", "INF_HAR.png", sep=""),  height = 8, width = 20)
 
 ```
 

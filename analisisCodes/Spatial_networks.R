@@ -45,6 +45,7 @@ DF_NEW<-  DF_TOTAL%>%
   filter(NUEVA_RUST ==1)
 
 
+#esto sirve para correr pruebas puntuales
 
 #nP =2000
 #rP = 0
@@ -195,11 +196,12 @@ melt_DF_POST_RES <- read.csv("../../data/baseDatosREDES_N.csv", header = TRUE)
 melt_DF_POST_RES$variable_mean  <- as.character(melt_DF_POST_RES$variable_mean)
 
 
-melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "N_REDES_mean"] <- "i. Infected networks AH/total plants"
-melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "T_REDES_mean"] <- "ii. Plants per infected network AH"
-melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "MUL_N_T_mean"] <- "iii. Estimated infected plants AH/total plants (i x ii)"
+melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "N_REDES_mean"] <- "i. Infected networks AH/density"
+melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "T_REDES_mean"] <- "ii. Plants/infected network AH"
+melt_DF_POST_RES$variable_mean[melt_DF_POST_RES$variable_mean == "MUL_N_T_mean"] <- "iii. Percentage of infected plants AH/density (i x ii*100)"
 
-
+melt_DF_POST_RES$value_mean[melt_DF_POST_RES$variable_mean == "MUL_N_T_mean"] <- melt_DF_POST_RES$value_mean[melt_DF_POST_RES$variable_mean == "MUL_N_T_mean"]*100
+melt_DF_POST_RES$value_sd[melt_DF_POST_RES$variable_mean == "MUL_N_T_mean"] <- melt_DF_POST_RES$value_sd[melt_DF_POST_RES$variable_mean == "MUL_N_T_mean"]*100
 
 
 FIG_REDES <- melt_DF_POST_RES %>% 
@@ -223,8 +225,8 @@ FIG_REDES <- melt_DF_POST_RES %>%
   labs(x ="Density (Plants/ha)", y="Magnitude", shape= "Legend", linetype= "Legend", fill= "Legend")
 
 
-ggsave(FIG_REDES,filename=paste("../../output/graficas/NETWORKS/", "redesAna2", ".pdf", sep=""),  height = 8, width = 30) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-ggsave(FIG_REDES,filename=paste("../../output/graficas/NETWORKS/", "redesAna2", ".png", sep=""),  height = 8, width = 30) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_REDES,filename=paste("../../output/graficas/NETWORKS/", "redesAna2", ".pdf", sep=""),  height = 8, width = 26) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_REDES,filename=paste("../../output/graficas/NETWORKS/", "redesAna2", ".png", sep=""),  height = 8, width = 26) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 
