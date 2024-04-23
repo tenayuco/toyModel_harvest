@@ -90,7 +90,7 @@ DF_TOTAL <- DF_TOTAL %>%
   filter(!is.na(DistanceW))%>%
   filter(DistanceW != 0)
 
-DF_TOTAL$DistanceW <- round(DF_TOTAL$DistanceW,1)  
+DF_TOTAL$DistanceW <- round(DF_TOTAL$DistanceW,0)  
 
 
 ####3
@@ -220,39 +220,9 @@ DF_TOTAL_AG <- DF_TOTAL_AG %>%
 ```
 Aqui tenemos un chunk de prueba
 
+
+
 ```{r}
-DF_TOTAL_TEMP <- DF_TOTAL_AG %>%
-  filter((numPlants== 2000) & (porcionCosecha == "Synchronous"))
-
-#DF_TOTAL_TEMP <- DF_TOTAL_TEMP %>%
- # group_by(Infection) %>%
-  #mutate(FrecCUM = cumsum(MeanFrec))
-
-##aqui un truco para no graficar el que no genera nueva infectin para la escala
-
-DF_TOTAL_TEMP$FrecCUM[DF_TOTAL_TEMP$Infection == "No Infection"] <- NA
-
-
-FIG_HIST_G <- DF_TOTAL_TEMP %>%
-  ggplot(aes(x= DistanceW)) +
-  geom_col(aes(y = MeanFrec, fill= as.character(Infection)),
-             color= "black", position = "stack")+
-  
-  geom_line(aes(y= FrecCUM, group= as.character(Infection)), color= "black",  size=2)+
-  geom_line(aes(y= FrecCUM, color= as.character(Infection)), size=1)+
-  #xlim(0, 110)+
-  #ylim(0, 0.45)+
-  scale_fill_manual(values =colorsDis)+
-  scale_color_manual(values =colorsDis)+
-  theme_bw() +
-  theme(text = element_text(size = 30))+
-  theme(legend.position = "none")+
-  theme(strip.background = element_rect(fill = "white"))+ 
-  scale_alpha(guide = 'none')+
-      labs(fill= "Rust", x= bquote('Step length' ~ (m^{1/2})), y= "Proportion of Steps")
-
-
-
 FIG_INF <- DF_TOTAL_AG %>%
   filter(Infection == "New Infection")%>%
     filter((numPlants== 500) | (numPlants== 2000) |(numPlants== 5000) )%>%
@@ -261,7 +231,7 @@ FIG_INF <- DF_TOTAL_AG %>%
     geom_line(aes(y= FrecCUM, group =SimID), color= "black", size=2)+
   geom_line(aes(y= FrecCUM, color=porcionCosecha, group =SimID), 
             size=1)+
-  xlim(0, 10)+
+  xlim(0, 110)+
   #ylim(0, 0.45)+
   facet_wrap(~numPlants)+
   scale_color_manual(values =groupColors4)+
@@ -270,60 +240,140 @@ FIG_INF <- DF_TOTAL_AG %>%
 #  theme(legend.position = "none")+
   theme(strip.background = element_rect(fill = "white"))+ 
   scale_alpha(guide = 'none')+
-      labs(fill= "Rust", x= bquote('Step length' ~ (m^{1/2})), y= "Proportion of Steps")
+     # labs(fill= "Rust", x= bquote('Step length' ~ (m^{1/2})), y= "Proportion of Steps")
+      labs(fill= "Rust", x= 'Step length', y= "Proportion of Steps", color= "Harvesting scenario")
 
 
- ggsave(FIG_INF,filename=paste("../../output/graficas/DIF_RUST/", "INF_HAR.png", sep=""),  height = 8, width = 20)
+
+ ggsave(FIG_INF,filename=paste("../../output/graficas/DIF_RUST/", "INF_HAR.png", sep=""),  height = 6, width = 20)
+
+```
+
+
+```{r}
+DF_SUPER_AG <- DF_TOTAL_AG%>%
+  group_by(HarvestModel, numPlants, numWorkers, DistanceW, HarvestTime
+           , porcionCosecha, SimID) %>%
+  summarise(MeanFrecTotal = sum(MeanFrec))
+
+
+DF_TOTAL_TEMP <- DF_SUPER_AG %>%
+  filter((numPlants== 2000) & (porcionCosecha == "Asynchronous"))
+
+#DF_TOTAL_TEMP <- DF_TOTAL_TEMP %>%
+ # group_by(Infection) %>%
+  #mutate(FrecCUM = cumsum(MeanFrec))
+
+##aqui un truco para no graficar el que no genera nueva infectin para la escala
+```
+
+
+
+```{r}
+CAJADIST<- DF_TOTAL%>%
+  ggplot(aes(x= DistanceW, y= as.character(porcionCosecha)))+
+  geom_violin(fill= "#EEEEEE")+ 
+  geom_point(aes(), shape= 21, fill= "gray", color= "black", size= 2)+
+  theme_bw()+
+    scale_fill_manual(values =colorsDis)+
+  theme(text = element_text(size = 20))+ 
+  theme(axis.ticks.y = element_blank(),
+        axis.text.y = element_blank())+
+  theme(legend.position = "none")+
+  xlim(0, 110)+
+  labs(x= "Step length (m)", y= "Rust", fill= "Rust")
+
+
+FIG_HIST_G <- DF_TOTAL_TEMP %>%
+  ggplot(aes(x= DistanceW)) +
+  geom_col(aes(y = MeanFrecTotal),
+             color= "black", fill= "gray", position = "stack")+
+  xlim(0, 110)+
+  ylim(0, 0.45)+
+  scale_fill_manual(values =colorsDis)+
+  scale_color_manual(values =colorsDis)+
+  theme_bw() +
+  theme(text = element_text(size = 30))+
+  theme(legend.position = "none")+
+  theme(strip.background = element_rect(fill = "white"))+ 
+  scale_alpha(guide = 'none')+
+      labs(fill= "Rust", x= bquote("Step length (m)"), y= "Proportion of Steps")
+
+
+HIS_COM<- FIG_HIST_G + annotation_custom(ggplotGrob(CAJADIST), xmin = 15, xmax = 100, ymin = 0.1, ymax = 0.4)
 
 ```
 
 
 
 ```{r}
-for (nP in unique(DF_TOTAL_AG$numPlants)){
-  for (pC in unique(DF_TOTAL_AG$porcionCosecha)){
+
+datos_TOTALES <- data.frame("Median" = 0, 
+               "Mean" = 0,
+                 "SD" = 0,
+               "pC" = 0, 
+               "nP" =0 )
+
+for (nP in unique(DF_SUPER_AG$numPlants)){
+  for (pC in unique(DF_SUPER_AG$porcionCosecha)){
     
-    DF_TOTAL_TEMP <- DF_TOTAL_AG %>%
+    DF_SUPER_TEMP <- DF_SUPER_AG %>%
       filter((numPlants== nP) & (porcionCosecha == pC))
     
+    DF_TOTAL_TEMP <-DF_TOTAL%>%
+      filter((numPlants== nP) & (porcionCosecha == pC))
     
-    DF_TOTAL_TEMP <- DF_TOTAL_TEMP %>%
-      group_by(Infection) %>%
-      mutate(FrecCUM = cumsum(MeanFrec))
-    
-    ##aqui un truco para no graficar el que no genera nueva infectin para la escala
-    
-    DF_TOTAL_TEMP$FrecCUM[DF_TOTAL_TEMP$Infection == "No Infection"] <- NA
-    
-    
-    FIG_HIST_G <- DF_TOTAL_TEMP %>%
-      #filter(Infection == "New Infection")%>%
-      ggplot(aes(x= DistanceW)) +
-      geom_col(aes(y = MeanFrec, fill= as.character(Infection)),
-               color= "black", position = "stack")+
-      # geom_histogram(color= "black", aes(fill= as.character(Infection), y = after_stat(count / sum(count))),binwidth=1) +
-      
-      geom_line(aes(y= FrecCUM, group= as.character(Infection)), color= "black",  size=2)+
-      geom_line(aes(y= FrecCUM, color= as.character(Infection)), size=1)+
-      xlim(0, 110)+
-      ylim(0, 0.16)+
-      scale_fill_manual(values =colorsDis)+
-      scale_color_manual(values =colorsDis)+
-      theme_bw() +
-      theme(text = element_text(size = 30))+
-      theme(legend.position = "none")+
-      theme(strip.background = element_rect(fill = "white"))+ 
-      scale_alpha(guide = 'none')+
-      labs(fill= "Rust", x= bquote('Step length' ~ (m^{1/2})), y= "Proportion of Steps")
-    
-    
+    CAJADIST_B<- DF_TOTAL_TEMP%>%
+  ggplot(aes(x= DistanceW, y= as.character(porcionCosecha)))+
+  geom_violin(fill= "#EEEEEE")+ 
+  geom_point(aes(), shape= 21, fill= "gray", color= "black", size= 2, alpha = 0.8)+
+  theme_bw()+
+    scale_fill_manual(values =colorsDis)+
+  theme(text = element_text(size = 20))+ 
+  theme(axis.ticks.y = element_blank(),
+        axis.text.y = element_blank())+
+  theme(legend.position = "none")+
+  xlim(0, 110)+
+  labs(x= "Step length (m)", y= "Rust", fill= "Rust")
 
-  
+
+FIG_HIST_G_B <- DF_SUPER_TEMP %>%
+  ggplot(aes(x= DistanceW)) +
+  geom_col(aes(y = MeanFrecTotal),
+             color= "black", fill= "gray", position = "stack")+
+  xlim(0, 110)+
+  ylim(0, 0.45)+
+  scale_fill_manual(values =colorsDis)+
+  scale_color_manual(values =colorsDis)+
+  theme_bw() +
+  theme(text = element_text(size = 30))+
+  theme(legend.position = "none")+
+  theme(strip.background = element_rect(fill = "white"))+ 
+  scale_alpha(guide = 'none')+
+      labs(fill= "Rust", x= bquote("Step length (m)"), y= "Proportion of Steps")
+
+
+HIS_COM_B<- FIG_HIST_G_B + annotation_custom(ggplotGrob(CAJADIST_B), xmin = 15, xmax = 100, ymin = 0.1, ymax = 0.4)
+    
+    
   #  ggsave(FIG_HIST_G,filename=paste("../../output/graficas/PATH/", "DisHIST_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-    ggsave(FIG_HIST_G,filename=paste("../../output/graficas/PATH/", "DisHIST_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+    ggsave(HIS_COM_B,filename=paste("../../output/graficas/PATH/", "DisFINAL_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+    
+   
+    
+   datos <- data.frame("Median" = median(DF_TOTAL_TEMP$DistanceW), 
+               "Mean" = mean(DF_TOTAL_TEMP$DistanceW),
+                 "SD" = sd(DF_TOTAL_TEMP$DistanceW),
+               "pC" = pC, 
+               "nP" = nP)
+    
+   datos_TOTALES <- rbind(datos_TOTALES, datos)
+   print(datos_TOTALES)
     
   }
 }
+
+write.csv(datos_TOTALES, paste("../../output/graficas/PATH/", "measures_TOTALES", ".csv"))
 
 
 ```
