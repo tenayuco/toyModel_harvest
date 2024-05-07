@@ -26,15 +26,14 @@ colorsDis3 <- c("#111111","#8B0000","#fd9706")
 
 ```
 
-
+We download the data of the movement of the workers during harvesting
 
 ```{r}
 #DF_SAM<- read.csv("./archivosTrabajandose/toyModelHarvest/data/DF_muestrasPath_complete.csv")
 DF_SAM <- read.csv("../../data/DF_muestrasPath_complete.csv", header = TRUE)
-#nP <- 2000
-#nW <- "1 worker"
-###########Plo
 
+#As we defined the model for SI and SF (not used at the end), SI only infects in the first half of the time
+# and then it harvest, but do not infect anymore. 
 
 DF_SAM_SI <- DF_SAM %>% filter(porcionCosecha == "S_I")
 DF_SAM_SF <- DF_SAM %>% filter(porcionCosecha == "S_F")
@@ -48,28 +47,22 @@ DF_SAM_SF <- DF_SAM_SF %>%
 
 DF_SAM <- rbind(DF_SAM_A, DF_SAM_SF, DF_SAM_SI)
 
-
-#aqui quitamos el SF, para la version más sencilla 
-
-
-DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="S_F"] <- "Synchronous Final" 
-
-
 DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="A"] <- "Asynchronous"
 DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="S_I"] <- "Synchronous" 
 DF_SAM$porcionCosecha[DF_SAM$porcionCosecha =="S_F"] <- "Synchronous Final" 
 
-##figuras sin el escenario de syncron Final
+##o remove the SF, to have the simpler versin
 DF_SAM <- DF_SAM %>%
   filter(porcionCosecha != "Synchronous Final")
 
-DF_SAM$DistanceW <- sqrt(DF_SAM$DistanceW)  #esto porque estaba al cuadrado los datos
+#the cacluatin was made with the square values, so we have to tkae the rootsquare
+DF_SAM$DistanceW <- sqrt(DF_SAM$DistanceW)  
 
 
 ```
 
 
-
+Then we take specifically the data corresponding to the moment of harvest. 
 ```{r}
 
 DF_TOTAL = DF_SAM %>%
@@ -77,23 +70,19 @@ DF_TOTAL = DF_SAM %>%
 
 rep <- length(unique(DF_TOTAL$Rep))
 
-
 DF_TOTAL$Conteo <- 1
 
-
-#prueba s
-#DF_TOTAL$DistanceW <- sqrt(DF_TOTAL$DistanceW) 
-
-
-
+#we remove the 0 values as they dont make sense
 DF_TOTAL <- DF_TOTAL %>%
   filter(!is.na(DistanceW))%>%
   filter(DistanceW != 0)
 
+#for better visualiztin we round only integer values
 DF_TOTAL$DistanceW <- round(DF_TOTAL$DistanceW,0)  
 
 
-####3
+####we create a new column to report the new infections 
+
 DF_TOTAL$Infection <- 0
 DF_TOTAL$Infection[DF_TOTAL$Rust =="1"] <- "No Infection" 
 DF_TOTAL$Infection[DF_TOTAL$Rust =="0"] <- "No Infection"
@@ -113,6 +102,7 @@ DF_TOTAL_PROXY <- DF_TOTAL %>%
 ```
 
 
+We do the general visualization of paths:
 
 ```{r}
 FIG_PATH_GEN<- DF_TOTAL %>% 
@@ -148,10 +138,14 @@ FIG_PATH_2000_todos<- DF_TOTAL %>%
   arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
   rowwise() %>% 
   ggplot(aes(x= X, y = Y, group=WorkerID)) +
-  geom_path(aes(col= as.character(Infection)),size=1.5, alpha= 0.8)+
+  #geom_path(aes(col= as.character(Infection)),size=1.5, alpha= 0.8)+
+  geom_path(aes(col= as.character(WorkerID)),size=1.5, alpha= 0.8)+
   geom_point(size=1.5)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
   #scale_color_viridis_c()+
-  scale_color_manual(values = colorsDis2)+
+  #scale_color_manual(values = colorsDis2)+
+#  scale_color_manual(values = mycols)+
+      scale_color_viridis_d()+
+
   theme(panel.spacing = unit(0.8, "lines"))+
   theme_bw()+
   facet_wrap(~porcionCosecha, nrow = 3) +
@@ -163,7 +157,7 @@ FIG_PATH_2000_todos<- DF_TOTAL %>%
   )+ 
   labs(x= "X (m)", y= "Y (m)", col= "Rust")
 
-ggsave(FIG_PATH_2000_todos,filename=paste("../../output/graficas/PATH/", "path_plants_2000_w1_todos.png", sep=""),  height = 10, width = 4.5) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_PATH_2000_todos,filename=paste("../../output/graficas/PATH/", "path_plants_2000_w1_todos.png", sep=""),  height = 10, width = 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 ```
@@ -194,114 +188,68 @@ FIG_PATH_2000_W1<- DF_TOTAL %>%
   )+ 
   labs(x= "X (m)", y= "Y (m)", col= "Rust")
 
-ggsave(FIG_PATH_2000_W1,filename=paste("../../output/graficas/PATH/", "path_plants_2000_1Worker.png", sep=""),  height = 10, width = 4.5) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_PATH_2000_W1,filename=paste("../../output/graficas/PATH/", "path_plants_2000_1Worker.png", sep=""),  height = 10, width = 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 ```
 
+Now, we will do the aggregate to generate the histogram manually
+
 
 ```{r}
-DF_TOTAL_AG <- DF_TOTAL %>%
-  group_by(HarvestModel, numPlants, numWorkers,  Infection, DistanceW, HarvestTime, porcionCosecha, SimID, Rep) %>%
+#total_AG agregates the distance values per:
+#numplant, numWorkers, infection, distnaceW, porcionCosecha, SimID, rep
+#and then from that have a frec abs (so we remove the x, y coodrinates)
+
+DF_TOTAL_AG_PRE <- DF_TOTAL %>%
+  group_by(numPlants, numWorkers,  Infection, DistanceW, porcionCosecha, SimID, Rep) %>%
   summarise(FrecAbs =sum(Conteo))
 
-DF_TOTAL_AG$Frec <- 2* DF_TOTAL_AG$FrecAbs/(DF_TOTAL_AG$numPlants)
+#hen we add the frec, as the value in telation o the number of jharvester plantws (2*../numplans)
+
+DF_TOTAL_AG_PRE$Frec <- 2* DF_TOTAL_AG_PRE$FrecAbs/(DF_TOTAL_AG_PRE$numPlants)
 #el 2 es porque realmente es la mitad del numbero de plantas
 
+#and then, we group these values per repetition
 
+#now we complete the combinatns opf distanfes
+
+DF_TOTAL_AG_PRE <- DF_TOTAL_AG_PRE %>%
+  ungroup() %>%
+  complete(DistanceW, nesting(numPlants, numWorkers,  Infection, porcionCosecha, Rep, SimID))
+
+############################
+DF_TOTAL_AG <- DF_TOTAL_AG_PRE %>%
+  group_by(numPlants, numWorkers,  Infection, DistanceW, porcionCosecha, SimID) %>%
+  summarise(MeanFrec =mean(Frec, na.rm = TRUE), SDFrec =sd(Frec, na.rm = TRUE))
 
 DF_TOTAL_AG <- DF_TOTAL_AG %>%
-  group_by(HarvestModel, numPlants, numWorkers,  Infection, DistanceW, HarvestTime, porcionCosecha, SimID) %>%
-  summarise(MeanFrec =sum(Frec)/rep)
+  filter(!(is.na(MeanFrec)))
 
+#DF_TOTAL_AG <- DF_TOTAL_AG %>%
+ # group_by(numPlants, numWorkers,  Infection, DistanceW, porcionCosecha, SimID) %>%
+#  summarise(MeanFrec =sum(Frec)/rep)
 
+#and this last rep was included because sometimes no all the values were present im the 30 repetitions, rep =! REP!! and we need to assert that even if it was not there, 
+#we have to divide it. This is not tje same as only 
+
+#finally, we add a column to add the cumulative values 
 DF_TOTAL_AG <- DF_TOTAL_AG %>%
   group_by(Infection, numPlants, porcionCosecha) %>%
   mutate(FrecCUM = cumsum(MeanFrec))
+
+
+###ACA ME QUEDE MAYO 7 
 ```
-Aqui tenemos un chunk de prueba
 
 
 
 ```{r}
-FIG_INF <- DF_TOTAL_AG %>%
-  filter(Infection == "New Infection")%>%
-    filter((numPlants== 500) | (numPlants== 2000) |(numPlants== 5000) )%>%
 
-  ggplot(aes(x= DistanceW)) +
-    geom_line(aes(y= FrecCUM, group =SimID), color= "black", size=2)+
-  geom_line(aes(y= FrecCUM, color=porcionCosecha, group =SimID), 
-            size=1)+
-  xlim(0, 110)+
-  #ylim(0, 0.45)+
-  facet_wrap(~numPlants)+
-  scale_color_manual(values =groupColors4)+
-  theme_bw() +
-  theme(text = element_text(size = 30))+
-#  theme(legend.position = "none")+
-  theme(strip.background = element_rect(fill = "white"))+ 
-  scale_alpha(guide = 'none')+
-     # labs(fill= "Rust", x= bquote('Step length' ~ (m^{1/2})), y= "Proportion of Steps")
-      labs(fill= "Rust", x= 'Step length', y= "Proportion of Steps", color= "Harvesting scenario")
+#this super aggregate does not consider the infection division. We just sum both valus!
 
-
-
- ggsave(FIG_INF,filename=paste("../../output/graficas/DIF_RUST/", "INF_HAR.png", sep=""),  height = 6, width = 20)
-
-```
-
-
-```{r}
 DF_SUPER_AG <- DF_TOTAL_AG%>%
-  group_by(HarvestModel, numPlants, numWorkers, DistanceW, HarvestTime
-           , porcionCosecha, SimID) %>%
+  group_by(numPlants, numWorkers, DistanceW, porcionCosecha, SimID) %>%
   summarise(MeanFrecTotal = sum(MeanFrec))
-
-
-DF_TOTAL_TEMP <- DF_SUPER_AG %>%
-  filter((numPlants== 2000) & (porcionCosecha == "Asynchronous"))
-
-#DF_TOTAL_TEMP <- DF_TOTAL_TEMP %>%
- # group_by(Infection) %>%
-  #mutate(FrecCUM = cumsum(MeanFrec))
-
-##aqui un truco para no graficar el que no genera nueva infectin para la escala
-```
-
-
-
-```{r}
-CAJADIST<- DF_TOTAL%>%
-  ggplot(aes(x= DistanceW, y= as.character(porcionCosecha)))+
-  geom_violin(fill= "#EEEEEE")+ 
-  geom_point(aes(), shape= 21, fill= "gray", color= "black", size= 2)+
-  theme_bw()+
-    scale_fill_manual(values =colorsDis)+
-  theme(text = element_text(size = 20))+ 
-  theme(axis.ticks.y = element_blank(),
-        axis.text.y = element_blank())+
-  theme(legend.position = "none")+
-  xlim(0, 110)+
-  labs(x= "Step length (m)", y= "Rust", fill= "Rust")
-
-
-FIG_HIST_G <- DF_TOTAL_TEMP %>%
-  ggplot(aes(x= DistanceW)) +
-  geom_col(aes(y = MeanFrecTotal),
-             color= "black", fill= "gray", position = "stack")+
-  xlim(0, 110)+
-  ylim(0, 0.45)+
-  scale_fill_manual(values =colorsDis)+
-  scale_color_manual(values =colorsDis)+
-  theme_bw() +
-  theme(text = element_text(size = 30))+
-  theme(legend.position = "none")+
-  theme(strip.background = element_rect(fill = "white"))+ 
-  scale_alpha(guide = 'none')+
-      labs(fill= "Rust", x= bquote("Step length (m)"), y= "Proportion of Steps")
-
-
-HIS_COM<- FIG_HIST_G + annotation_custom(ggplotGrob(CAJADIST), xmin = 15, xmax = 100, ymin = 0.1, ymax = 0.4)
-
 ```
 
 
@@ -377,6 +325,40 @@ write.csv(datos_TOTALES, paste("../../output/graficas/PATH/", "measures_TOTALES"
 
 
 ```
+
+
+
+```{r}
+FIG_INF <- DF_TOTAL_AG %>%
+  filter(Infection == "New Infection")%>%
+    filter((numPlants== 500) | (numPlants== 2000) |(numPlants== 5000) )%>%
+
+  ggplot(aes(x= DistanceW)) +
+  
+    geom_ribbon(aes(ymin = FrecCUM - SDFrec, ymax = FrecCUM + SDFrec, fill= porcionCosecha), alpha= 0.7) +
+    geom_line(aes(y= FrecCUM, group =SimID), color= "black", size=2)+
+  geom_line(aes(y= FrecCUM, color=porcionCosecha, group =SimID), 
+            size=1)+
+  xlim(0, 30)+
+  #ylim(0, 0.45)+
+  facet_wrap(~numPlants, ncol = 1)+
+  scale_color_manual(values =groupColors4)+
+    scale_fill_manual(values =groupColors4)+
+
+  theme_bw() +
+  theme(text = element_text(size = 30))+
+#  theme(legend.position = "none")+
+  theme(strip.background = element_rect(fill = "white"))+ 
+  scale_alpha(guide = 'none')+
+     # labs(fill= "Rust", x= bquote('Step length' ~ (m^{1/2})), y= "Proportion of Steps")
+      labs(fill= "Rust", x= 'Step length', y= "Proportion of Steps", color= "Harvesting scenario")
+
+
+ ggsave(FIG_INF,filename=paste("../../output/graficas/DIF_RUST/", "INF_HAR.png", sep=""),  height = 6, width = 20)
+
+```
+
+
 
 
 
@@ -787,6 +769,5 @@ library(knitr)
 purl("../../src/grapherCodes/figuresLattice.Rmd", output= "../../src/grapherCodes/figuresLattice.R")
 
 ```
-
 
 
