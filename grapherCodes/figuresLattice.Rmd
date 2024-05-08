@@ -149,7 +149,7 @@ FIG_PATH_2000_todos<- DF_TOTAL %>%
   theme(panel.spacing = unit(0.8, "lines"))+
   theme_bw()+
   facet_wrap(~porcionCosecha, nrow = 3) +
-  theme(text = element_text(size = 20))+
+  theme(text = element_text(size = 25))+
   theme(legend.position = "none") +
   theme(
     strip.background = element_blank(),
@@ -180,7 +180,7 @@ FIG_PATH_2000_W1<- DF_TOTAL %>%
   theme(panel.spacing = unit(0.8, "lines"))+
   theme_bw()+
   facet_wrap(~porcionCosecha, nrow = 3) +
-  theme(text = element_text(size = 20))+
+  theme(text = element_text(size = 25))+
   theme(legend.position = "none") +
   theme(
     strip.background = element_blank(),
@@ -262,7 +262,8 @@ for (nP in unique(DF_SUPER_AG$numPlants)){
   for (pC in unique(DF_SUPER_AG$porcionCosecha)){
     
     DF_SUPER_TEMP <- DF_SUPER_AG %>%
-      filter((numPlants== nP) & (porcionCosecha == pC))
+      filter((numPlants== nP) & (porcionCosecha == pC)) %>%
+      filter(MeanFrecTotal !=0)
     
     DF_TOTAL_TEMP <-DF_TOTAL%>%
       filter((numPlants== nP) & (porcionCosecha == pC))
@@ -273,12 +274,12 @@ for (nP in unique(DF_SUPER_AG$numPlants)){
   geom_point(aes(), shape= 21, fill= "gray", color= "black", size= 2, alpha = 0.8)+
   theme_bw()+
     scale_fill_manual(values =colorsDis)+
-  theme(text = element_text(size = 20))+ 
+  theme(text = element_text(size = 25))+ 
   theme(axis.ticks.y = element_blank(),
         axis.text.y = element_blank())+
   theme(legend.position = "none")+
   xlim(0, 110)+
-  labs(x= "Step length (m)", y= "Rust", fill= "Rust")
+  labs(x= "Step length (m)", y= "", fill= "")
 
 
 FIG_HIST_G_B <- DF_SUPER_TEMP %>%
@@ -290,18 +291,18 @@ FIG_HIST_G_B <- DF_SUPER_TEMP %>%
   scale_fill_manual(values =colorsDis)+
   scale_color_manual(values =colorsDis)+
   theme_bw() +
-  theme(text = element_text(size = 30))+
+  theme(text = element_text(size = 25))+
   theme(legend.position = "none")+
   theme(strip.background = element_rect(fill = "white"))+ 
   scale_alpha(guide = 'none')+
-      labs(fill= "Rust", x= bquote("Step length (m)"), y= "Proportion of Steps")
+      labs(fill= "", x= bquote("Step length (m)"), y= "Proportion of Steps")
 
 
 HIS_COM_B<- FIG_HIST_G_B + annotation_custom(ggplotGrob(CAJADIST_B), xmin = 15, xmax = 100, ymin = 0.1, ymax = 0.4)
     
     
   #  ggsave(FIG_HIST_G,filename=paste("../../output/graficas/PATH/", "DisHIST_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-    ggsave(HIS_COM_B,filename=paste("../../output/graficas/PATH/", "DisFINAL_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+    ggsave(HIS_COM_B,filename=paste("../../output/graficas/PATH/", "DisFINAL_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 5, width = 7) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
     
    
     
@@ -346,61 +347,15 @@ FIG_INF <- DF_TOTAL_AG %>%
   theme(strip.background = element_rect(fill = "white"))+ 
   scale_alpha(guide = 'none')+
   theme(legend.position="bottom")+
-      labs(fill= "Harvesting Scenario", x= 'Step length', y= "Proportion of Steps", color= "Harvesting scenario")
+      labs(fill= "Harvesting Scenario", x= 'Step length', y= "Proportion of Infective steps", color= "Harvesting scenario")
 
 
- ggsave(FIG_INF,filename=paste("../../output/graficas/DIF_RUST/", "INF_HAR.png", sep=""),  height = 10, width = 10)
-
-```
-
-
-```{r}
-
-
-DF_MAX_INF <- DF_TOTAL_AG %>%
-  filter(Infection == "New Infection")%>%
-  group_by(numPlants, Infection, porcionCosecha) %>%
-  summarise(MaxFrec = max(FrecCUM))
-  
-```
-
-
-```{r}
-DF_SUPER_AG <- DF_TOTAL %>%
-  group_by(numPlants, numWorkers,  Infection, porcionCosecha, Rep) %>%
-  summarise(FrecAbs =sum(Conteo))
-
-DF_SUPER_AG$Frec <- 2* DF_SUPER_AG$FrecAbs/(DF_SUPER_AG$numPlants)
-#el 2 es porque realmente es la mitad del numbero de plantas
-
-
-DF_SUPER_AG <- DF_SUPER_AG%>%
-  group_by(numPlants, numWorkers,  Infection, porcionCosecha) %>%
-  summarise(MeanFrec =mean(Frec), sdFrec =sd(Frec))
+ ggsave(FIG_INF,filename=paste("../../output/graficas/DIF_RUST/", "INF_HAR.png", sep=""),  height = 12, width = 12)
 
 ```
 
 
-
-
-```{r}
-FIG_W_DEN <- DF_SUPER_AG%>%
-  filter(Infection == "New Infection")%>%
-  ggplot(aes(x = numPlants, y = MeanFrec))+
-  geom_line(aes(group = porcionCosecha))+
-   geom_errorbar(aes(ymin =MeanFrec- sdFrec , ymax = MeanFrec+ sdFrec), width = 0.2, color= "black")+ 
-  geom_point(aes(fill= as.character(porcionCosecha), shape= as.character(porcionCosecha)), color= "black", size=5, stroke=1, alpha= 1)+
-  #geom_point(aes(shape= as.character(porcionCosecha), color= as.character(porcionCosecha)), size= 3)+
-  scale_fill_manual(values = groupColors2)+
-  scale_shape_manual(values= c(21, 22, 23))+
-  theme_bw() +
-  theme(text = element_text(size = 25))+
-  theme(strip.background = element_rect(fill = "white"))+
-  labs(x= "Density (Plants/ha)", y= "Proportion of infective steps", fill= "Harvesting Scenario",shape= "Harvesting Scenario")
-
-ggsave(FIG_W_DEN,filename=paste("../../output/graficas/SUP_FIG/", "FIG_W_DEN.png", sep=""),  height = 6, width = 12)
-
-```
+This is the section about cumulative trajectory
 
 
 ```{r}
@@ -424,7 +379,7 @@ DF_CUM_A <- DF_CUM %>%
   mutate(PerArbBerry = 100*(numPlants/2 - (HarvestStep*numWorkers))/(numPlants))
 
 DF_CUM_SI <- DF_CUM%>%
-  filter(porcionCosecha == "Synchronous  Initial")%>%
+  filter(porcionCosecha == "Synchronous")%>%
   mutate(PerStep = 100*HarvestStep/250)%>%
   mutate(PerArbBerry = 100*(numPlants - (HarvestStep*numWorkers))/(numPlants))
 
@@ -444,8 +399,10 @@ rm(DF_CUM_SF)
 #DF_CUM$ArbNoCos <- DF_CUM$numPlants - DF_CUM$HarvestStep
 
 #DF_CUM$PerCos <- 100 -(DF_CUM$ArbNoCos/DF_CUM$numPlants *100)
+```
 
 
+```{r}
 FIG_CUM <- DF_CUM %>%
   #filter(Rep ==2)%>%
   #filter(WorkerID == "W_2")%>%
@@ -463,7 +420,7 @@ FIG_CUM <- DF_CUM %>%
   labs(x= "% Harvested trees", y= "Size of step per worker")
 
 
-ggsave(FIG_CUM,filename=paste("../../output/graficas/SUP_FIG/", "FIG_PROGRESSION.png", sep=""),  height = 10, width = 20)
+ggsave(FIG_CUM,filename=paste("../../output/graficas/SUP_FIG/", "FIG_PROGRESSION.png", sep=""),  height = 8, width = 20)
 
 
 
@@ -472,12 +429,12 @@ FIG_CUM_2000 <- DF_CUM %>%
  # filter(WorkerID == )%>%
   filter(numPlants== 2000)%>%
   ggplot(aes(x= PerArbBerry, y = DistanceW)) +
-  geom_line(aes(group = WorkerID, color = Infection))+
+  geom_line(aes(group = WorkerID, color = WorkerID))+
   facet_wrap(~porcionCosecha, nrow = 3, scales = "free_x") +
   #facet_wrap(~porcionCosecha, nrow = 3) +
 
   theme_bw() +
-  scale_color_manual(values = colorsDis2)+
+  scale_color_viridis_d()+
   #geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= 0.025, size = 0.2, color= "Black")+
   theme(text = element_text(size = 25))+
   scale_x_reverse()+
@@ -485,10 +442,12 @@ FIG_CUM_2000 <- DF_CUM %>%
     strip.background = element_blank(),
     strip.text.x = element_blank()
   )+
+  theme(legend.position = "none")+
   labs(x= "% Trees with berries", y= "Step length per worker (m)", color= "Rust")
 
 
-ggsave(FIG_CUM_2000,filename=paste("../../output/graficas/PATH/", "FIG_PROGRESSION_2000.png", sep=""),  height = 12, width = 8.5 )
+ggsave(FIG_CUM_2000,filename=paste("../../output/graficas/PATH/", "FIG_PROGRESSION_2000.png", sep=""),  height = 10, width = 6)
+
 
 ```
 
@@ -771,4 +730,3 @@ purl("../../src/grapherCodes/figuresLattice.Rmd", output= "../../src/grapherCode
   #mutate(DIF_CUM = FrecCUM - lag(FrecCUM))
 
 ```
-
