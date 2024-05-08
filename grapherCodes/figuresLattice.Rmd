@@ -207,6 +207,7 @@ DF_TOTAL_AG_PRE <- DF_TOTAL %>%
 #hen we add the frec, as the value in telation o the number of jharvester plantws (2*../numplans)
 
 DF_TOTAL_AG_PRE$Frec <- 2* DF_TOTAL_AG_PRE$FrecAbs/(DF_TOTAL_AG_PRE$numPlants)
+
 #el 2 es porque realmente es la mitad del numbero de plantas
 
 #and then, we group these values per repetition
@@ -218,27 +219,22 @@ DF_TOTAL_AG_PRE <- DF_TOTAL_AG_PRE %>%
   complete(DistanceW, nesting(numPlants, numWorkers,  Infection, porcionCosecha, Rep, SimID))
 
 ############################
+
+DF_TOTAL_AG_PRE$Frec[is.na(DF_TOTAL_AG_PRE$Frec)] <- 0
+
 DF_TOTAL_AG <- DF_TOTAL_AG_PRE %>%
   group_by(numPlants, numWorkers,  Infection, DistanceW, porcionCosecha, SimID) %>%
   summarise(MeanFrec =mean(Frec, na.rm = TRUE), SDFrec =sd(Frec, na.rm = TRUE))
 
-DF_TOTAL_AG <- DF_TOTAL_AG %>%
-  filter(!(is.na(MeanFrec)))
-
-#DF_TOTAL_AG <- DF_TOTAL_AG %>%
- # group_by(numPlants, numWorkers,  Infection, DistanceW, porcionCosecha, SimID) %>%
-#  summarise(MeanFrec =sum(Frec)/rep)
-
-#and this last rep was included because sometimes no all the values were present im the 30 repetitions, rep =! REP!! and we need to assert that even if it was not there, 
-#we have to divide it. This is not tje same as only 
+##despues de completar y de hacer el agregamiento bueno deben quedar una cantidad de rengones
+## con sentido. Completar hace que le agegues 0 en donde no había nada. 
+## eneste caso, tenemos numPlans/numWorkers (5)+ Infection (2)* DistanceW (116)* porcionCosecha (2) =   2320 renglnones
 
 #finally, we add a column to add the cumulative values 
 DF_TOTAL_AG <- DF_TOTAL_AG %>%
   group_by(Infection, numPlants, porcionCosecha) %>%
   mutate(FrecCUM = cumsum(MeanFrec))
 
-
-###ACA ME QUEDE MAYO 7 
 ```
 
 
@@ -334,12 +330,11 @@ FIG_INF <- DF_TOTAL_AG %>%
     filter((numPlants== 500) | (numPlants== 2000) |(numPlants== 5000) )%>%
 
   ggplot(aes(x= DistanceW)) +
-  
-    geom_ribbon(aes(ymin = FrecCUM - SDFrec, ymax = FrecCUM + SDFrec, fill= porcionCosecha), alpha= 0.7) +
-    geom_line(aes(y= FrecCUM, group =SimID), color= "black", size=2)+
-  geom_line(aes(y= FrecCUM, color=porcionCosecha, group =SimID), 
-            size=1)+
-  xlim(0, 30)+
+   # geom_line(aes(y= FrecCUM, group =SimID), color= "black", size=2)+
+  #geom_line(aes(y= FrecCUM, color=porcionCosecha, group =SimID), size=1)+
+  geom_ribbon(aes(ymin=FrecCUM- SDFrec, ymax=FrecCUM+SDFrec, group= SimID, 
+                  fill= porcionCosecha), color= "black")+
+  xlim(0, 20)+
   #ylim(0, 0.45)+
   facet_wrap(~numPlants, ncol = 1)+
   scale_color_manual(values =groupColors4)+
@@ -350,16 +345,13 @@ FIG_INF <- DF_TOTAL_AG %>%
 #  theme(legend.position = "none")+
   theme(strip.background = element_rect(fill = "white"))+ 
   scale_alpha(guide = 'none')+
-     # labs(fill= "Rust", x= bquote('Step length' ~ (m^{1/2})), y= "Proportion of Steps")
-      labs(fill= "Rust", x= 'Step length', y= "Proportion of Steps", color= "Harvesting scenario")
+  theme(legend.position="bottom")+
+      labs(fill= "Harvesting Scenario", x= 'Step length', y= "Proportion of Steps", color= "Harvesting scenario")
 
 
- ggsave(FIG_INF,filename=paste("../../output/graficas/DIF_RUST/", "INF_HAR.png", sep=""),  height = 6, width = 20)
+ ggsave(FIG_INF,filename=paste("../../output/graficas/DIF_RUST/", "INF_HAR.png", sep=""),  height = 10, width = 10)
 
 ```
-
-
-
 
 
 ```{r}
@@ -770,4 +762,13 @@ purl("../../src/grapherCodes/figuresLattice.Rmd", output= "../../src/grapherCode
 
 ```
 
+```{r}
+## ESTO LO DEJO PARA CUANDO QUEIRA USAR LA FUCNION LAF
+#DF_TOTAL_AG$DIF_CUM <- NULL
+
+#DF_TOTAL_AG <- DF_TOTAL_AG %>%
+ # group_by(numPlants, numWorkers, Infection, porcionCosecha, SimID)%>%
+  #mutate(DIF_CUM = FrecCUM - lag(FrecCUM))
+
+```
 
