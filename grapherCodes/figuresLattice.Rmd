@@ -11,14 +11,12 @@ library(viridis)
 library(dplyr)
 library(tidyverse)
 library(reshape2)
+
+#base de datos general de colores:
 mycols <- c("#021128","#1b4a64", "#3585a0", "#759580", "#c78f34", "#fd9706","#fdb81c","#fbdb30")
-mycols3c <- c("#fdb81c", "#759580", "#1b4a64")
-
-groupColors2 <- c("#1b4a64", "#fd9706", "#fbdb30", "white")#ESTE ES CEMTAL
-groupColors3 <- c("white", "#fd9706", "#1b4a64" )
-groupColors <- c("#1b4a64", "#fd9706", "#fbdb30", "white", "#fd9706", "#fbdb30", "#111111")
-
-groupColors4 <- c("#1b4a64", "#fd9706", "#fbdb30", "black")
+mycols2 <- c("#1b4a64", "#fd9706")
+mycols3 <- c("#1b4a64", "#fd9706", "black")
+mycols3_white <- c("#1b4a64", "#fd9706", "#eeeeee")
 
 colorsDis <- c("#B87400","white")
 colorsDis2 <- c("#B87400","#555555")
@@ -89,15 +87,14 @@ DF_TOTAL$Infection[DF_TOTAL$Rust =="0"] <- "No Infection"
 DF_TOTAL$Infection[DF_TOTAL$Rust =="0.5"] <- "New Infection"
 
 
+#these lines of code can be used to run a proxy
 
-DF_TOTAL_PROXY <- DF_TOTAL %>%
-  filter(porcionCosecha == "Asynchronous")%>%
-  filter(numPlants == 2000)%>%
-  filter(Infection == "New Infection")%>%
-  filter(Rep %in% c(0,1,2,3,4,5))%>%
-  filter(DistanceW <1.1)
-
-
+#DF_TOTAL_PROXY <- DF_TOTAL %>%
+#  filter(porcionCosecha == "Asynchronous")%>%
+#  filter(numPlants == 2000)%>%
+#  filter(Infection == "New Infection")%>%
+#  filter(Rep %in% c(0,1,2,3,4,5))%>%
+#  filter(DistanceW <1.1)
 #DF_TOTAL <- DF_TOTAL_PROXY
 ```
 
@@ -115,7 +112,6 @@ FIG_PATH_GEN<- DF_TOTAL %>%
     geom_path(aes(col= WorkerID),size=1)+
     geom_point(size=1)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
     scale_color_viridis_d()+
-    #scale_color_manual(values = mycols)+
     facet_grid(porcionCosecha ~numPlants) +
     theme(panel.spacing = unit(0.8, "lines"), text = element_text(size = 15))+
     theme_bw()+
@@ -141,9 +137,6 @@ FIG_PATH_2000_todos<- DF_TOTAL %>%
   #geom_path(aes(col= as.character(Infection)),size=1.5, alpha= 0.8)+
   geom_path(aes(col= as.character(WorkerID)),size=1.5, alpha= 0.8)+
   geom_point(size=1.5)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
-  #scale_color_viridis_c()+
-  #scale_color_manual(values = colorsDis2)+
-#  scale_color_manual(values = mycols)+
       scale_color_viridis_d()+
 
   theme(panel.spacing = unit(0.8, "lines"))+
@@ -325,36 +318,6 @@ write.csv(datos_TOTALES, paste("../../output/graficas/PATH/", "measures_TOTALES"
 
 
 
-```{r}
-FIG_INF <- DF_TOTAL_AG %>%
-  filter(Infection == "New Infection")%>%
-    filter((numPlants== 500) | (numPlants== 2000) |(numPlants== 5000) )%>%
-
-  ggplot(aes(x= DistanceW)) +
-   # geom_line(aes(y= FrecCUM, group =SimID), color= "black", size=2)+
-  #geom_line(aes(y= FrecCUM, color=porcionCosecha, group =SimID), size=1)+
-  geom_ribbon(aes(ymin=FrecCUM- SDFrec, ymax=FrecCUM+SDFrec, group= SimID, 
-                  fill= porcionCosecha), color= "black")+
-  xlim(0, 20)+
-  #ylim(0, 0.45)+
-  facet_wrap(~numPlants, ncol = 1)+
-  scale_color_manual(values =groupColors4)+
-    scale_fill_manual(values =groupColors4)+
-
-  theme_bw() +
-  theme(text = element_text(size = 30))+
-#  theme(legend.position = "none")+
-  theme(strip.background = element_rect(fill = "white"))+ 
-  scale_alpha(guide = 'none')+
-  theme(legend.position="bottom")+
-      labs(fill= "Harvesting Scenario", x= 'Step length', y= "Proportion of Infective steps", color= "Harvesting scenario")
-
-
- ggsave(FIG_INF,filename=paste("../../output/graficas/DIF_RUST/", "INF_HAR.png", sep=""),  height = 12, width = 12)
-
-```
-
-
 This is the section about cumulative trajectory
 
 
@@ -451,6 +414,40 @@ ggsave(FIG_CUM_2000,filename=paste("../../output/graficas/PATH/", "FIG_PROGRESSI
 
 ```
 
+
+
+Here is for the supplementary mateiral
+```{r}
+FIG_INF <- DF_TOTAL_AG %>%
+  filter(Infection == "New Infection")%>%
+    filter((numPlants== 500) | (numPlants== 2000) |(numPlants== 5000) )%>%
+
+  ggplot(aes(x= DistanceW)) +
+   # geom_line(aes(y= FrecCUM, group =SimID), color= "black", size=2)+
+  #geom_line(aes(y= FrecCUM, color=porcionCosecha, group =SimID), size=1)+
+  geom_ribbon(aes(ymin=FrecCUM- SDFrec, ymax=FrecCUM+SDFrec, group= SimID, 
+                  fill= porcionCosecha), color= "black")+
+  xlim(0, 20)+
+  #ylim(0, 0.45)+
+  facet_wrap(~numPlants, ncol = 1)+
+  scale_color_manual(values =mycols2)+
+    scale_fill_manual(values =mycols2)+
+
+  theme_bw() +
+  theme(text = element_text(size = 30))+
+#  theme(legend.position = "none")+
+  theme(strip.background = element_rect(fill = "white"))+ 
+  scale_alpha(guide = 'none')+
+  theme(legend.position="bottom")+
+      labs(fill= "Harvesting Scenario", x= 'Step length', y= "Proportion of Infective steps", color= "Harvesting scenario")
+
+
+ ggsave(FIG_INF,filename=paste("../../output/graficas/DIF_RUST/", "INF_HAR.png", sep=""),  height = 12, width = 12)
+
+```
+
+
+This chunks is only for a visualizaton of the whole plot. Do not activate
 ```{r}
 
 wholePlot <- 0
@@ -472,7 +469,6 @@ if (wholePlot ==1){
         geom_point(aes(x=X , y= Y, color= as.character(Rust)), size= 2)+
         ggtitle("")+
         facet_wrap(~porcionCosecha, ncol=2)+
-        scale_color_manual(values = mycols3c)+
         theme(text = element_text(size = 25))+
         theme_bw()
       
@@ -489,6 +485,9 @@ AHORA TODA ESTA SECCIón viene para algo más..
 
 
 
+
+
+
 ```{r}
 DF_AV <- read.csv("../../data/DF_spatialAverage_complete.csv", header = TRUE)
 
@@ -501,8 +500,10 @@ DF_AV$porcionCosecha[DF_AV$HarvestModel =="control"] <- "control"
 
 DF_AV$porcionCosecha[DF_AV$porcionCosecha =="A"] <- " Asynchronous"
 DF_AV$porcionCosecha[DF_AV$porcionCosecha =="S_F"] <- " Synchronous Final" 
-DF_AV$porcionCosecha[DF_AV$porcionCosecha =="S_I"] <- " Synchronous  Initial" 
+DF_AV$porcionCosecha[DF_AV$porcionCosecha =="S_I"] <- " Synchronous" 
 
+DF_AV <- DF_AV %>%
+  filter(DF_AV$porcionCosecha != " Synchronous Final")
 
 DF_AV$HarvestModel[DF_AV$HarvestModel =="closeness"] <- "harvest"
 
@@ -542,12 +543,12 @@ FIG_RUST <- DF_AV%>%
   filter(Time == timeMAX)%>%
   filter(numWorkers !=5)%>%
   filter(HarvestTime ==5 |HarvestTime =="control")%>% 
-  mutate(porcionCosecha = (ifelse(porcionCosecha == "control", " Control", porcionCosecha)))%>% 
+  mutate(porcionCosecha = (ifelse(porcionCosecha == "control", "Control", porcionCosecha)))%>% 
   ggplot(aes(x= as.factor(HarvestModel), y= Rust))+
   geom_boxplot(color= "black", aes(fill= as.character(porcionCosecha)))+ 
   ggtitle("")+
   facet_wrap(~ numPlants, nrow=1, labeller = label_both)+
-  scale_fill_manual(values = groupColors)+
+  scale_fill_manual(values = mycols3_white)+
   theme_bw() +
   theme(text = element_text(size = 25))+
   theme(strip.background = element_rect(fill = "white"))+ 
@@ -567,93 +568,25 @@ FIG_SLI_time <- DF_AV_AVR %>%
   filter(HarvestTime ==5|HarvestTime =="control")%>% 
   filter(numPlants == 500 | numPlants == 2000 |numPlants == 5000)%>% 
   
-  mutate(porcionCosecha = (ifelse(porcionCosecha == "control", "No harvesting (control)", porcionCosecha)))%>% 
+  mutate(porcionCosecha = (ifelse(porcionCosecha == "control", "Control (no harvesting)", porcionCosecha)))%>% 
   ggplot(aes(x= Time, color= as.character(porcionCosecha) ,
              fill= as.character(porcionCosecha)
              ))+
-  geom_line(size= 1, aes(y= AverageRust))+
   geom_ribbon(color= "black", aes( 
-                  ymin=AverageRust-SD_Rust, ymax=AverageRust+SD_Rust, linetype= as.character(porcionCosecha)),alpha=0.8) +
+                  ymin=AverageRust-SD_Rust, ymax=AverageRust+SD_Rust, linetype= as.character(porcionCosecha)),alpha=0.9) +
+  #  geom_line(size= 1, aes(y= AverageRust))+
   ggtitle("")+
   facet_wrap(~ numPlants, nrow =1)+
   theme(panel.spacing = unit(1, "cm"))+
-  scale_linetype_manual(values= c(5,2,1, 0))+
-  scale_fill_manual(values = groupColors4)+
-  scale_color_manual(values = groupColors4)+
+  scale_linetype_manual(values= c(1, 5,2, 0))+
+  scale_fill_manual(values = mycols3_white)+
+  scale_color_manual(values = mycols3)+
   theme_bw()+
   theme(text = element_text(size = 20))+
   theme(strip.background = element_rect(fill = "white"))+
   theme(panel.spacing = unit(1, "cm"))+
   labs(x= "Time step (t)", y= "Average Rust (%)", color= "Harvesting scenario", fill= "Harvesting scenario", linetype="Harvesting scenario" )
-ggsave(FIG_SLI_time,filename=paste("../../output/graficas/SUP_FIG/", "rust_time_abs", ".png", sep=""),  height = 5, width = 16) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc)
-
-```
-
-```{r}
-
-densidades = length(unique(DF_AV$numPlants))
-
-#this takes the Average and first remove all control rows. and put only time =10
-# [(2 porcCosecha (A and S)* 5 harvestingTime * 2 numWorkers)]* 5 numPlants * * 30 rep
-#[20] * 5 * 30
-# 3000 rows 
-# and then it groups by rep (30)*num plants(5) * num Wo (2)* Harvest tine (5) 1500, 
-# so we do not include the harvest model in the gripuing, but we put the differeces between the models
-# 1500 rows with a new variabe
-
-
-
-DF_DIF <- DF_AV %>%
-  filter(HarvestModel != "control")%>%  #we remove the contorl, we do not need it.
-  filter(Time == timeMAX)
-
-DF_AvsSF <- DF_DIF %>%
-  filter(porcionCosecha != " Synchronous  Initial")
-DF_AvsSF$Rust[DF_AvsSF$porcionCosecha == " Synchronous Final"] <- DF_AvsSF$Rust[DF_AvsSF$porcionCosecha == " Synchronous Final"]*-1
-DF_AvsSF <- DF_AvsSF %>%
-  group_by(Rep, numPlants) %>%
-  summarise(PerIncrease = sum(Rust))
-DF_AvsSF$DIF <- "A-SF"
-
-
-DF_AvsSI <- DF_DIF %>%
-  filter(porcionCosecha != " Synchronous Final")
-DF_AvsSI$Rust[DF_AvsSI$porcionCosecha == " Synchronous  Initial"] <- DF_AvsSI$Rust[DF_AvsSI$porcionCosecha == " Synchronous  Initial"]*-1
-DF_AvsSI <- DF_AvsSI %>%
-  group_by(Rep, numPlants) %>%
-  summarise(PerIncrease = sum(Rust))
-DF_AvsSI$DIF <- "A-SI"
-
-
-DF_SFvsSI <- DF_DIF %>%
-  filter(porcionCosecha != " Asynchronous")
-DF_SFvsSI$Rust[DF_SFvsSI$porcionCosecha == " Synchronous  Initial"] <- DF_SFvsSI$Rust[DF_SFvsSI$porcionCosecha == " Synchronous  Initial"]*-1
-DF_SFvsSI <- DF_SFvsSI %>%
-  group_by(Rep, numPlants) %>%
-  summarise(PerIncrease = sum(Rust))
-DF_SFvsSI$DIF <- "SF-SI"
-
-DF_MODELS <- rbind(DF_AvsSI, DF_AvsSF, DF_SFvsSI)
-rm(DF_AvsSF, DF_AvsSI, DF_SFvsSI)  
-
-```
-
-```{r}
-FIG_DIF_MODELS <- DF_MODELS%>%
-  ggplot(aes(x= as.factor(numPlants), y= PerIncrease))+
-  geom_boxplot(color= "black", aes(fill= DIF))+
-  ggtitle("")+
-  #facet_wrap(~numPlants, nrow=2)+
-  scale_fill_manual(values =  c("white", "#CCCCCC", "#666666"))+
-  geom_segment(aes(x=0, y=0, xend= 6, yend=0), size = 0.2, color= "DarkRed")+
-  theme_bw() +
-  #theme(legend.position = "none")+
-  theme(text = element_text(size = 25))+
-  theme(strip.background = element_rect(fill = "white"))+
-  labs(x= "Density (Plants/ha)", y= "Average Rust Difference")
-
-ggsave(FIG_DIF_MODELS,filename="../../output/graficas/DIF_RUST/dif_models.png",  height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-
+ggsave(FIG_SLI_time,filename=paste("../../output/graficas/DIF_RUST/", "rust_time_abs", ".png", sep=""),  height = 5, width = 16) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc)
 ```
 
 
@@ -681,7 +614,7 @@ filter(porcionCosecha != "control")
 ```
 
 ```{r}
-FIG_DIF_CONTROL_H2 <- DF_MODvsCON_GEN %>%
+FIG_DIF_CONTROL <- DF_MODvsCON_GEN %>%
   filter(Time == timeMAX)%>%
  # filter(numWorkers == 1)%>%
   filter(numPlants!=4000)%>%
@@ -692,8 +625,8 @@ FIG_DIF_CONTROL_H2 <- DF_MODvsCON_GEN %>%
   geom_boxplot(color = "black", aes(fill= porcionCosecha, linetype= porcionCosecha), position = "dodge")+ 
   ggtitle("")+
   facet_wrap(~numPlants, nrow = 1, strip.position = "bottom")+
-  scale_fill_manual(values = groupColors2)+ 
-  scale_linetype_manual(values= c(5,2,1, 0))+
+  scale_fill_manual(values = mycols2)+ 
+  scale_linetype_manual(values= c(1,5, 0))+
   ylim(0, 18)+
   theme_bw() +
   theme(text = element_text(size = 20),
@@ -705,11 +638,60 @@ FIG_DIF_CONTROL_H2 <- DF_MODvsCON_GEN %>%
   #theme(legend.position = "none")+
   labs(x= "Density (Plants/ha)", y= "Rust Increase (Scenario-Control)", fill= "Harvesting Scenario", linetype="Harvesting Scenario" )
 
-ggsave(FIG_DIF_CONTROL_H2,filename="../../output/graficas/DIF_RUST/ModelvsControl_harvest4_numW1.png",  height = 5, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_DIF_CONTROL,filename="../../output/graficas/DIF_RUST/ModelvsControl.png",  height = 5, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 ```
 
 
+
+Para el suplmentario!! 
+
+
+```{r eval=FALSE, include=FALSE}
+
+densidades = length(unique(DF_AV$numPlants))
+
+
+DF_DIF <- DF_AV %>%
+  filter(HarvestModel != "control")%>%  #we remove the contorl, we do not need it.
+  filter(Time == timeMAX)
+
+#this chunks is removed  but i kept the logic just in case
+#DF_AvsSF <- DF_DIF %>%
+#  filter(porcionCosecha != " Synchronous")
+#DF_AvsSF$Rust[DF_AvsSF$porcionCosecha == " Synchronous Final"] <- DF_AvsSF$Rust[DF_AvsSF$porcionCosecha == " Synchronous Final"]*-1
+#DF_AvsSF <- DF_AvsSF %>%
+#  group_by(Rep, numPlants) %>%
+#  summarise(PerIncrease = sum(Rust))
+#DF_AvsSF$DIF <- "A-SF"
+
+
+DF_DIF$Rust[DF_DIF$porcionCosecha == "Synchronous"] <- DF_DIF$Rust[DF_DIF$porcionCosecha == "Synchronous"]*-1
+
+DF_DIF <- DF_DIF %>%
+  group_by(Rep, numPlants) %>%
+  summarise(PerIncrease = sum(Rust))
+
+
+```
+
+```{r eval=FALSE, include=FALSE}
+FIG_DIF_MODELS <- DF_DIF%>%
+  ggplot(aes(x= as.factor(numPlants), y= PerIncrease))+
+  geom_boxplot(color= "black", aes())+
+  ggtitle("")+
+  #facet_wrap(~numPlants, nrow=2)+
+  scale_fill_manual(values =  c("white", "#CCCCCC", "#666666"))+
+  geom_segment(aes(x=0, y=0, xend= 6, yend=0), size = 0.2, color= "DarkRed")+
+  theme_bw() +
+  #theme(legend.position = "none")+
+  theme(text = element_text(size = 25))+
+  theme(strip.background = element_rect(fill = "white"))+
+  labs(x= "Density (Plants/ha)", y= "Average Rust Difference")
+
+ggsave(FIG_DIF_MODELS,filename="../../output/graficas/DIF_RUST/dif_models.png",  height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+```
 
 
 
