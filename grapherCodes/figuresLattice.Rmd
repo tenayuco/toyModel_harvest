@@ -121,7 +121,6 @@ FIG_PATH_GEN<- DF_TOTAL %>%
     labs(x= "X", y= "Y", col= "Worker")
   
   ggsave(FIG_PATH_GEN,filename=paste("../../output/graficas/SUP_FIG/", "path_GENERAL.png", sep=""),  height = 12, width = 18) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-
 ```
 
 ```{r}
@@ -238,8 +237,59 @@ DF_TOTAL_AG <- DF_TOTAL_AG %>%
 
 DF_SUPER_AG <- DF_TOTAL_AG%>%
   group_by(numPlants, numWorkers, DistanceW, porcionCosecha, SimID) %>%
-  summarise(MeanFrecTotal = sum(MeanFrec))
+  summarise(MeanFrecTotal = sum(MeanFrec), MeanFrecCUM = sum(FrecCUM))
+
+write.csv(DF_SUPER_AG, paste("../../output/graficas/PATH/", "DF_SUPER_AG", ".csv"))
 ```
+
+
+```{r}
+FIG_HIST_G_B_GEN <- DF_SUPER_AG %>%
+    filter(MeanFrecTotal !=0)%>%
+
+  filter((numPlants== 500) | (numPlants== 2000) |(numPlants== 5000))%>%
+  ggplot(aes(x= DistanceW)) +
+  geom_col(aes(y = MeanFrecTotal),
+             color= "black", fill= "gray", position = "stack")+
+#  xlim(0, 110)+
+  ylim(0, 0.7)+
+  facet_wrap(~porcionCosecha*numPlants, ncol = 3)+
+  scale_fill_manual(values =colorsDis)+
+  scale_color_manual(values =colorsDis)+
+  theme_bw() +
+  theme(text = element_text(size = 25))+
+  theme(legend.position = "none")+
+  theme(strip.background = element_rect(fill = "white"))+ 
+  scale_alpha(guide = 'none')+
+      labs(fill= "", x= bquote("Step length (m)"), y= "Proportion of Steps")
+
+ ggsave(FIG_HIST_G_B_GEN,filename=paste("../../output/graficas/PATH/", "HISTO_GENERAL", ".png", sep=""),  height =7, width = 12) 
+
+```
+
+
+```{r eval=FALSE, include=FALSE}
+
+
+DF_SIZE_STEP <- read.csv("../../data/DF_CUM_EDITADO.csv", header = TRUE)
+
+FIG_SS <- DF_SIZE_STEP %>%
+  ggplot(aes(x= DistanceW)) +
+  geom_point(aes(y = MeanFrecCUM), color = "black")+
+  geom_line(aes(y = MeanFrecCUM,  color= as.factor(porcionCosecha)))+
+  theme_bw() +
+  facet_wrap(~numPlants, ncol = 5)+
+  theme(text = element_text(size = 25))+
+  theme(legend.position = "none")+
+  theme(strip.background = element_rect(fill = "white"))+ 
+  scale_alpha(guide = 'none')+
+      labs(fill= "", x= bquote("Step length (m)"), y= "Proportion of Steps")
+
+
+
+
+```
+
 
 
 
@@ -248,8 +298,14 @@ DF_SUPER_AG <- DF_TOTAL_AG%>%
 datos_TOTALES <- data.frame("Median" = 0, 
                "Mean" = 0,
                  "SD" = 0,
+               "Mode" = 0,
                "pC" = 0, 
                "nP" =0 )
+
+getmode <- function(v) {
+   uniqv <- unique(v)
+   uniqv[which.max(tabulate(match(v, uniqv)))]
+}
 
 for (nP in unique(DF_SUPER_AG$numPlants)){
   for (pC in unique(DF_SUPER_AG$porcionCosecha)){
@@ -297,11 +353,13 @@ HIS_COM_B<- FIG_HIST_G_B + annotation_custom(ggplotGrob(CAJADIST_B), xmin = 15, 
   #  ggsave(FIG_HIST_G,filename=paste("../../output/graficas/PATH/", "DisHIST_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
     ggsave(HIS_COM_B,filename=paste("../../output/graficas/PATH/", "DisFINAL_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 5, width = 7) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
     
+    
    
     
    datos <- data.frame("Median" = median(DF_TOTAL_TEMP$DistanceW), 
                "Mean" = mean(DF_TOTAL_TEMP$DistanceW),
                  "SD" = sd(DF_TOTAL_TEMP$DistanceW),
+               "Mode" = getmode(DF_TOTAL_TEMP$DistanceW),
                "pC" = pC, 
                "nP" = nP)
     
@@ -426,23 +484,24 @@ FIG_INF <- DF_TOTAL_AG %>%
    # geom_line(aes(y= FrecCUM, group =SimID), color= "black", size=2)+
   #geom_line(aes(y= FrecCUM, color=porcionCosecha, group =SimID), size=1)+
   geom_ribbon(aes(ymin=FrecCUM- SDFrec, ymax=FrecCUM+SDFrec, group= SimID, 
-                  fill= porcionCosecha), color= "black")+
+                  fill= porcionCosecha, linetype= porcionCosecha), color= "black")+
   xlim(0, 20)+
   #ylim(0, 0.45)+
-  facet_wrap(~numPlants, ncol = 1)+
+  facet_wrap(~numPlants, nrow = 1)+
   scale_color_manual(values =mycols2)+
     scale_fill_manual(values =mycols2)+
+  scale_linetype_manual(values= c(1,5, 0))+
 
   theme_bw() +
-  theme(text = element_text(size = 30))+
+  theme(text = element_text(size = 20))+
 #  theme(legend.position = "none")+
   theme(strip.background = element_rect(fill = "white"))+ 
   scale_alpha(guide = 'none')+
-  theme(legend.position="bottom")+
-      labs(fill= "Harvesting Scenario", x= 'Step length', y= "Proportion of Infective steps", color= "Harvesting scenario")
+ # theme(legend.position="bottom")+
+      labs(fill= "Harvesting Scenario", x= 'Step length', y= "Proportion of Infective steps", color= "Harvesting scenario", linetype = "Harvesting Scenario")
 
 
- ggsave(FIG_INF,filename=paste("../../output/graficas/DIF_RUST/", "INF_HAR.png", sep=""),  height = 12, width = 12)
+ ggsave(FIG_INF,filename=paste("../../output/graficas/DIF_RUST/", "INF_HAR.png", sep=""),  height = 5, width = 16)
 
 ```
 
