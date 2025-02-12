@@ -11,6 +11,7 @@ library(viridis)
 library(dplyr)
 library(tidyverse)
 library(reshape2)
+library(TAM)
 
 #base de datos general de colores:
 mycols <- c("#021128","#1b4a64", "#3585a0", "#759580", "#c78f34", "#fd9706","#fdb81c","#fbdb30")
@@ -241,6 +242,57 @@ DF_SUPER_AG <- DF_TOTAL_AG%>%
 
 write.csv(DF_SUPER_AG, paste("../../output/graficas/PATH/", "DF_SUPER_AG", ".csv"))
 ```
+
+```{r}
+#here I am goinf to run a test to see the influence of the number or repretitions on the final values of mean and sd
+
+
+
+DF_TOTAL_AG_PRE$FrecAbs[is.na(DF_TOTAL_AG_PRE$FrecAbs)] <- 0
+
+
+
+DF_STATS_REP <- data.frame()
+
+for (i in unique(DF_TOTAL_AG_PRE$Rep)){
+  DF_i <-DF_TOTAL_AG_PRE %>%
+    filter(Rep<i+1)
+  
+  DF_STATS_REP_i <- DF_i %>%
+    ungroup()%>%
+    group_by(numPlants, porcionCosecha) %>%
+    summarise(wMean = weighted_mean(x= DistanceW, w=FrecAbs), 
+           wVar = weighted_var(x= DistanceW, w=FrecAbs), 
+           NumRep = i)
+  
+ # wMean <- weighted_mean(x= DF_i$DistanceW, w=DF_i$FrecAbs)
+#  wVar <- weighted_sd(x= DF_i$DistanceW, w=DF_i$FrecAbs)
+#  wSke <- weighted_skewness(x= DF_i$DistanceW, w=DF_i$FrecAbs)
+
+ # DF_STATS_REP_i <-  data.frame(wMean = wMean, wVar = wVar, wSke = wSke, NumRep = i)
+  
+  DF_STATS_REP <- rbind( DF_STATS_REP,  DF_STATS_REP_i)
+  
+}
+
+
+
+
+FIG_STAT_REP <- DF_STATS_REP %>% 
+  ggplot(aes(x= NumRep, y = wMean)) +
+  geom_point(aes(col= numPlants)) + 
+  #scale_color_manual(values = colorsDis2)+
+ # theme(panel.spacing = unit(0.8, "lines"))+
+  theme_bw()+
+  facet_wrap(~porcionCosecha*numPlants, nrow = 3) +
+  theme(text = element_text(size = 25))+
+  theme(legend.position = "none")
+
+
+
+```
+
+
 
 
 ```{r}
