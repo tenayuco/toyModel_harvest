@@ -284,7 +284,7 @@ FIG_STAT_REP <- DF_STATS_REP %>%
   #scale_color_manual(values = colorsDis2)+
  # theme(panel.spacing = unit(0.8, "lines"))+
   theme_bw()+
-  facet_wrap(~porcionCosecha*numPlants, nrow = 3) +
+  facet_wrap(~porcionCosecha*numPlants, nrow = 2) +
   theme(text = element_text(size = 25))+
   theme(legend.position = "none")
 
