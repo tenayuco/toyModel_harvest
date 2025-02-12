@@ -1,0 +1,6 @@
+### this is to ignore data
+data/
+
+## ignore the output
+
+output/
