@@ -253,22 +253,16 @@ DF_TOTAL_AG_PRE$FrecAbs[is.na(DF_TOTAL_AG_PRE$FrecAbs)] <- 0
 
 DF_STATS_REP <- data.frame()
 
-for (i in unique(DF_TOTAL_AG_PRE$Rep)){
+for (i in 0:max(DF_TOTAL_AG_PRE$Rep)){
   DF_i <-DF_TOTAL_AG_PRE %>%
-    filter(Rep<i+1)
+    filter(Rep<i+1)  #so the repetitions go from 0 to 29, and the index goes 
   
   DF_STATS_REP_i <- DF_i %>%
     ungroup()%>%
     group_by(numPlants, porcionCosecha) %>%
     summarise(wMean = weighted_mean(x= DistanceW, w=FrecAbs), 
            wSD = weighted_sd(x= DistanceW, w=FrecAbs), 
-           NumRep = i)
-  
- # wMean <- weighted_mean(x= DF_i$DistanceW, w=DF_i$FrecAbs)
-#  wVar <- weighted_sd(x= DF_i$DistanceW, w=DF_i$FrecAbs)
-#  wSke <- weighted_skewness(x= DF_i$DistanceW, w=DF_i$FrecAbs)
-
- # DF_STATS_REP_i <-  data.frame(wMean = wMean, wVar = wVar, wSke = wSke, NumRep = i)
+           NumRep = i+1)
   
   DF_STATS_REP <- rbind(DF_STATS_REP,  DF_STATS_REP_i)
   
@@ -279,22 +273,25 @@ DF_STATS_REP_L <- DF_STATS_REP %>%
   gather(key = "Stat", value = "value", wMean, wSD)
 
 
+
+
 FIG_STAT_REP <- DF_STATS_REP_L %>% 
   ggplot(aes(x= NumRep, y = value)) +
-  geom_point(aes(col= porcionCosecha)) + 
   geom_line(aes(group = porcionCosecha))+
+  geom_point(aes(col= porcionCosecha)) + 
     scale_color_manual(values =mycols2)+
-  #scale_color_manual(values = colorsDis2)+
- # theme(panel.spacing = unit(0.8, "lines"))+
   theme_bw()+
-  facet_wrap(~Stat*numPlants, nrow = 2, scales = "free_y") +
+  facet_grid(Stat~numPlants, scales = "free_y") +
   theme(text = element_text(size = 25))+
   theme(strip.background = element_rect(fill = "white"))+ 
   scale_alpha(guide = 'none')+
-      labs(color= "Harvesting Scenario", x= "Number of repetitions", y= "Value")
+      labs(color= "Harvesting Scenario", x= "Number of repetitions", y= "Step-length distribution") +
+  ggtitle("Density (Plants/ha)") +
+  theme(plot.title = element_text(hjust = 0.5, size = 20))
 
 
-ggsave(FIG_STAT_REP,filename=paste("../../output/graficas/SUP_FIG/", "meanSD_rep.png", sep=""),  height = 6, width = 16) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+ggsave(FIG_STAT_REP,filename=paste("../../output/graficas/SUP_FIG/", "meanSD_rep.png", sep=""),  height = 7, width = 20) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 ```
 
@@ -598,7 +595,9 @@ if (wholePlot ==1){
 
 ```
 
-AHORA TODA ESTA SECCIón viene para algo más.. 
+
+
+Now, this section is for the infection process Part II (is independent of Part I)
 
 
 
@@ -636,6 +635,58 @@ DF_AV$Rust <- DF_AV$Rust*100 #lo pasamos a un porcentage de infeccion para tener
 # 4 * 5 * 25 * 30
 # 15000  rows
 ```
+
+Here I added a independent chunk to show how the results are roust in 30 repetitions
+
+
+```{r}
+
+
+DF_INF_REP <- data.frame()
+
+for (i in 0:max(DF_AV$Rep)){
+  DF_i <-DF_AV %>%
+    filter(Rep<i+1)%>%
+    filter(Time == 12)
+
+  DF_INF_REP_i <- DF_i %>%
+    ungroup()%>%
+    group_by(numPlants, numWorkers, HarvestModel, HarvestTime,porcionCosecha, SimID) %>%
+    summarise(AverageRust = mean(Rust), SD_Rust = sd(Rust), NumRep = i+1)
+  DF_INF_REP <- rbind(DF_INF_REP,  DF_INF_REP_i)
+  
+}
+
+
+DF_INF_REP_L <- DF_INF_REP %>%
+  gather(key = "Stat", value = "value", AverageRust, SD_Rust)
+
+
+
+
+FIG_INF_REP <- DF_INF_REP_L %>% 
+  ggplot(aes(x= NumRep, y = value)) +
+  geom_line(aes(group = porcionCosecha))+
+  geom_point(aes(col= porcionCosecha)) + 
+  scale_color_manual(values = mycols3)+
+  #scale_color_manual(values = colorsDis2)+
+ # theme(panel.spacing = unit(0.8, "lines"))+
+  theme_bw()+
+  facet_grid(Stat~numPlants, scales = "free_y") +
+  theme(text = element_text(size = 25))+
+  theme(strip.background = element_rect(fill = "white"))+ 
+  scale_alpha(guide = 'none')+
+      labs(color= "Harvesting Scenario", x= "Number of repetitions", y= "Rust infection")+
+   ggtitle("Density (Plants/ha)") +
+  theme(plot.title = element_text(hjust = 0.5, size = 20))
+
+
+ggsave(FIG_INF_REP,filename=paste("../../output/graficas/SUP_FIG/", "meanINF_rep.png", sep=""),  height = 7, width = 20) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+```
+
+
+
 
 
 ```{r}
