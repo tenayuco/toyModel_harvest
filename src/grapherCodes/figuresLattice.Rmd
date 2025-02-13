@@ -282,6 +282,7 @@ FIG_STAT_REP <- DF_STATS_REP_L %>%
     scale_color_manual(values =mycols2)+
   theme_bw()+
   facet_grid(Stat~numPlants, scales = "free_y") +
+    theme(panel.spacing = unit(0.5, "cm"))+
   theme(text = element_text(size = 25))+
   theme(strip.background = element_rect(fill = "white"))+ 
   scale_alpha(guide = 'none')+
@@ -673,6 +674,7 @@ FIG_INF_REP <- DF_INF_REP_L %>%
  # theme(panel.spacing = unit(0.8, "lines"))+
   theme_bw()+
   facet_grid(Stat~numPlants, scales = "free_y") +
+  theme(panel.spacing = unit(0.5, "cm"))+
   theme(text = element_text(size = 25))+
   theme(strip.background = element_rect(fill = "white"))+ 
   scale_alpha(guide = 'none')+
