@@ -15,7 +15,7 @@ mycols3c <- c("#759580", "#1b4a64","#fdb81c")
 groupColors2 <- c("#1b4a64", "#fd9706", "#fbdb30", "white")#ESTE ES CEMTAL
 colorRedes <- c("black", "black","darkred")
 
-
+setwd(here("Documents/interplayPaper/interplayGit/toyModel_harvest/src/analisisCodes/"))
 
 #take the dataframe
 
@@ -35,7 +35,7 @@ DF_TOTAL$X.1 <- NULL
 DF_TOTAL$FruitLoad <- NULL
 DF_TOTAL$TotalHarvest <- NULL
 
- 
+
 DF_NEW<-  DF_TOTAL%>%
   group_by(X, Y, Rep, numPlants)%>% #son las vairables que quedan y sobre esos escenarios, vamos a hacer las diferencias entre modelos
   summarise(NUEVA_RUST = (Rust - Rust[HarvestModel=="control"]), 
