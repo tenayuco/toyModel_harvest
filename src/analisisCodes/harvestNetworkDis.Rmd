@@ -7,19 +7,23 @@ output: html_notebook
 
 ```{r}
 #this codes makes the analysis for the netwrks
-
 library(ggplot2)
+library(viridis)
 library(dplyr)
 library(tidyverse)
-library(igraph)
 library(reshape2)
+library(TAM)
 
+#base de datos general de colores:
 mycols <- c("#021128","#1b4a64", "#3585a0", "#759580", "#c78f34", "#fd9706","#fdb81c","#fbdb30")
-mycols3a <-c("#021128", "#fd9706", "#1b4a64", "#759580")
-mycols3b <-c("#1b4a64", "#fdb81c", "#759580")
-mycols3c <- c("#759580", "#1b4a64","#fdb81c")
-groupColors2 <- c("#1b4a64", "#fd9706", "#fbdb30", "white")#ESTE ES CEMTAL
-colorRedes <- c("black", "black","darkred")
+mycols2 <- c("#1b4a64", "#fd9706")
+mycols3 <- c("#1b4a64", "#fd9706", "black")
+mycols3_white <- c("#1b4a64", "#fd9706", "#eeeeee")
+
+colorsDis <- c("#B87400","white")
+colorsDis2 <- c("#B87400","#555555")
+colorsDis3 <- c("#111111","#8B0000","#fd9706")
+
 ```
 
 ```{r}
@@ -225,6 +229,47 @@ scale_fill_viridis_d(option = "inferno", direction = -1, end = 0.8)  +
 ggsave(FIG_HIST_HAR,filename=paste("../../output/graficas/SUP_FIG/", "NetHar.png", sep=""),  height = 10, width = 15) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 ```
 
+VERSIOIN  2
+
+```{r}
+FIG_HIST_HAR_2 <- DF_HIST_HAR %>%
+  filter(numPlants ==500|numPlants ==2000|numPlants ==5000)%>%
+  ggplot(aes(x = degree)) +
+  # Primary y-axis: meanFrecDeg (bars)
+  geom_col(aes(y = meanFrecDeg,
+               fill= as.factor(porcionCosecha)), 
+           position = "dodge",
+           color = "black",
+           width = 0.8,
+           alpha=0.7) +
+  
+  
+
+ scale_fill_manual(values = mycols2)+
+ scale_color_manual(values = mycols2 )+
+
+  # Faceting
+  facet_wrap(~numPlants, nrow = 1) +
+  
+  # Theme and labels
+  theme_bw() +
+  theme(
+    text = element_text(size = 25),
+    #legend.position = "none",
+    strip.background = element_rect(fill = "white")
+  ) +
+  labs(
+   fill = "Harvesting Scenario", 
+    color=  "Harvesting Scenario",
+    x = bquote("Size of network"), 
+    y = "Average number of infected networks AH"
+  ) 
+
+
+ggsave(FIG_HIST_HAR_2,filename=paste("../../output/graficas/SUP_FIG/", "NetHar2.png", sep=""),  height = 8, width = 28) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+```
+
+
 
 ```{r}
 
@@ -262,3 +307,43 @@ ggsave(FIG_CUM_HAR,filename=paste("../../output/graficas/SUP_FIG/", "CumHar.png"
 
 ```
 
+VERSIO 2
+
+```{r}
+
+FIG_CUM_HAR_2 <- DF_HIST_HAR %>%
+    filter(numPlants ==500|numPlants ==2000|numPlants ==5000)%>%
+
+  ggplot(aes(x = degree)) +
+  # Primary y-axis: meanFrecDeg (bars)
+  
+  geom_line(aes(y = meanPlantCUM, color = factor(porcionCosecha)), linewidth = 1) +
+  geom_ribbon(aes(ymin = meanPlantCUM - sdPlantCUM, ymax = meanPlantCUM + sdPlantCUM, fill = factor(porcionCosecha)), alpha = 0.4) +
+ 
+
+ scale_fill_manual(values = mycols2)+
+   scale_color_manual(values = mycols2)+
+
+
+  # Faceting
+  facet_wrap(~numPlants, nrow = 1) +
+  # Theme and labels
+  theme_bw() +
+  theme(
+    text = element_text(size = 25),
+    #legend.position = "none",
+    strip.background = element_rect(fill = "white")
+  ) +
+  labs(
+    fill = "Harvesting Scenario", 
+    color=  "Harvesting Scenario",
+    x = bquote("Size of network"), 
+    y = "Cumulative % of infected plants AH"
+  ) 
+
+
+ggsave(FIG_CUM_HAR_2,filename=paste("../../output/graficas/SUP_FIG/", "CumHar2.png", sep=""),  height = 8, width = 28) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+
+
+```
