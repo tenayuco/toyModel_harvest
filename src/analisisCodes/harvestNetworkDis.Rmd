@@ -232,11 +232,15 @@ ggsave(FIG_HIST_HAR,filename=paste("../../output/graficas/SUP_FIG/", "NetHar.png
 VERSIOIN  2
 
 ```{r}
+
+
 FIG_HIST_HAR_2 <- DF_HIST_HAR %>%
+  group_by(numPlants, porcionCosecha) %>%
+  mutate(maxNet = sum(meanFrecDeg)) %>%
   filter(numPlants ==500|numPlants ==2000|numPlants ==5000)%>%
   ggplot(aes(x = degree)) +
   # Primary y-axis: meanFrecDeg (bars)
-  geom_col(aes(y = meanFrecDeg,
+  geom_col(aes(y = meanFrecDeg/maxNet,
                fill= as.factor(porcionCosecha)), 
            position = "dodge",
            color = "black",
@@ -262,11 +266,11 @@ FIG_HIST_HAR_2 <- DF_HIST_HAR %>%
    fill = "Harvesting Scenario", 
     color=  "Harvesting Scenario",
     x = bquote("Size of network"), 
-    y = "Average number of infected networks AH"
+    y = "Infected networks AH"
   ) 
 
 
-ggsave(FIG_HIST_HAR_2,filename=paste("../../output/graficas/SUP_FIG/", "NetHar2.png", sep=""),  height = 8, width = 28) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_HIST_HAR_2,filename=paste("../../output/graficas/SUP_FIG/", "NetHar2.png", sep=""),  height = 6, width = 21) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 ```
 
 
@@ -330,7 +334,7 @@ FIG_CUM_HAR_2 <- DF_HIST_HAR %>%
   # Theme and labels
   theme_bw() +
   theme(
-    text = element_text(size = 25),
+    text = element_text(size = 24.5),
     #legend.position = "none",
     strip.background = element_rect(fill = "white")
   ) +
@@ -338,11 +342,11 @@ FIG_CUM_HAR_2 <- DF_HIST_HAR %>%
     fill = "Harvesting Scenario", 
     color=  "Harvesting Scenario",
     x = bquote("Size of network"), 
-    y = "Cumulative % of infected plants AH"
+    y = "Cumulated infected plants AH(%)"
   ) 
 
 
-ggsave(FIG_CUM_HAR_2,filename=paste("../../output/graficas/SUP_FIG/", "CumHar2.png", sep=""),  height = 8, width = 28) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_CUM_HAR_2,filename=paste("../../output/graficas/SUP_FIG/", "CumHar2.png", sep=""),  height = 6, width = 21) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 
 
