@@ -211,18 +211,18 @@ scale_fill_viridis_d(option = "inferno", direction = -1, end = 0.8)  +
   theme_bw() +
   theme(
     text = element_text(size = 25),
-    legend.position = "none",
+    #legend.position = "none",
     strip.background = element_rect(fill = "white")
   ) +
   labs(
-    fill = "", 
-    col = "",
+   fill = "Density (Plants/ha)", 
+    color=  "Density (Plants/ha)",
     x = bquote("Size of network"), 
     y = "Average number of infected networks AH"
   ) 
 
 
-ggsave(FIG_HIST_HAR,filename=paste("../../output/graficas/SUP_FIG/", "NetHar.png", sep=""),  height = 10, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_HIST_HAR,filename=paste("../../output/graficas/SUP_FIG/", "NetHar.png", sep=""),  height = 10, width = 15) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 ```
 
 
@@ -233,7 +233,7 @@ FIG_CUM_HAR <- DF_HIST_HAR %>%
   # Primary y-axis: meanFrecDeg (bars)
   
   geom_line(aes(y = meanPlantCUM, color = factor(numPlants)), linewidth = 1) +
-  geom_ribbon(aes(ymin = meanPlantCUM - sdPlantCUM, ymax = meanPlantCUM + sdPlantCUM, fill = factor(numPlants)), alpha = 0.5) +
+  geom_ribbon(aes(ymin = meanPlantCUM - sdPlantCUM, ymax = meanPlantCUM + sdPlantCUM, fill = factor(numPlants)), alpha = 0.4) +
  
 
 scale_fill_viridis_d(option = "inferno", direction = -1, end = 0.8)  +
