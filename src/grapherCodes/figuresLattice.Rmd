@@ -20,7 +20,7 @@ mycols3 <- c("#1b4a64", "#fd9706", "black")
 mycols3_white <- c("#1b4a64", "#fd9706", "#eeeeee")
 
 colorsDis <- c("#B87400","white")
-colorsDis2 <- c("#B87400","#555555")
+colorsDis2 <- c("#B87400","#aaaaaa")
 colorsDis3 <- c("#111111","#8B0000","#fd9706")
 
 ```
@@ -112,7 +112,7 @@ FIG_PATH_GEN<- DF_TOTAL %>%
     ggplot(aes(x= X, y = Y, group=WorkerID)) +
     geom_path(aes(col= WorkerID),size=1)+
     geom_point(size=1)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
-    scale_color_viridis_d()+
+    scale_color_viridis_d(option = "inferno", end = 0.8, direction = -1)+
     facet_grid(porcionCosecha ~numPlants) +
     theme(panel.spacing = unit(0.8, "lines"), text = element_text(size = 15))+
     theme_bw()+
@@ -137,7 +137,7 @@ FIG_PATH_2000_todos<- DF_TOTAL %>%
   #geom_path(aes(col= as.character(Infection)),size=1.5, alpha= 0.8)+
   geom_path(aes(col= as.character(WorkerID)),size=1.5, alpha= 0.8)+
   geom_point(size=1.5)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
-      scale_color_viridis_d()+
+    scale_color_viridis_d(option = "inferno", end = 0.8, direction = -1)+
 
   theme(panel.spacing = unit(0.8, "lines"))+
   theme_bw()+
@@ -237,7 +237,7 @@ DF_TOTAL_AG <- DF_TOTAL_AG %>%
 #this super aggregate does not consider the infection division. We just sum both valus!
 
 DF_SUPER_AG <- DF_TOTAL_AG%>%
-  group_by(numPlants, numWorkers, DistanceW, porcionCosecha, SimID) %>%
+  group_by(numPlants, numWorkers, DistanceW, porcionCosecha, SimID, Infection) %>%
   summarise(MeanFrecTotal = sum(MeanFrec), MeanFrecCUM = sum(FrecCUM))
 
 write.csv(DF_SUPER_AG, paste("../../output/graficas/PATH/", "DF_SUPER_AG", ".csv"))
@@ -305,12 +305,12 @@ FIG_HIST_G_B_GEN <- DF_SUPER_AG %>%
 
   filter((numPlants== 500) | (numPlants== 2000) |(numPlants== 5000))%>%
   ggplot(aes(x= DistanceW)) +
-  geom_col(aes(y = MeanFrecTotal),
-             color= "black", fill= "gray", position = "stack")+
+  geom_col(aes(y = MeanFrecTotal, fill = Infection),
+             color= "black", position = "stack")+
 #  xlim(0, 110)+
   ylim(0, 0.7)+
   facet_wrap(~porcionCosecha*numPlants, ncol = 3)+
-  scale_fill_manual(values =colorsDis)+
+  scale_fill_manual(values =colorsDis2)+
   scale_color_manual(values =colorsDis)+
   theme_bw() +
   theme(text = element_text(size = 25))+
@@ -375,10 +375,12 @@ for (nP in unique(DF_SUPER_AG$numPlants)){
     
     CAJADIST_B<- DF_TOTAL_TEMP%>%
   ggplot(aes(x= DistanceW, y= as.character(porcionCosecha)))+
-  geom_violin(fill= "#EEEEEE")+ 
-  geom_point(aes(), shape= 21, fill= "gray", color= "black", size= 2, alpha = 0.8)+
+  geom_violin(aes(fill= Infection), adjust = 3)+ 
+  geom_point(aes(fill= Infection), color= "black", shape= 21, size= 2, alpha = 0.5)+
   theme_bw()+
-    scale_fill_manual(values =colorsDis)+
+    scale_fill_manual(values =colorsDis2)+
+   scale_color_manual(values =colorsDis2)+
+
   theme(text = element_text(size = 25))+ 
   theme(axis.ticks.y = element_blank(),
         axis.text.y = element_blank())+
@@ -389,12 +391,11 @@ for (nP in unique(DF_SUPER_AG$numPlants)){
 
 FIG_HIST_G_B <- DF_SUPER_TEMP %>%
   ggplot(aes(x= DistanceW)) +
-  geom_col(aes(y = MeanFrecTotal),
-             color= "black", fill= "gray", position = "stack")+
+  geom_col(aes(y = MeanFrecTotal, fill= Infection),
+             color= "black", position = "stack")+
   xlim(0, 110)+
   ylim(0, 0.45)+
-  scale_fill_manual(values =colorsDis)+
-  scale_color_manual(values =colorsDis)+
+  scale_fill_manual(values =colorsDis2)+
   theme_bw() +
   theme(text = element_text(size = 25))+
   theme(legend.position = "none")+
@@ -488,7 +489,7 @@ FIG_CUM <- DF_CUM %>%
   geom_line(aes(color= as.factor(Rep), group= WorkerID))+
   facet_grid(porcionCosecha ~numPlants) +
   theme_bw() +
-  scale_color_viridis_d()+
+    scale_color_viridis_d(option = "inferno", end = 0.8, direction = -1)+
     scale_x_reverse()+
   #geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= 0.025, size = 0.2, color= "Black")+
   theme(text = element_text(size = 25))+
@@ -511,7 +512,7 @@ FIG_CUM_2000 <- DF_CUM %>%
   #facet_wrap(~porcionCosecha, nrow = 3) +
 
   theme_bw() +
-  scale_color_viridis_d()+
+  scale_color_viridis_d(option = "inferno", end = 0.8, direction = -1)+
   #geom_segment(aes(x=1.5, y=0, xend= 1.5, yend= 0.025, size = 0.2, color= "Black")+
   theme(text = element_text(size = 25))+
   scale_x_reverse()+
