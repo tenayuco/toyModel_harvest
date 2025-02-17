@@ -241,7 +241,7 @@ FIG_HIST_HAR_2 <- DF_HIST_HAR %>%
   filter(numPlants ==500|numPlants ==2000|numPlants ==5000)%>%
   ggplot(aes(x = degree)) +
   # Primary y-axis: meanFrecDeg (bars)
-  geom_col(aes(y = meanFrecDeg/maxNet,
+  geom_col(aes(y = meanFrecDeg/numPlants,
                fill= as.factor(porcionCosecha)), 
            position = "dodge",
            color = "black",
@@ -258,6 +258,8 @@ FIG_HIST_HAR_2 <- DF_HIST_HAR %>%
   
   # Theme and labels
   theme_bw() +
+  theme(panel.spacing = unit(1, "cm"))+
+
   theme(
     text = element_text(size = 25),
     #legend.position = "none",
@@ -267,7 +269,7 @@ FIG_HIST_HAR_2 <- DF_HIST_HAR %>%
    fill = "Harvesting Scenario", 
     color=  "Harvesting Scenario",
     x = bquote("Size of network"), 
-    y = "Infected networks AH"
+    y = "Infected networks AH/# plants"
   ) 
 
 
@@ -336,6 +338,8 @@ FIG_CUM_HAR_2 <- DF_HIST_HAR %>%
   facet_wrap(~numPlants, nrow = 1) +
   # Theme and labels
   theme_bw() +
+    theme(panel.spacing = unit(1, "cm"))+
+
   theme(
     text = element_text(size = 24.5),
     #legend.position = "none",
