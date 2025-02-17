@@ -162,6 +162,7 @@ DF_HIST<- DF_HIST%>%
   group_by(Rep, numPlants, porcionCosecha) %>%
   mutate(plantCUM = cumsum(perPlantRust))
 
+
 FIG_ALL_REP <- DF_HIST %>%
   ggplot(aes(x = degree)) +
   geom_line(aes(y = plantCUM, color = factor(Rep)), linewidth = 1)+
@@ -275,6 +276,8 @@ ggsave(FIG_HIST_HAR_2,filename=paste("../../output/graficas/SUP_FIG/", "NetHar2.
 
 
 
+
+
 ```{r}
 
 FIG_CUM_HAR <- DF_HIST_HAR %>%
@@ -351,3 +354,15 @@ ggsave(FIG_CUM_HAR_2,filename=paste("../../output/graficas/SUP_FIG/", "CumHar2.p
 
 
 ```
+
+
+```{r}
+FIG_MAX_NET <- DF_HIST %>%
+  ungroup()%>%
+  group_by(numPlants, porcionCosecha, Rep) %>%
+  summarise(totNet = sum(frecDegree))%>%
+  group_by(numPlants)%>%
+  summarise(meanTotNet = mean(totNet), sdTotNet = sd(totNet))%>%
+  mutate(meanNetPlant =  meanTotNet/numPlants, sdNetPlant = sdTotNet/numPlants)
+```
+
