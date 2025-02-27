@@ -31,7 +31,10 @@ toyModel_harvest
 			--SUP_FIG (supplementary figures)
 		-figurasLattice
 
-For the purposes of the reproducibilty, the full data folder is available in the following link (drive*)The ouput folder will be created through the code.  
+For the purposes of the reproducibilty, the full data folder is available in the following link
+
+https://drive.google.com/drive/folders/1aOuhljg_9z-g45MkrTvafkeaSxyl2Vj9?usp=sharing
+
 
 In the following lines, I describe the role of /src folder
 
