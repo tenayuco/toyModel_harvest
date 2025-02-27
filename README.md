@@ -14,10 +14,12 @@ toyModel_harvest
 			-execute_toyModer_pat.py
 			- __init__.py 
 			- README_patungCodes.md
-			
+		-/dataBaseCodes
+			- dataBaseModifications.rmd
 		-/grapherCodes
-			 
+			-  figuresLattice.Rmd
 		-/analisCodes
+			- fittingDistribution.R
 		
 	-data
 		- DF_total_TF.csv 
@@ -26,15 +28,12 @@ toyModel_harvest
 		- DF_spatialAverage_complete.csv
 		- datosParaFiguras.csv (from another paper)
 		- histHar.csv
-		
 	-output
 		-graficas
-		
 			-DIF_RUST (for figures 4)
 			-NETWORK (for figure 5)
 			-PATH (figure 2 and 3)
 			-SUP_FIG (supplementary figures)
-			
 		-figurasLattice
 
 For the purposes of the reproducibilty, the full data folder is available in the following link
@@ -61,7 +60,7 @@ This folder runs the simulation in a condor language machine. Take a look at the
 
 After runing everything and downloading the data (see README_patungCodes) you will have a dataPatung_descargado/salida folder. 
 
-##dataBaseCodes 
+## dataBaseCodes 
 
 This folder takes the the dataPatung_descargado/salida and modificates the data base to create more suitable and useful data structure to make the figures. For the purposes of the reproducibilty, the full data folder is available in the following link (drive*)
 
@@ -75,7 +74,7 @@ c) data/DF_total_TF.csv, and
 d) data/DF_total_TF_short.csv
 
 
-##analisisCodes 
+## analisisCodes 
 This folder analyses the results at a network level and send a csv to the grapher codes to reproduce the figures. 
 
 * harvestNetworkDis.rmd 
@@ -90,7 +89,7 @@ This codes fits the step length distribution to different functions (Nicholas Me
 
 Old code that generates an old version figure of the netwrok plots. 
 
-##grapherCodes 
+## grapherCodes 
 
 * figuresLattice.Rmd
 
