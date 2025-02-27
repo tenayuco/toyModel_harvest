@@ -6,29 +6,29 @@ This repository provides the code to reproduce the results and figures of the pa
 ## structure
 
 toyModel_harvest
-	--src
-		--/patungCodes (run the simulation)
-			--creator_CI_patung.py
-			--creator_SubmitFile.py
-			--execute_toyModer_pat.py
-			-- __init__.py 
-			-- README_patungCodes.md
-		--/grapherCodes
-			-- 
-		--/analisCodes
-	--data
-		-- DF_total_TF.csv 
-		-- DF_total_TF_short.csv 
-		-- DF_muestrasPath_complete.csv
-		-- DF_spatialAverage_complete.csv
-		-- datosParaFiguras.csv (from another paper)
-		-- histHar.csv
-	--output
-		--graficas
-			--DIF_RUST (for figures 4)
-			--NETWORK (for figure 5)
-			--PATH (figure 2 and 3)
-			--SUP_FIG (supplementary figures)
+	  - src
+		 - patungCodes (run the simulation)
+			-creator_CI_patung.py
+			-creator_SubmitFile.py
+			-execute_toyModer_pat.py
+			- __init__.py 
+			- README_patungCodes.md
+		-/grapherCodes
+			- 
+		-/analisCodes
+	-data
+		- DF_total_TF.csv 
+		- DF_total_TF_short.csv 
+		- DF_muestrasPath_complete.csv
+		- DF_spatialAverage_complete.csv
+		- datosParaFiguras.csv (from another paper)
+		- histHar.csv
+	-output
+		-graficas
+			-DIF_RUST (for figures 4)
+			-NETWORK (for figure 5)
+			-PATH (figure 2 and 3)
+			-SUP_FIG (supplementary figures)
 		-figurasLattice
 
 For the purposes of the reproducibilty, the full data folder is available in the following link
@@ -97,7 +97,7 @@ This code creates all the figures (manuscript and supplementary) and store them 
 Emilio Mora Van Cauwelaert
 
 emiliomora92@gmail.com 
-ex. [@DomPizzie](https://twitter.com/dompizzie)
+
 
 ## Version History
 
