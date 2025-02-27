@@ -6,6 +6,7 @@ This repository provides the code to reproduce the results and figures of the pa
 ## structure
 
 toyModel_harvest
+
 	  - src
 		 - patungCodes (run the simulation)
 			-creator_CI_patung.py
@@ -13,9 +14,11 @@ toyModel_harvest
 			-execute_toyModer_pat.py
 			- __init__.py 
 			- README_patungCodes.md
+			
 		-/grapherCodes
-			- 
+			 
 		-/analisCodes
+		
 	-data
 		- DF_total_TF.csv 
 		- DF_total_TF_short.csv 
@@ -23,12 +26,15 @@ toyModel_harvest
 		- DF_spatialAverage_complete.csv
 		- datosParaFiguras.csv (from another paper)
 		- histHar.csv
+		
 	-output
 		-graficas
+		
 			-DIF_RUST (for figures 4)
 			-NETWORK (for figure 5)
 			-PATH (figure 2 and 3)
 			-SUP_FIG (supplementary figures)
+			
 		-figurasLattice
 
 For the purposes of the reproducibilty, the full data folder is available in the following link
