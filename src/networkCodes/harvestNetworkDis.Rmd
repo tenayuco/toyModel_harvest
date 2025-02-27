@@ -1,0 +1,150 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This codes analyses the network of infected plants and return a csv (histNet.csv) in data, that can be used to produce the figure 5. 
+
+```{r}
+#this codes makes the analysis for the netwrks
+library(ggplot2)
+library(viridis)
+library(dplyr)
+library(tidyverse)
+library(reshape2)
+library(TAM)
+
+#base de datos general de colores:
+mycols <- c("#021128","#1b4a64", "#3585a0", "#759580", "#c78f34", "#fd9706","#fdb81c","#fbdb30")
+mycols2 <- c("#1b4a64", "#fd9706")
+mycols3 <- c("#1b4a64", "#fd9706", "black")
+mycols3_white <- c("#1b4a64", "#fd9706", "#eeeeee")
+
+colorsDis <- c("#B87400","white")
+colorsDis2 <- c("#B87400","#555555")
+colorsDis3 <- c("#111111","#8B0000","#fd9706")
+
+```
+
+```{r}
+rerunAna <- 0
+
+if (rerunAna == 1){
+
+DF_TOTAL <- read.csv("../../data/DF_total_TF.csv", header = TRUE)
+
+DF_TOTAL <- DF_TOTAL %>% 
+  filter(porcionCosecha != "S_F")
+
+
+#remove unuses colunmns
+DF_TOTAL$X.1 <- NULL
+DF_TOTAL$FruitLoad <- NULL
+DF_TOTAL$TotalHarvest <- NULL
+
+
+###########this is to see the new infection by harvest########333
+DF_NEW<-  DF_TOTAL%>%
+  group_by(X, Y, Rep, numPlants)%>% #son las vairables que quedan y sobre esos escenarios, vamos a hacer las diferencias entre modelos
+  summarise(NUEVA_RUST = (Rust - Rust[HarvestModel=="control"]), 
+            porcionCosecha = porcionCosecha
+            )%>%
+  filter(porcionCosecha != 1)%>% #para quitar las lineas del control
+  filter(NUEVA_RUST ==1)
+
+
+#esto sirve para correr pruebas puntuales
+
+#nP =2000
+#rP = 0
+#pC = "A"
+
+
+#columns = c("Rep", "numPlants",  "porcionCosecha",  "N_REDES",  "T_REDES" , "MAX_T_REDES") 
+columns = c("Rep", "numPlants",  "porcionCosecha") 
+
+DF_HIST = data.frame() 
+
+  for (nP in unique(DF_NEW$numPlants)){
+    for (pC in unique(DF_NEW$porcionCosecha)) {
+      #contador <- 0
+      for (rP in unique(DF_NEW$Rep)) {
+      print(c(nP, rP, pC))
+      DF_TEMP <- DF_NEW %>%
+      filter(numPlants ==nP & Rep == rP & porcionCosecha== pC)
+        if (nrow(DF_TEMP)==0){  #esto porque hay comb que no exiten en las nuevas redes
+    }
+        else
+    {  
+          N <- dim(DF_TEMP)[1]
+  
+          distance_matrix <- matrix(0,nrow=N,ncol=N)
+          for( i in 1:N){
+            for( j in 1:N ){
+              distance_matrix[i,j] <- sqrt( (DF_TEMP$X[i] - DF_TEMP$X[j])^2 + (DF_TEMP$Y[i] - DF_TEMP$Y[j])^2 )
+        #image(distance_matrix)
+        }
+    }
+    
+          Crit_Dist <- 1.5
+    
+    #MAKE ADJ MATRIX WITH CRITICAL DISTANCE
+          adj_matrix <- matrix(0,nrow=N,ncol=N)
+    
+          for(i in 1:N){
+            for(j in 1:N){
+              if(i != j & distance_matrix[i,j] <= Crit_Dist){
+                adj_matrix[i,j] = 1
+                }else{
+                  adj_matrix[i,j] = 0
+        }
+      }
+    }
+   #image(adj_matrix)
+    plot_graph <- graph.adjacency(adj_matrix,mode="undirected")
+    #Pull out cluster IDs and put them in the data set
+    
+    zippin <-layout.fruchterman.reingold(plot_graph)
+    zippin[,1] <- DF_TEMP$X
+    zippin[,2] <- DF_TEMP$Y
+    
+    groups <- unlist(clusters(plot_graph)[1])
+    DF_TEMP$cluster <- groups
+    #Add degree to our data set too
+    
+    
+    
+    DF_TEMP$CONTEO <- 1
+    #aqui saque el grado a mano
+    DF_TEMP <- DF_TEMP %>%
+      group_by(Rep, numPlants, NUEVA_RUST, porcionCosecha, cluster)%>%
+      summarise(degree = sum(CONTEO)) 
+    
+    
+    ###now we gonna count how many per sizeof cluster per reptition
+    
+    DF_TEMP$CONTEO2 <- 1
+    DF_TEMP_HIS <- DF_TEMP  %>%
+      group_by(Rep, numPlants, porcionCosecha, degree)%>%
+      summarise(frecDegree = sum(CONTEO2))
+    
+    DF_HIST <- rbind(DF_HIST, DF_TEMP_HIS)
+
+    }
+  }
+    }
+  }
+
+
+
+
+
+
+write.csv(DF_HIST, "../../data/histHar.csv")
+
+
+}
+
+```
+
+

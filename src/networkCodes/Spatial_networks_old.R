@@ -230,27 +230,6 @@ ggsave(FIG_REDES,filename=paste("../../output/graficas/NETWORKS/", "redesAna2", 
 
 
 
-# FIG_REDES_VIEJA <- melt_DF_POST_RES %>% 
-# #  filter(comPuesta =="no")%>% 
-#   ggplot(aes(x= numPlants, y= value_mean))+
-#   geom_line(size=1, aes(color = variable_mean, linetype = variable_mean, group=variable_mean))+
-#   geom_errorbar(size=0.5, aes( 
-#     ymin=value_mean-value_sd, ymax=value_mean+value_sd, color = variable_mean)) +
-#   geom_point(size= 6, aes(color = variable_mean, shape= variable_mean), fill="white", stroke= 1)+
-#   scale_shape_manual(values = c(21, 24, 22))+
-#   scale_color_manual(values = colorRedes)+
-#   scale_linetype_manual(values = c(1,1,2))+
-#   facet_wrap(~porcionCosecha* variable_mean, scales = "free_y")+
-#   theme_bw()+
-#   theme(text = element_text(size = 25), 
-#         legend.key.size=unit(1,"cm"))+
-#   theme(strip.background = element_rect(colour= "black",
-#                                         fill="white"))+
-#   #theme(legend.position = "none") +
-#   labs(x ="Density (Plants/ha)", y="Magnitude", shape= "Legend", linetype= "Legend", color= "Legend")
-
-
-
 
 
 

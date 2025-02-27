@@ -3,6 +3,8 @@ title: "R Notebook"
 output: html_notebook
 ---
 
+This code will generate almost all the figures (from 2 to 5) (plus the supplementary figures) used in this paper. 
+
 We first run the libraries and colors
 
 ```{r}
@@ -22,13 +24,17 @@ mycols3_white <- c("#1b4a64", "#fd9706", "lightgray")
 colorsDis <- c("#B87400","white")
 colorsDis2 <- c("#B87400","#aaaaaa")
 colorsDis3 <- c("#111111","#8B0000","#fd9706")
+colorsWholePlot <- c("white", "#B87400","#aaaaaa")
 
 ```
 
-We download the data of the movement of the workers during harvesting
+##. 1 Step-length distributions
+
+We download the data of the movement of the workers during harvesting (data/DF_muestrasPath_complete.csv)
+
+
 
 ```{r}
-#DF_SAM<- read.csv("./archivosTrabajandose/toyModelHarvest/data/DF_muestrasPath_complete.csv")
 DF_SAM <- read.csv("../../data/DF_muestrasPath_complete.csv", header = TRUE)
 
 #As we defined the model for SI and SF (not used at the end), SI only infects in the first half of the time
@@ -61,7 +67,7 @@ DF_SAM$DistanceW <- sqrt(DF_SAM$DistanceW)
 ```
 
 
-Then we take specifically the data corresponding to the moment of harvest. 
+Then we take specifically the data corresponding to the moment of harvest. DF_TOTAL is the full data base at the moment of harvest
 ```{r}
 
 DF_TOTAL = DF_SAM %>%
@@ -97,96 +103,13 @@ DF_TOTAL$Infection[DF_TOTAL$Rust =="0.5"] <- "New Infection"
 #  filter(Rep %in% c(0,1,2,3,4,5))%>%
 #  filter(DistanceW <1.1)
 #DF_TOTAL <- DF_TOTAL_PROXY
+
+head(DF_TOTAL)
 ```
 
+Now, we create other databases
 
-We do the general visualization of paths:
-
-```{r}
-FIG_PATH_GEN<- DF_TOTAL %>% 
-    filter(Rep == 0)%>%
-    filter(numPlants == 500 |numPlants == 2000 | numPlants == 5000)%>% #solo un ejepmplo
-    filter(WorkerID != 0)%>% 
-    arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
-    rowwise() %>% 
-    ggplot(aes(x= X, y = Y, group=WorkerID)) +
-    geom_path(aes(col= WorkerID),size=1)+
-    geom_point(size=1)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
-    scale_color_viridis_d(option = "inferno", end = 0.8, direction = -1)+
-    facet_grid(porcionCosecha ~numPlants) +
-    theme(panel.spacing = unit(0.8, "lines"), text = element_text(size = 15))+
-    theme_bw()+
-    theme(strip.background = element_rect(fill = "white"))+ 
-    theme(text = element_text(size = 25))+
-    theme(legend.position = "none") +
-    labs(x= "X", y= "Y", col= "Worker")
-  
-  ggsave(FIG_PATH_GEN,filename=paste("../../output/graficas/SUP_FIG/", "path_GENERAL.png", sep=""),  height = 12, width = 18) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-```
-
-```{r}
-FIG_PATH_2000_todos<- DF_TOTAL %>% 
-  #filter(HarvestStep <160)%>% #ultimo 160 plantas de ahi
-  filter(Rep == 2)%>%
- # filter(numWorkers =="1 worker")%>%
-  filter(numPlants == 2000)%>% #solo un ejepmplo
-  filter(WorkerID != 0)%>% 
-  arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
-  rowwise() %>% 
-  ggplot(aes(x= X, y = Y, group=WorkerID)) +
-  #geom_path(aes(col= as.character(Infection)),size=1.5, alpha= 0.8)+
-  geom_path(aes(col= as.character(WorkerID)),size=1.5, alpha= 0.8)+
-  geom_point(size=1.5)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
-    scale_color_viridis_d(option = "inferno", end = 0.8, direction = -1)+
-
-  theme(panel.spacing = unit(0.8, "lines"))+
-  theme_bw()+
-  facet_wrap(~porcionCosecha, nrow = 3) +
-  theme(text = element_text(size = 25))+
-  theme(legend.position = "none") +
-  theme(
-    strip.background = element_blank(),
-    strip.text.x = element_blank()
-  )+ 
-  labs(x= "X (m)", y= "Y (m)", col= "Rust")
-
-ggsave(FIG_PATH_2000_todos,filename=paste("../../output/graficas/PATH/", "path_plants_2000_w1_todos.png", sep=""),  height = 10, width = 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-
-
-```
-
-
-```{r}
-FIG_PATH_2000_W1<- DF_TOTAL %>% 
-  #filter(HarvestStep <160)%>% #ultimo 160 plantas de ahi
-  filter(Rep == 2)%>%
-  # filter(numWorkers =="1 worker")%>%
-  filter(numPlants ==3000)%>% #solo un ejepmplo
-  filter(WorkerID == "W_4")%>% 
-  arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
-  rowwise() %>% 
-  ggplot(aes(x= X, y = Y, group=WorkerID)) +
-  geom_path(col= "black",size=1.5, alpha= 0.7)+
-  geom_point(size=1.5)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
-  #scale_color_viridis_c()+
-  scale_color_manual(values = colorsDis2)+
-  theme(panel.spacing = unit(0.8, "lines"))+
-  theme_bw()+
-  facet_wrap(~porcionCosecha, nrow = 3) +
-  theme(text = element_text(size = 25))+
-  theme(legend.position = "none") +
-  theme(
-    strip.background = element_blank(),
-    strip.text.x = element_blank()
-  )+ 
-  labs(x= "X (m)", y= "Y (m)", col= "Rust")
-
-ggsave(FIG_PATH_2000_W1,filename=paste("../../output/graficas/PATH/", "path_plants_3000_1Worker.png", sep=""),  height = 10, width = 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-
-```
-
-Now, we will do the aggregate to generate the histogram manually
-
+DF_TOTAL_AG_PRE grooups the rows by distance and count how many steps per distance. But keeps separate repetitions. 
 
 ```{r}
 #total_AG agregates the distance values per:
@@ -215,25 +138,28 @@ DF_TOTAL_AG_PRE <- DF_TOTAL_AG_PRE %>%
 
 DF_TOTAL_AG_PRE$Frec[is.na(DF_TOTAL_AG_PRE$Frec)] <- 0
 
+head(DF_TOTAL_AG_PRE)
+```
+
+DF_TOTAL_AG calcualtes the mean and sd of each frecuency for each distance step 
+
+```{r}
 DF_TOTAL_AG <- DF_TOTAL_AG_PRE %>%
   group_by(numPlants, numWorkers,  Infection, DistanceW, porcionCosecha, SimID) %>%
   summarise(MeanFrec =mean(Frec, na.rm = TRUE), SDFrec =sd(Frec, na.rm = TRUE))
 
-##despues de completar y de hacer el agregamiento bueno deben quedar una cantidad de rengones
-## con sentido. Completar hace que le agegues 0 en donde no había nada. 
-## eneste caso, tenemos numPlans/numWorkers (5)+ Infection (2)* DistanceW (116)* porcionCosecha (2) =   2320 renglnones
 
 #finally, we add a column to add the cumulative values 
 DF_TOTAL_AG <- DF_TOTAL_AG %>%
   group_by(Infection, numPlants, porcionCosecha) %>%
   mutate(FrecCUM = cumsum(MeanFrec))
 
+head(DF_TOTAL_AG)
 ```
 
-
+DF_SUPER_AG is almost the same but just consider the distance, without the infection status. 
 
 ```{r}
-
 #this super aggregate does not consider the infection division. We just sum both valus!
 
 DF_SUPER_AG <- DF_TOTAL_AG%>%
@@ -243,112 +169,9 @@ DF_SUPER_AG <- DF_TOTAL_AG%>%
 write.csv(DF_SUPER_AG, paste("../../output/graficas/PATH/", "DF_SUPER_AG", ".csv"))
 ```
 
-```{r}
-#here I am goinf to run a test to see the influence of the number or repretitions on the final values of mean and sd
+## Visusalization of some plots. 
 
-
-DF_TOTAL_AG_PRE$FrecAbs[is.na(DF_TOTAL_AG_PRE$FrecAbs)] <- 0
-
-
-
-DF_STATS_REP <- data.frame()
-
-for (i in 0:max(DF_TOTAL_AG_PRE$Rep)){
-  DF_i <-DF_TOTAL_AG_PRE %>%
-    filter(Rep<i+1)  #so the repetitions go from 0 to 29, and the index goes 
-  
-  DF_STATS_REP_i <- DF_i %>%
-    ungroup()%>%
-    group_by(numPlants, porcionCosecha) %>%
-    summarise(wMean = weighted_mean(x= DistanceW, w=FrecAbs), 
-           wSD = weighted_sd(x= DistanceW, w=FrecAbs), 
-           NumRep = i+1)
-  
-  DF_STATS_REP <- rbind(DF_STATS_REP,  DF_STATS_REP_i)
-  
-}
-
-
-DF_STATS_REP_L <- DF_STATS_REP %>%
-  gather(key = "Stat", value = "value", wMean, wSD)
-
-
-
-
-FIG_STAT_REP <- DF_STATS_REP_L %>% 
-  ggplot(aes(x= NumRep, y = value)) +
-  geom_line(aes(group = porcionCosecha))+
-  geom_point(aes(col= porcionCosecha)) + 
-    scale_color_manual(values =mycols2)+
-  theme_bw()+
-  facet_grid(Stat~numPlants, scales = "free_y") +
-    theme(panel.spacing = unit(0.5, "cm"))+
-  theme(text = element_text(size = 25))+
-  theme(strip.background = element_rect(fill = "white"))+ 
-  scale_alpha(guide = 'none')+
-      labs(color= "Harvesting Scenario", x= "Number of repetitions", y= "Step-length distribution") +
-  ggtitle("Density (Plants/ha)") +
-  theme(plot.title = element_text(hjust = 0.5, size = 20))
-
-
-
-ggsave(FIG_STAT_REP,filename=paste("../../output/graficas/SUP_FIG/", "meanSD_rep.png", sep=""),  height = 7, width = 20) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-
-```
-
-
-
-
-```{r}
-FIG_HIST_G_B_GEN <- DF_SUPER_AG %>%
-    filter(MeanFrecTotal !=0)%>%
-
-  filter((numPlants== 500) | (numPlants== 2000) |(numPlants== 5000))%>%
-  ggplot(aes(x= DistanceW)) +
-  geom_col(aes(y = MeanFrecTotal, fill = Infection),
-             color= "black", position = "stack")+
-#  xlim(0, 110)+
-  ylim(0, 0.7)+
-  facet_wrap(~porcionCosecha*numPlants, ncol = 3)+
-  scale_fill_manual(values =colorsDis2)+
-  scale_color_manual(values =colorsDis)+
-  theme_bw() +
-  theme(text = element_text(size = 25))+
-  theme(legend.position = "none")+
-  theme(strip.background = element_rect(fill = "white"))+ 
-  scale_alpha(guide = 'none')+
-      labs(fill= "", x= bquote("Step length (m)"), y= "Proportion of Steps")
-
- ggsave(FIG_HIST_G_B_GEN,filename=paste("../../output/graficas/PATH/", "HISTO_GENERAL", ".png", sep=""),  height =7, width = 12) 
-
-```
-
-
-```{r eval=FALSE, include=FALSE}
-
-
-DF_SIZE_STEP <- read.csv("../../data/DF_CUM_EDITADO.csv", header = TRUE)
-
-FIG_SS <- DF_SIZE_STEP %>%
-  ggplot(aes(x= DistanceW)) +
-  geom_point(aes(y = MeanFrecCUM), color = "black")+
-  geom_line(aes(y = MeanFrecCUM,  color= as.factor(porcionCosecha)))+
-  theme_bw() +
-  facet_wrap(~numPlants, ncol = 5)+
-  theme(text = element_text(size = 25))+
-  theme(legend.position = "none")+
-  theme(strip.background = element_rect(fill = "white"))+ 
-  scale_alpha(guide = 'none')+
-      labs(fill= "", x= bquote("Step length (m)"), y= "Proportion of Steps")
-
-
-
-
-```
-
-
-
-
+This first code generates the histogram for all planting densities and harvesting scenarios (Fig 2A and more)
 ```{r}
 
 datos_TOTALES <- data.frame("Median" = 0, 
@@ -403,8 +226,8 @@ FIG_HIST_G_B <- DF_SUPER_TEMP %>%
 HIS_COM_B<- FIG_HIST_G_B + annotation_custom(ggplotGrob(CAJADIST_B), xmin = 15, xmax = 100, ymin = 0.1, ymax = 0.4)
     
     
-  #  ggsave(FIG_HIST_G,filename=paste("../../output/graficas/PATH/", "DisHIST_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 8, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-    ggsave(HIS_COM_B,filename=paste("../../output/graficas/PATH/", "DisFINAL_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 5, width = 7) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ 
+    ggsave(HIS_COM_B,filename=paste("../../output/graficas/PATH/", "Fig2A_DisFINAL_", "nP_", nP, "pC_", pC, ".png", sep=""),  height = 5, width = 7) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
     
     
    
@@ -428,8 +251,174 @@ write.csv(datos_TOTALES, paste("../../output/graficas/PATH/", "measures_TOTALES"
 ```
 
 
+Fig. 2B
+```{r}
+FIG_PATH_2000_todos<- DF_TOTAL %>% 
+  #filter(HarvestStep <160)%>% #ultimo 160 plantas de ahi
+  filter(Rep == 2)%>%
+ # filter(numWorkers =="1 worker")%>%
+  filter(numPlants == 2000)%>% #solo un ejepmplo
+  filter(WorkerID != 0)%>% 
+  arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
+  rowwise() %>% 
+  ggplot(aes(x= X, y = Y, group=WorkerID)) +
+  #geom_path(aes(col= as.character(Infection)),size=1.5, alpha= 0.8)+
+  geom_path(aes(col= as.character(WorkerID)),size=1.5, alpha= 0.8)+
+  geom_point(size=1.5)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
+    scale_color_viridis_d(option = "inferno", end = 0.8, direction = -1)+
 
-This is the section about cumulative trajectory
+  theme(panel.spacing = unit(0.8, "lines"))+
+  theme_bw()+
+  facet_wrap(~porcionCosecha, nrow = 3) +
+  theme(text = element_text(size = 25))+
+  theme(legend.position = "none") +
+  theme(
+    strip.background = element_blank(),
+    strip.text.x = element_blank()
+  )+ 
+  labs(x= "X (m)", y= "Y (m)", col= "Rust")
+
+ggsave(FIG_PATH_2000_todos,filename=paste("../../output/graficas/PATH/", "Fig2B_path_plants_2000.png", sep=""),  height = 10, width = 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+
+```
+
+Fig. 3A
+```{r}
+FIG_PATH_2000_W1<- DF_TOTAL %>% 
+  #filter(HarvestStep <160)%>% #ultimo 160 plantas de ahi
+  filter(Rep == 2)%>%
+  # filter(numWorkers =="1 worker")%>%
+  filter(numPlants ==3000)%>% #solo un ejepmplo
+  filter(WorkerID == "W_4")%>% 
+  arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
+  rowwise() %>% 
+  ggplot(aes(x= X, y = Y, group=WorkerID)) +
+  geom_path(col= "black",size=1.5, alpha= 0.7)+
+  geom_point(size=1.5)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
+  #scale_color_viridis_c()+
+  scale_color_manual(values = colorsDis2)+
+  theme(panel.spacing = unit(0.8, "lines"))+
+  theme_bw()+
+  facet_wrap(~porcionCosecha, nrow = 3) +
+  theme(text = element_text(size = 25))+
+  theme(legend.position = "none") +
+  theme(
+    strip.background = element_blank(),
+    strip.text.x = element_blank()
+  )+ 
+  labs(x= "X (m)", y= "Y (m)", col= "Rust")
+
+ggsave(FIG_PATH_2000_W1,filename=paste("../../output/graficas/PATH/", "Fig3A_path_plants_3000_1Worker.png", sep=""),  height = 10, width = 6) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+```
+
+
+
+Fig. S1.3
+
+```{r}
+FIG_PATH_GEN<- DF_TOTAL %>% 
+    filter(Rep == 0)%>%
+    filter(numPlants == 500 |numPlants == 2000 | numPlants == 5000)%>% #solo un ejepmplo
+    filter(WorkerID != 0)%>% 
+    arrange(WorkerID, HarvestStep)%>%  #importante para que se orden por pasos, y despues se hace por worker!!
+    rowwise() %>% 
+    ggplot(aes(x= X, y = Y, group=WorkerID)) +
+    geom_path(aes(col= WorkerID),size=1)+
+    geom_point(size=1)+ # es importante que sea path, porque así lo hace según coo estan ordenados los
+    scale_color_viridis_d(option = "inferno", end = 0.8, direction = -1)+
+    facet_grid(porcionCosecha ~numPlants) +
+    theme(panel.spacing = unit(0.8, "lines"), text = element_text(size = 15))+
+    theme_bw()+
+    theme(strip.background = element_rect(fill = "white"))+ 
+    theme(text = element_text(size = 25))+
+    theme(legend.position = "none") +
+    labs(x= "X", y= "Y", col= "Worker")
+  
+  ggsave(FIG_PATH_GEN,filename=paste("../../output/graficas/SUP_FIG/", "FigS1_3.path_GENERAL.png", sep=""),  height = 12, width = 18) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+```
+
+Fig. S1_4
+```{r}
+FIG_HIST_G_B_GEN <- DF_SUPER_AG %>%
+    filter(MeanFrecTotal !=0)%>%
+
+  filter((numPlants== 500) | (numPlants== 2000) |(numPlants== 5000))%>%
+  ggplot(aes(x= DistanceW)) +
+  geom_col(aes(y = MeanFrecTotal),
+             color= "black", position = "stack")+
+#  xlim(0, 110)+
+  ylim(0, 0.7)+
+  facet_wrap(~porcionCosecha*numPlants, ncol = 3)+
+  scale_fill_manual(values =colorsDis2)+
+  scale_color_manual(values =colorsDis)+
+  theme_bw() +
+  theme(text = element_text(size = 25))+
+  theme(legend.position = "none")+
+  theme(strip.background = element_rect(fill = "white"))+ 
+  scale_alpha(guide = 'none')+
+      labs(fill= "", x= bquote("Step length (m)"), y= "Proportion of Steps")
+
+ ggsave(FIG_HIST_G_B_GEN,filename=paste("../../output/graficas/SUP_FIG/", "FigS1_4_HISTO_GENERAL", ".png", sep=""),  height =7, width = 12) 
+
+```
+
+
+
+Fig. S1.1 A
+```{r}
+#here I am goinf to run a test to see the influence of the number or repretitions on the final values of mean and sd
+
+
+DF_TOTAL_AG_PRE$FrecAbs[is.na(DF_TOTAL_AG_PRE$FrecAbs)] <- 0
+
+DF_STATS_REP <- data.frame()
+
+for (i in 0:max(DF_TOTAL_AG_PRE$Rep)){
+  DF_i <-DF_TOTAL_AG_PRE %>%
+    filter(Rep<i+1)  #so the repetitions go from 0 to 29, and the index goes 
+  
+  DF_STATS_REP_i <- DF_i %>%
+    ungroup()%>%
+    group_by(numPlants, porcionCosecha) %>%
+    summarise(wMean = weighted_mean(x= DistanceW, w=FrecAbs), 
+           wSD = weighted_sd(x= DistanceW, w=FrecAbs), 
+           NumRep = i+1)
+  
+  DF_STATS_REP <- rbind(DF_STATS_REP,  DF_STATS_REP_i)
+  
+}
+
+
+DF_STATS_REP_L <- DF_STATS_REP %>%
+  gather(key = "Stat", value = "value", wMean, wSD)
+
+
+
+
+FIG_STAT_REP <- DF_STATS_REP_L %>% 
+  ggplot(aes(x= NumRep, y = value)) +
+  geom_line(aes(group = porcionCosecha))+
+  geom_point(aes(col= porcionCosecha)) + 
+    scale_color_manual(values =mycols2)+
+  theme_bw()+
+  facet_grid(Stat~numPlants, scales = "free_y") +
+    theme(panel.spacing = unit(0.5, "cm"))+
+  theme(text = element_text(size = 25))+
+  theme(strip.background = element_rect(fill = "white"))+ 
+  scale_alpha(guide = 'none')+
+      labs(color= "Harvesting Scenario", x= "Number of repetitions", y= "Step-length distribution") +
+  ggtitle("Density (Plants/ha)") +
+  theme(plot.title = element_text(hjust = 0.5, size = 20))
+
+
+
+ggsave(FIG_STAT_REP,filename=paste("../../output/graficas/SUP_FIG/", "FigS1_A_meanSD_rep.png", sep=""),  height = 7, width = 20) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+```
+
+This is the section about cumulative trajectory (Fig2_C and fig S1.6)
 
 
 ```{r}
@@ -494,7 +483,7 @@ FIG_CUM <- DF_CUM %>%
   labs(x= "% Harvested trees", y= "Size of step per worker")
 
 
-ggsave(FIG_CUM,filename=paste("../../output/graficas/SUP_FIG/", "FIG_PROGRESSION.png", sep=""),  height = 8, width = 20)
+ggsave(FIG_CUM,filename=paste("../../output/graficas/SUP_FIG/", "FigS1_6_FIG_PROGRESSION.png", sep=""),  height = 8, width = 20)
 
 
 
@@ -520,14 +509,13 @@ FIG_CUM_2000 <- DF_CUM %>%
   labs(x= "% Trees with berries", y= "Step length per worker (m)", color= "Rust")
 
 
-ggsave(FIG_CUM_2000,filename=paste("../../output/graficas/PATH/", "FIG_PROGRESSION_2000.png", sep=""),  height = 10, width = 6)
+ggsave(FIG_CUM_2000,filename=paste("../../output/graficas/PATH/", "Fig2C_PROGRESSION_2000.png", sep=""),  height = 10, width = 6)
 
 
 ```
 
+I take advantage of DF_TOTAL_AG to plot the infective steps during harvest (Fig.5A)
 
-
-Here is for the supplementary mateiral
 ```{r}
 FIG_INF <- DF_TOTAL_AG %>%
   filter(Infection == "New Infection")%>%
@@ -556,15 +544,16 @@ FIG_INF <- DF_TOTAL_AG %>%
       labs(fill= "Harvesting Scenario", color= "Harvesting Scenario", x= 'Step length', y= "Proportion of Infective steps", color= "Harvesting scenario", linetype = "Harvesting Scenario")
 
 
- ggsave(FIG_INF,filename=paste("../../output/graficas/DIF_RUST/", "INF_HAR.png", sep=""),  height = 5, width = 17)
+ ggsave(FIG_INF,filename=paste("../../output/graficas/NETWORK/", "Fig5A_INF_HAR.png", sep=""),  height = 5, width = 17)
 
 ```
 
 
-This chunks is only for a visualizaton of the whole plot. Do not activate
+
+This chunks is only for a visualizaton of the whole harvested plot. 
 ```{r}
 
-wholePlot <- 0
+wholePlot <- 1
 
 n= 0
 if (wholePlot ==1){
@@ -572,30 +561,32 @@ if (wholePlot ==1){
   #DF_SAM = DF_sample
   
   for(nP in unique(DF_SAM$numPlants)){
-    for(tiempo in c(0,timeMAX)){
       FIG_PLOT <- DF_SAM %>%
         filter(numPlants == nP)%>%
         filter(Rep ==0)%>%
-        filter(Time == tiempo) %>%
         add_row(porcionCosecha = "Asynchronous",  Rep= 0,   ID= 999999,  X= NA,  Y=NA , Rust= 0.5)%>% ##ESte es un truquito para que siempre hayan 3 colores en cada graficas, porque le 0.5 siempre desaprece
         add_row(porcionCosecha = "Synchronous",  Rep= 0,   ID= 9999999,  X= NA,  Y=NA , Rust= 0.5)%>%
         ggplot()+
-        geom_point(aes(x=X , y= Y, color= as.character(Rust)), size= 2)+
+        geom_point(aes(x=X , y= Y, fill= as.character(Rust)), color="black", size= 2, shape=21)+
+          scale_fill_manual(values = colorsWholePlot)+
+
         ggtitle("")+
+        
         facet_wrap(~porcionCosecha, ncol=2)+
         theme(text = element_text(size = 25))+
         theme_bw()
       
       
-      ggsave(FIG_PLOT,filename=paste("../../output/figurasLattice/",nP, "plotFigure_", tiempo, ".png",sep=""), height = 8, width = 16) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+      ggsave(FIG_PLOT,filename=paste("../../output/figurasLattice/",nP, "harvestPlant_", ".png",sep=""), height = 8, width = 16) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
       n= n+1
-    }
+    
   }
 }
 
 ```
 
 
+## Part 2. The infection process
 
 Now, this section is for the infection process Part II (is independent of Part I)
 
@@ -896,20 +887,242 @@ ggsave(FIG_DIF_MODELS,filename="../../output/graficas/DIF_RUST/dif_models.png", 
 
 
 
+
+################here for the networks and the infective steps (Fig 5)
+
+
+
+
+
+
+```{r}
+DF_HIST <- read.csv("../../data/histHar.csv", header = TRUE)
+
+DF_HIST$plantRust <- DF_HIST$degree * DF_HIST$frecDegree
+DF_HIST$perPlantRust <- 100*DF_HIST$plantRust/DF_HIST$numPlants
+```
+
+```{r}
+
+DF_HIST<- DF_HIST%>%
+  ungroup() %>%
+  group_by(Rep, numPlants, porcionCosecha) %>%
+  mutate(plantCUM = cumsum(perPlantRust))
+
+
+FIG_ALL_REP <- DF_HIST %>%
+  ggplot(aes(x = degree)) +
+  geom_line(aes(y = plantCUM, color = factor(Rep)), linewidth = 1)+
+  # Faceting
+  facet_grid(porcionCosecha~numPlants) +
+  scale_color_viridis_d()+
+  # Theme and labels
+  theme_bw() +
+  theme(
+    text = element_text(size = 25),
+    #legend.position = "none",
+    strip.background = element_rect(fill = "white")
+  )
+
+```
+
+
+
+```{r}
+DF_HIST_HAR <- DF_HIST %>%
+  ungroup() %>%
+  group_by(numPlants, porcionCosecha, degree) %>%
+  summarise(meanFrecDeg = mean(frecDegree), sdFrecDeg = sd(frecDegree), 
+            meanPlantCUM = mean(plantCUM), sdPlantCUM = sd(plantCUM))
+
+
+
+DF_HIST_HAR$porcionCosecha[DF_HIST_HAR$porcionCosecha =="A"] <- "Asynchronous"
+#DF_POST_RES$porcionCosecha[DF_POST_RES$porcionCosecha =="S_F"] <- "Synchronous Final" 
+DF_HIST_HAR$porcionCosecha[DF_HIST_HAR$porcionCosecha =="S_I"] <- "Synchronous"
+```
+
+
+```{r}
+FIG_HIST_HAR <- DF_HIST_HAR %>%
+  ggplot(aes(x = degree)) +
+  # Primary y-axis: meanFrecDeg (bars)
+  geom_col(aes(y = meanFrecDeg, 
+               fill = as.factor(numPlants),
+               color= as.factor(numPlants)), 
+           position = "dodge",
+           width = 1,
+           alpha=0.7) +
+scale_fill_viridis_d(option = "inferno", direction = -1, end = 0.8)  +
+  scale_color_viridis_d(option = "inferno", direction = -1, end = 0.8)  +
+
+  # Faceting
+  facet_wrap(~porcionCosecha, ncol = 1) +
+  
+  # Theme and labels
+  theme_bw() +
+  theme(
+    text = element_text(size = 25),
+    #legend.position = "none",
+    strip.background = element_rect(fill = "white")
+  ) +
+  labs(
+   fill = "Density (Plants/ha)", 
+    color=  "Density (Plants/ha)",
+    x = bquote("Size of network"), 
+    y = "Average number of infected networks AH"
+  ) 
+
+
+ggsave(FIG_HIST_HAR,filename=paste("../../output/graficas/SUP_FIG/", "NetHar.png", sep=""),  height = 10, width = 15) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+```
+
+VERSIOIN  2
+
+```{r}
+
+
+FIG_HIST_HAR_2 <- DF_HIST_HAR %>%
+  group_by(numPlants, porcionCosecha) %>%
+  mutate(maxNet = sum(meanFrecDeg)) %>%
+  filter(numPlants ==500|numPlants ==2000|numPlants ==5000)%>%
+  ggplot(aes(x = degree)) +
+  # Primary y-axis: meanFrecDeg (bars)
+  geom_col(aes(y = meanFrecDeg/numPlants,
+               fill= as.factor(porcionCosecha)), 
+           position = "dodge",
+           color = "black",
+           width = 0.8,
+           alpha=0.7) +
+  
+  
+
+ scale_fill_manual(values = mycols2)+
+ scale_color_manual(values = mycols2 )+
+
+  # Faceting
+  facet_wrap(~numPlants, nrow = 1) +
+  
+  # Theme and labels
+  theme_bw() +
+  theme(panel.spacing = unit(1, "cm"))+
+
+  theme(
+    text = element_text(size = 25),
+    #legend.position = "none",
+    strip.background = element_rect(fill = "white")
+  ) +
+  labs(
+   fill = "Harvesting Scenario", 
+    color=  "Harvesting Scenario",
+    x = bquote("Size of network"), 
+    y = "Infected networks AH/# plants"
+  ) 
+
+
+ggsave(FIG_HIST_HAR_2,filename=paste("../../output/graficas/SUP_FIG/", "NetHar2.png", sep=""),  height = 6, width = 21) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+```
+
+
+
+
+
+```{r}
+
+FIG_CUM_HAR <- DF_HIST_HAR %>%
+  ggplot(aes(x = degree)) +
+  # Primary y-axis: meanFrecDeg (bars)
+  
+  geom_line(aes(y = meanPlantCUM, color = factor(numPlants)), linewidth = 1) +
+  geom_ribbon(aes(ymin = meanPlantCUM - sdPlantCUM, ymax = meanPlantCUM + sdPlantCUM, fill = factor(numPlants)), alpha = 0.4) +
+ 
+
+scale_fill_viridis_d(option = "inferno", direction = -1, end = 0.8)  +
+scale_color_viridis_d(option = "inferno", direction = -1, end = 0.8)  +
+
+  # Faceting
+  facet_wrap(~porcionCosecha, ncol = 1) +
+  # Theme and labels
+  theme_bw() +
+  theme(
+    text = element_text(size = 25),
+    #legend.position = "none",
+    strip.background = element_rect(fill = "white")
+  ) +
+  labs(
+    fill = "Density (Plants/ha)", 
+    color=  "Density (Plants/ha)",
+    x = bquote("Size of network"), 
+    y = "Cumulative percentage of infected plants AH"
+  ) 
+
+
+ggsave(FIG_CUM_HAR,filename=paste("../../output/graficas/SUP_FIG/", "CumHar.png", sep=""),  height = 10, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+
+
+```
+
+VERSIO 2
+
+```{r}
+
+FIG_CUM_HAR_2 <- DF_HIST_HAR %>%
+    filter(numPlants ==500|numPlants ==2000|numPlants ==5000)%>%
+
+  ggplot(aes(x = degree)) +
+  # Primary y-axis: meanFrecDeg (bars)
+  
+  geom_line(aes(y = meanPlantCUM, color = factor(porcionCosecha)), linewidth = 1) +
+  geom_ribbon(aes(ymin = meanPlantCUM - sdPlantCUM, ymax = meanPlantCUM + sdPlantCUM, fill = factor(porcionCosecha)), alpha = 0.4) +
+ 
+
+ scale_fill_manual(values = mycols2)+
+   scale_color_manual(values = mycols2)+
+
+
+  # Faceting
+  facet_wrap(~numPlants, nrow = 1) +
+  # Theme and labels
+  theme_bw() +
+    theme(panel.spacing = unit(1, "cm"))+
+
+  theme(
+    text = element_text(size = 24.5),
+    #legend.position = "none",
+    strip.background = element_rect(fill = "white")
+  ) +
+  labs(
+    fill = "Harvesting Scenario", 
+    color=  "Harvesting Scenario",
+    x = bquote("Size of network"), 
+    y = "Cumulated infected plants AH(%)"
+  ) 
+
+
+ggsave(FIG_CUM_HAR_2,filename=paste("../../output/graficas/SUP_FIG/", "CumHar2.png", sep=""),  height = 6, width = 21) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+
+
+```
+
+
+```{r}
+FIG_MAX_NET <- DF_HIST %>%
+  ungroup()%>%
+  group_by(numPlants, porcionCosecha, Rep) %>%
+  summarise(totNet = sum(frecDegree))%>%
+  group_by(numPlants)%>%
+  summarise(meanTotNet = mean(totNet), sdTotNet = sd(totNet))%>%
+  mutate(meanNetPlant =  meanTotNet/numPlants, sdNetPlant = sdTotNet/numPlants)
+```
+
+
+
 ####para volvero codigo plano (y poderlo correr desde la terminal)
 
 ```{r}
 library(knitr)
 purl("../../src/grapherCodes/figuresLattice.Rmd", output= "../../src/grapherCodes/figuresLattice.R")
-
-```
-
-```{r}
-## ESTO LO DEJO PARA CUANDO QUEIRA USAR LA FUCNION LAF
-#DF_TOTAL_AG$DIF_CUM <- NULL
-
-#DF_TOTAL_AG <- DF_TOTAL_AG %>%
- # group_by(numPlants, numWorkers, Infection, porcionCosecha, SimID)%>%
-  #mutate(DIF_CUM = FrecCUM - lag(FrecCUM))
 
 ```

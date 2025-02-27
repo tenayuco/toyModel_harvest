@@ -1,7 +1,9 @@
 
-INSTRUCTIVO CORTO PARA REPRODUCIR CODIGO. 
+INSTRUCTIONS TO REPRODUCE THE CODE
 
-Usar dos terminales (una de patung y otra de tu compu)
+[This is more for the author of the paper, dont mind this document)
+
+Use two terminals, one of your computer and one in the supercomputer (condor based) 
 
 ---------------------------------------------------
 TERMINAL 1
@@ -11,7 +13,7 @@ ssh emilio@patung.lancis.ecologia.unam.mx
 
 Si estas en lancis, cambia todo de emilio@patung.lancis.ecologia.unam.mx a emilio@192.168.1.10
 
-graciaspatung en nahuaaa
+gracias + nombre de la computadora (el que puso rodrigo) en la lengua que aprendi en en enalt. 
 -------------------------------------------------
 
 TERMINAL 1 - PATUNG
