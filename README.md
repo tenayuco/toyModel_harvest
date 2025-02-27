@@ -14,22 +14,26 @@ toyModel_harvest
 			-- __init__.py 
 			-- README_patungCodes.md
 		--/grapherCodes
+			-- 
 		--/analisCodes
 	--data
-		--dataPatungDescargado/
-		--DF_total_TF.csv (large data with all scenarios at final time)
-		--DF_total_TF_short.csv (created)
+		-- DF_total_TF.csv 
+		-- DF_total_TF_short.csv 
 		-- DF_muestrasPath_complete.csv
 		-- DF_spatialAverage_complete.csv
-		-- datosParaFiguras.csv
-		--baseDatosREDES_N.csv
-		
+		-- datosParaFiguras.csv (from another paper)
+		-- histHar.csv
 	--output
-		--
+		--graficas
+			--DIF_RUST (for figures 4)
+			--NETWORK (for figure 5)
+			--PATH (figure 2 and 3)
+			--SUP_FIG (supplementary figures)
+		-figurasLattice
 
+For the purposes of the reproducibilty, the full data folder is available in the following link (drive*)The ouput folder will be created through the code.  
 
-For the purposes of the reproducibilty, the full data folder is available in the following link (drive*)
-The ouput folder will be created through the code.  
+In the following lines, I describe the role of /src folder
 
 ## patungCodes
 
@@ -62,12 +66,16 @@ c) data/DF_total_TF.csv, and
 d) data/DF_total_TF_short.csv
 
 
-##networkCodes 
+##analisisCodes 
 This folder analyses the results at a network level and send a csv to the grapher codes to reproduce the figures. 
 
 * harvestNetworkDis.rmd 
 
 This codes uses the data/DF_total_TF.csv and generates the data/histHar.csv (to plot the networks). 
+
+* fittingDistribution.R
+
+This codes fits the step length distribution to different functions (Nicholas Medina function). And then generates Fig. S.1.3
 
 * Spatial_networks_old.R
 
@@ -75,76 +83,19 @@ Old code that generates an old version figure of the netwrok plots.
 
 ##grapherCodes 
 
+* figuresLattice.Rmd
+
+This code creates all the figures (manuscript and supplementary) and store them in the output subfolders
 
 
-##otherCodes 
-
-This codes make some analisis on the distributions
-
-* distributionSteps
-* anaSteps
-
-
-
-
-
-
-analisisCodes
-basicCodes
-
-
-
-## Getting Started
-
-### Dependencies
-
-* Describe any prerequisites, libraries, OS version, etc., needed before installing program.
-* ex. Windows 10
-
-### Installing
-
-* How/where to download your program
-* Any modifications needed to be made to files/folders
-
-### Executing program
-
-* How to run the program
-* Step-by-step bullets
-```
-code blocks for commands
-```
-
-## Help
-
-Any advise for common problems or issues.
-```
-command to run if program contains helper info
-```
 
 ## Authors
 
-Contributors names and contact info
+Emilio Mora Van Cauwelaert
 
-ex. Dominique Pizzie  
+emiliomora92@gmail.com 
 ex. [@DomPizzie](https://twitter.com/dompizzie)
 
 ## Version History
 
-* 0.2
-    * Various bug fixes and optimizations
-    * See [commit change]() or See [release history]()
-* 0.1
-    * Initial Release
-
-## License
-
-This project is licensed under the [NAME HERE] License - see the LICENSE.md file for details
-
-## Acknowledgments
-
-Inspiration, code snippets, etc.
-* [awesome-readme](https://github.com/matiassingers/awesome-readme)
-* [PurpleBooth](https://gist.github.com/PurpleBooth/109311bb0361f32d87a2)
-* [dbader](https://github.com/dbader/readme-template)
-* [zenorocha](https://gist.github.com/zenorocha/4526327)
-* [fvcproductions](https://gist.github.com/fvcproductions/1bfc2d4aecb01a834b46)
+* 27 feb 2025. This version is already functional. I will clean it no make it easier to follow. 

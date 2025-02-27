@@ -1,5 +1,5 @@
 ---
-title: "R Notebook"
+title: "Codes for figures - Interplay"
 output: html_notebook
 ---
 
@@ -28,10 +28,11 @@ colorsWholePlot <- c("white", "#B87400","#aaaaaa")
 
 ```
 
-##. 1 Step-length distributions
+## 1. Step-length distributions
 
 We download the data of the movement of the workers during harvesting (data/DF_muestrasPath_complete.csv)
 
+### 1.1. Preparation of databases
 
 
 ```{r}
@@ -169,7 +170,7 @@ DF_SUPER_AG <- DF_TOTAL_AG%>%
 write.csv(DF_SUPER_AG, paste("../../output/graficas/PATH/", "DF_SUPER_AG", ".csv"))
 ```
 
-## Visusalization of some plots. 
+### 1.2. Visualization of some plots. 
 
 This first code generates the histogram for all planting densities and harvesting scenarios (Fig 2A and more)
 ```{r}
@@ -517,7 +518,7 @@ ggsave(FIG_CUM_2000,filename=paste("../../output/graficas/PATH/", "Fig2C_PROGRES
 I take advantage of DF_TOTAL_AG to plot the infective steps during harvest (Fig.5A)
 
 ```{r}
-FIG_INF <- DF_TOTAL_AG %>%
+FIG_STEPS_INF <- DF_TOTAL_AG %>%
   filter(Infection == "New Infection")%>%
     filter((numPlants== 500) | (numPlants== 2000) |(numPlants== 5000) )%>%
 
@@ -540,11 +541,12 @@ FIG_INF <- DF_TOTAL_AG %>%
   theme(panel.spacing = unit(1, "cm"))+
   theme(strip.background = element_rect(fill = "white"))+ 
   scale_alpha(guide = 'none')+
- # theme(legend.position="bottom")+
-      labs(fill= "Harvesting Scenario", color= "Harvesting Scenario", x= 'Step length', y= "Proportion of Infective steps", color= "Harvesting scenario", linetype = "Harvesting Scenario")
+ ggtitle("Density (Plants/ha)") +
+  theme(plot.title = element_text(hjust = 0.5, size = 20))+
+  labs(tag = "A", fill= "Harvesting Scenario", color= "Harvesting Scenario", x= 'Step length', y= "Infected plants during harvest (DH)", color= "Harvesting scenario", linetype = "Harvesting Scenario")
 
 
- ggsave(FIG_INF,filename=paste("../../output/graficas/NETWORK/", "Fig5A_INF_HAR.png", sep=""),  height = 5, width = 17)
+ ggsave(FIG_STEPS_INF,filename=paste("../../output/graficas/NETWORK/", "Fig5A_INF_HAR.png", sep=""),  height = 5, width = 17)
 
 ```
 
@@ -586,10 +588,10 @@ if (wholePlot ==1){
 ```
 
 
-## Part 2. The infection process
+## 2. The infection process
 
-Now, this section is for the infection process Part II (is independent of Part I)
 
+This part is independent of part 1 and uses DF_spatialAverage_complete.csv
 
 
 
@@ -618,16 +620,182 @@ DF_AV$HarvestModel[DF_AV$HarvestModel =="closeness"] <- "harvest"
 
 DF_AV$Rust <- DF_AV$Rust*100 #lo pasamos a un porcentage de infeccion para tener una intepretacion as sencilla 
 
+head(DF_AV)
 
-#Our first verification is the number of lines for DF_AV
-# we need to have a data frame with 
-# [(3 porcCosecha (A, SI, SF)* 1 harvestingTime * 1 numWorkers) + (1 control)]* 5 numPlants * 25 (time max*2+1) times * 30 rep
-#[3 * 1 * 1 +1) * 5* 25* 30 rep
-# 4 * 5 * 25 * 30
-# 15000  rows
 ```
 
-Here I added a independent chunk to show how the results are roust in 30 repetitions
+
+
+
+```{r}
+#here we summarize or average between all repetition- So
+#DF_AV_MOD_AVR should be 15000/30 = 500 (combinations)
+
+DF_AV_AVR <- DF_AV %>%
+  group_by(numPlants, numWorkers, HarvestModel, HarvestTime,porcionCosecha, Time, SimID) %>%
+  summarise(AverageRust = mean(Rust), SD_Rust = sd(Rust))
+
+head(DF_AV_AVR)
+```
+
+
+
+```{r}
+############FIRST FIGURES, time seires, final time, control paarte
+#these figures are only plotted without the number of workers that did not show a relevant difference
+# so we are plotting only the last time == 12
+
+timeMAX <- 12
+
+
+FIG_RUST <- DF_AV%>%
+  filter(Time == timeMAX)%>%
+  filter(numWorkers !=5)%>%
+  filter(HarvestTime ==5 |HarvestTime =="control")%>% 
+  mutate(porcionCosecha = (ifelse(porcionCosecha == "control", "Control", porcionCosecha)))%>% 
+  ggplot(aes(x= as.factor(HarvestModel), y= Rust))+
+  geom_boxplot(color= "black", aes(fill= as.character(porcionCosecha)))+ 
+  ggtitle("")+
+  facet_wrap(~ numPlants, nrow=1, labeller = label_both)+
+  scale_fill_manual(values = mycols3_white)+
+  theme_bw() +
+  theme(text = element_text(size = 25))+
+  theme(strip.background = element_rect(fill = "white"))+ 
+  ylim(0,100)+
+  labs(x= "Density (Plants/ha)", y= "Average Rust", fill= "Coffee Maturation")
+
+ggsave(FIG_RUST,filename=paste("../../output/graficas/SUP_FIG/", "FigX_rust_plants_abs", ".png", sep=""),  height = 10, width = 16) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+#
+```
+
+
+Fig 4. A time series 
+```{r}
+FIG_SLI_time <- DF_AV_AVR %>% 
+  filter(numWorkers !=5)%>% 
+  filter(HarvestTime ==5|HarvestTime =="control")%>% 
+  filter(numPlants == 500 | numPlants == 2000 |numPlants == 5000)%>% 
+  
+  mutate(porcionCosecha = (ifelse(porcionCosecha == "control", "Control (no harvesting)", porcionCosecha)))%>% 
+  ggplot(aes(x= Time, color= as.character(porcionCosecha) ,
+             fill= as.character(porcionCosecha)
+             ))+
+  geom_ribbon(color= "black", aes( 
+                  ymin=AverageRust-SD_Rust, ymax=AverageRust+SD_Rust, linetype= as.character(porcionCosecha)),alpha=0.6) +
+  #  geom_line(size= 1, aes(y= AverageRust))+
+  ggtitle("")+
+  facet_wrap(~ numPlants, nrow =1)+
+  theme(panel.spacing = unit(1, "cm"))+
+  scale_linetype_manual(values= c(1, 5,2, 0))+
+  scale_fill_manual(values = mycols3_white)+
+  scale_color_manual(values = mycols3)+
+  theme_bw()+
+  theme(text = element_text(size = 20))+
+  theme(strip.background = element_rect(fill = "white"))+
+  theme(panel.spacing = unit(1, "cm"))+
+   ggtitle("Density (Plants/ha)") +
+  theme(plot.title = element_text(hjust = 0.5, size = 20))+
+  labs(tag= "A", x= "Time step (t)", y= "Average Rust (%)", color= "Harvesting scenario", fill= "Harvesting scenario", linetype="Harvesting scenario" )
+ggsave(FIG_SLI_time,filename=paste("../../output/graficas/DIF_RUST/", "Fig4A_rust_time_abs", ".png", sep=""),  height = 5, width = 16) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc)
+```
+
+A new data base to calcultarte the difference of rust infection between the control and the harvesting scenarios 
+```{r}
+DF_MODvsCON_GEN <- DF_AV %>%
+  filter(Time == HarvestTime |Time == timeMAX) %>%
+  group_by(Rep, numPlants)%>% #son las vairables que quedan y sobre esos escenarios, vamos a hacer las diferencias entre modelos
+  summarise(Rust = Rust, ModCo_Rust = ((Rust - Rust[HarvestModel=="control"])), Per_Rust = ((Rust - Rust[HarvestModel=="control"])/Rust[HarvestModel=="control"]),
+            porcionCosecha = porcionCosecha, HarvestTime = HarvestTime, numWorkers = numWorkers, Time= Time)  # esto es solo para que despues de leer por condicion, regrese...?
+
+
+```
+
+```{r}
+DF_MODvsCON_GEN <- DF_MODvsCON_GEN%>%
+filter(porcionCosecha != "control")
+
+DF_PerRust <- DF_MODvsCON_GEN  %>%
+  group_by(numPlants) %>%
+  summarise(meanPerRust = mean(Per_Rust))
+
+```
+
+
+Fig 4 B. difference
+
+```{r}
+FIG_DIF_CONTROL <- DF_MODvsCON_GEN %>%
+  filter(Time == timeMAX)%>%
+ # filter(numWorkers == 1)%>%
+  filter(numPlants!=4000)%>%
+  mutate(porcionCosecha = (ifelse(porcionCosecha == "control", " No harvesting (control)", porcionCosecha)))%>% 
+ # mutate(porcionCosecha = (ifelse(porcionCosecha == "0.5", "With large steps", porcionCosecha)))%>% 
+#  mutate(porcionCosecha = (ifelse(porcionCosecha == "1", "Without large steps", porcionCosecha)))%>% 
+  ggplot(aes(x= as.factor(HarvestTime), y= ModCo_Rust))+
+  geom_boxplot(color = "black", aes(fill= porcionCosecha, linetype= porcionCosecha), position = "dodge", alpha=0.6)+ 
+  ggtitle("")+
+  facet_wrap(~numPlants, nrow = 1, strip.position = "bottom")+
+  scale_fill_manual(values = mycols2)+ 
+  scale_linetype_manual(values= c(1,5, 0))+
+  ylim(0, 18)+
+  theme_bw() +
+  theme(text = element_text(size = 20),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())+
+  #theme(strip.background = element_rect(fill = "white"))+ 
+  theme(strip.background = element_blank())+
+  theme(panel.spacing = unit(0, "cm"))+
+  #theme(legend.position = "none")+
+  labs(tag= "B", x= "Density (Plants/ha)", y= "Rust Increase (Scenario-Control)", fill= "Harvesting Scenario", linetype="Harvesting Scenario" )
+
+ggsave(FIG_DIF_CONTROL,filename="../../output/graficas/DIF_RUST/Fig4_B_ModelvsControl.png",  height = 5, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+```
+
+#### Try to make figure 4 directly
+
+```{r}
+library(patchwork)
+FIG4 <- FIG_SLI_time/FIG_DIF_CONTROL
+
+ggsave(FIG4,filename=paste("../../output/graficas/DIF_RUST/", "Fig4_total.png", sep=""),  height = 10, width = 14) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+```
+
+
+```{r}
+FIG_DIF_REL <- DF_MODvsCON_GEN %>%
+  filter(Time == timeMAX)%>%
+ # filter(numWorkers == 1)%>%
+  filter(numPlants!=4000)%>%
+  mutate(porcionCosecha = (ifelse(porcionCosecha == "control", " No harvesting (control)", porcionCosecha)))%>% 
+ # mutate(porcionCosecha = (ifelse(porcionCosecha == "0.5", "With large steps", porcionCosecha)))%>% 
+#  mutate(porcionCosecha = (ifelse(porcionCosecha == "1", "Without large steps", porcionCosecha)))%>% 
+  ggplot(aes(x= as.factor(HarvestTime), y= Per_Rust*100))+
+  geom_boxplot(color = "black", aes(fill= porcionCosecha, linetype= porcionCosecha), position = "dodge", alpha=0.6)+ 
+  ggtitle("")+
+  facet_wrap(~numPlants, nrow = 1, strip.position = "bottom")+
+  scale_fill_manual(values = mycols2)+ 
+  scale_linetype_manual(values= c(1,5, 0))+
+  #ylim(0, 18)+
+  theme_bw() +
+  theme(text = element_text(size = 20),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())+
+  #theme(strip.background = element_rect(fill = "white"))+ 
+  theme(strip.background = element_blank())+
+  theme(panel.spacing = unit(0, "cm"))+
+  #theme(legend.position = "none")+
+  labs(x= "Density (Plants/ha)", y= "Relative Rust increase", fill= "Harvesting Scenario", linetype="Harvesting Scenario" )
+
+ggsave(FIG_DIF_REL,filename="../../output/graficas/SUP_FIG/FigS1_7_RELModelvsControl.png",  height = 5, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+```
+
+
+
+Here I added a independent chunk to show how the results are roust in 30 repetitions (Fig S1.1B)
 
 
 ```{r}
@@ -673,226 +841,14 @@ FIG_INF_REP <- DF_INF_REP_L %>%
   theme(plot.title = element_text(hjust = 0.5, size = 20))
 
 
-ggsave(FIG_INF_REP,filename=paste("../../output/graficas/SUP_FIG/", "meanINF_rep.png", sep=""),  height = 7, width = 20) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_INF_REP,filename=paste("../../output/graficas/SUP_FIG/", "FigS1_1_B_meanINF_rep.png", sep=""),  height = 7, width = 20) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 
 ```
 
 
+## 3. The infected networks. 
 
-
-
-```{r}
-#here we summarize or average between all repetition- So
-#DF_AV_MOD_AVR should be 15000/30 = 500 (combinations)
-
-DF_AV_AVR <- DF_AV %>%
-  group_by(numPlants, numWorkers, HarvestModel, HarvestTime,porcionCosecha, Time, SimID) %>%
-  summarise(AverageRust = mean(Rust), SD_Rust = sd(Rust))
-
-```
-
-```{r}
-############FIRST FIGURES, time seires, final time, control paarte
-#these figures are only plotted without the number of workers that did not show a relevant difference
-# so we are plotting only the last time == 12
-
-timeMAX <- 12
-
-
-FIG_RUST <- DF_AV%>%
-  filter(Time == timeMAX)%>%
-  filter(numWorkers !=5)%>%
-  filter(HarvestTime ==5 |HarvestTime =="control")%>% 
-  mutate(porcionCosecha = (ifelse(porcionCosecha == "control", "Control", porcionCosecha)))%>% 
-  ggplot(aes(x= as.factor(HarvestModel), y= Rust))+
-  geom_boxplot(color= "black", aes(fill= as.character(porcionCosecha)))+ 
-  ggtitle("")+
-  facet_wrap(~ numPlants, nrow=1, labeller = label_both)+
-  scale_fill_manual(values = mycols3_white)+
-  theme_bw() +
-  theme(text = element_text(size = 25))+
-  theme(strip.background = element_rect(fill = "white"))+ 
-  ylim(0,100)+
-  labs(x= "Density (Plants/ha)", y= "Average Rust", fill= "Coffee Maturation")
-
-ggsave(FIG_RUST,filename=paste("../../output/graficas/SUP_FIG/", "rust_plants_abs", ".png", sep=""),  height = 10, width = 16) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-
-#
-```
-
-
-
-```{r}
-FIG_SLI_time <- DF_AV_AVR %>% 
-  filter(numWorkers !=5)%>% 
-  filter(HarvestTime ==5|HarvestTime =="control")%>% 
-  filter(numPlants == 500 | numPlants == 2000 |numPlants == 5000)%>% 
-  
-  mutate(porcionCosecha = (ifelse(porcionCosecha == "control", "Control (no harvesting)", porcionCosecha)))%>% 
-  ggplot(aes(x= Time, color= as.character(porcionCosecha) ,
-             fill= as.character(porcionCosecha)
-             ))+
-  geom_ribbon(color= "black", aes( 
-                  ymin=AverageRust-SD_Rust, ymax=AverageRust+SD_Rust, linetype= as.character(porcionCosecha)),alpha=0.6) +
-  #  geom_line(size= 1, aes(y= AverageRust))+
-  ggtitle("")+
-  facet_wrap(~ numPlants, nrow =1)+
-  theme(panel.spacing = unit(1, "cm"))+
-  scale_linetype_manual(values= c(1, 5,2, 0))+
-  scale_fill_manual(values = mycols3_white)+
-  scale_color_manual(values = mycols3)+
-  theme_bw()+
-  theme(text = element_text(size = 20))+
-  theme(strip.background = element_rect(fill = "white"))+
-  theme(panel.spacing = unit(1, "cm"))+
-  labs(x= "Time step (t)", y= "Average Rust (%)", color= "Harvesting scenario", fill= "Harvesting scenario", linetype="Harvesting scenario" )
-ggsave(FIG_SLI_time,filename=paste("../../output/graficas/DIF_RUST/", "rust_time_abs", ".png", sep=""),  height = 5, width = 16) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc)
-```
-
-
-```{r}
-DF_MODvsCON_GEN <- DF_AV %>%
-  filter(Time == HarvestTime |Time == timeMAX) %>%
-  group_by(Rep, numPlants)%>% #son las vairables que quedan y sobre esos escenarios, vamos a hacer las diferencias entre modelos
-  summarise(Rust = Rust, ModCo_Rust = ((Rust - Rust[HarvestModel=="control"])), Per_Rust = ((Rust - Rust[HarvestModel=="control"])/Rust[HarvestModel=="control"]),
-            porcionCosecha = porcionCosecha, HarvestTime = HarvestTime, numWorkers = numWorkers, Time= Time)  # esto es solo para que despues de leer por condicion, regrese...?
-
-#esta deberia tener:
-
-# [(2 porcCosecha (A and S)* 5 harvestingTime * 2 numWorkers) + 1 control que se filtra]* 5 numPlants * * 30 rep
-#[21] * 5 * 30  = 3150 PARA EL HARVEST MAX#
-#[(2 porcCosecha (A and S)* 5 harvestingTime * 2 numWorkers) 5 numPlants * * 30 rep
-  #3000 para el harvest time. Esto porque aqui no se pone el control. 
-  #6150
-
-```
-
-```{r}
-DF_MODvsCON_GEN <- DF_MODvsCON_GEN%>%
-filter(porcionCosecha != "control")
-
-DF_PerRust <- DF_MODvsCON_GEN  %>%
-  group_by(numPlants) %>%
-  summarise(meanPerRust = mean(Per_Rust))
-
-```
-
-```{r}
-FIG_DIF_CONTROL <- DF_MODvsCON_GEN %>%
-  filter(Time == timeMAX)%>%
- # filter(numWorkers == 1)%>%
-  filter(numPlants!=4000)%>%
-  mutate(porcionCosecha = (ifelse(porcionCosecha == "control", " No harvesting (control)", porcionCosecha)))%>% 
- # mutate(porcionCosecha = (ifelse(porcionCosecha == "0.5", "With large steps", porcionCosecha)))%>% 
-#  mutate(porcionCosecha = (ifelse(porcionCosecha == "1", "Without large steps", porcionCosecha)))%>% 
-  ggplot(aes(x= as.factor(HarvestTime), y= ModCo_Rust))+
-  geom_boxplot(color = "black", aes(fill= porcionCosecha, linetype= porcionCosecha), position = "dodge", alpha=0.6)+ 
-  ggtitle("")+
-  facet_wrap(~numPlants, nrow = 1, strip.position = "bottom")+
-  scale_fill_manual(values = mycols2)+ 
-  scale_linetype_manual(values= c(1,5, 0))+
-  ylim(0, 18)+
-  theme_bw() +
-  theme(text = element_text(size = 20),
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank())+
-  #theme(strip.background = element_rect(fill = "white"))+ 
-  theme(strip.background = element_blank())+
-  theme(panel.spacing = unit(0, "cm"))+
-  #theme(legend.position = "none")+
-  labs(x= "Density (Plants/ha)", y= "Rust Increase (Scenario-Control)", fill= "Harvesting Scenario", linetype="Harvesting Scenario" )
-
-ggsave(FIG_DIF_CONTROL,filename="../../output/graficas/DIF_RUST/ModelvsControl.png",  height = 5, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-
-```
-
-
-```{r}
-FIG_DIF_REL <- DF_MODvsCON_GEN %>%
-  filter(Time == timeMAX)%>%
- # filter(numWorkers == 1)%>%
-  filter(numPlants!=4000)%>%
-  mutate(porcionCosecha = (ifelse(porcionCosecha == "control", " No harvesting (control)", porcionCosecha)))%>% 
- # mutate(porcionCosecha = (ifelse(porcionCosecha == "0.5", "With large steps", porcionCosecha)))%>% 
-#  mutate(porcionCosecha = (ifelse(porcionCosecha == "1", "Without large steps", porcionCosecha)))%>% 
-  ggplot(aes(x= as.factor(HarvestTime), y= Per_Rust*100))+
-  geom_boxplot(color = "black", aes(fill= porcionCosecha, linetype= porcionCosecha), position = "dodge", alpha=0.6)+ 
-  ggtitle("")+
-  facet_wrap(~numPlants, nrow = 1, strip.position = "bottom")+
-  scale_fill_manual(values = mycols2)+ 
-  scale_linetype_manual(values= c(1,5, 0))+
-  #ylim(0, 18)+
-  theme_bw() +
-  theme(text = element_text(size = 20),
-        axis.text.x = element_blank(),
-        axis.ticks.x = element_blank())+
-  #theme(strip.background = element_rect(fill = "white"))+ 
-  theme(strip.background = element_blank())+
-  theme(panel.spacing = unit(0, "cm"))+
-  #theme(legend.position = "none")+
-  labs(x= "Density (Plants/ha)", y= "Relative Rust increase", fill= "Harvesting Scenario", linetype="Harvesting Scenario" )
-
-ggsave(FIG_DIF_REL,filename="../../output/graficas/SUP_FIG/RELModelvsControl.png",  height = 5, width = 12) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-
-```
-
-Para el suplmentario!! 
-
-
-```{r eval=FALSE, include=FALSE}
-
-densidades = length(unique(DF_AV$numPlants))
-
-
-DF_DIF <- DF_AV %>%
-  filter(HarvestModel != "control")%>%  #we remove the contorl, we do not need it.
-  filter(Time == timeMAX)
-
-#this chunks is removed  but i kept the logic just in case
-#DF_AvsSF <- DF_DIF %>%
-#  filter(porcionCosecha != " Synchronous")
-#DF_AvsSF$Rust[DF_AvsSF$porcionCosecha == " Synchronous Final"] <- DF_AvsSF$Rust[DF_AvsSF$porcionCosecha == " Synchronous Final"]*-1
-#DF_AvsSF <- DF_AvsSF %>%
-#  group_by(Rep, numPlants) %>%
-#  summarise(PerIncrease = sum(Rust))
-#DF_AvsSF$DIF <- "A-SF"
-
-
-DF_DIF$Rust[DF_DIF$porcionCosecha == "Synchronous"] <- DF_DIF$Rust[DF_DIF$porcionCosecha == "Synchronous"]*-1
-
-DF_DIF <- DF_DIF %>%
-  group_by(Rep, numPlants) %>%
-  summarise(PerIncrease = sum(Rust))
-
-
-```
-
-```{r eval=FALSE, include=FALSE}
-FIG_DIF_MODELS <- DF_DIF%>%
-  ggplot(aes(x= as.factor(numPlants), y= PerIncrease))+
-  geom_boxplot(color= "black", aes())+
-  ggtitle("")+
-  #facet_wrap(~numPlants, nrow=2)+
-  scale_fill_manual(values =  c("white", "#CCCCCC", "#666666"))+
-  geom_segment(aes(x=0, y=0, xend= 6, yend=0), size = 0.2, color= "DarkRed")+
-  theme_bw() +
-  #theme(legend.position = "none")+
-  theme(text = element_text(size = 25))+
-  theme(strip.background = element_rect(fill = "white"))+
-  labs(x= "Density (Plants/ha)", y= "Average Rust Difference")
-
-ggsave(FIG_DIF_MODELS,filename="../../output/graficas/DIF_RUST/dif_models.png",  height = 8, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-
-```
-
-
-
-
-################here for the networks and the infective steps (Fig 5)
-
-
-
-
+This part uses histHar created by src/harvestNetworkDIs
 
 
 ```{r}
@@ -943,6 +899,154 @@ DF_HIST_HAR$porcionCosecha[DF_HIST_HAR$porcionCosecha =="S_I"] <- "Synchronous"
 ```
 
 
+
+Figure 5 A 
+
+```{r}
+
+
+FIG_HIST_HAR_2 <- DF_HIST_HAR %>%
+  group_by(numPlants, porcionCosecha) %>%
+  mutate(maxNet = sum(meanFrecDeg)) %>%
+  filter(numPlants ==500|numPlants ==2000|numPlants ==5000)%>%
+  ggplot(aes(x = degree)) +
+  # Primary y-axis: meanFrecDeg (bars)
+  geom_col(aes(y = meanFrecDeg/numPlants,
+               fill= as.factor(porcionCosecha)), 
+           position = "dodge",
+           color = "black",
+           width = 0.8,
+           alpha=0.7) +
+  
+  
+
+ scale_fill_manual(values = mycols2)+
+ scale_color_manual(values = mycols2 )+
+
+  # Faceting
+  facet_wrap(~numPlants, nrow = 1) +
+  
+  # Theme and labels
+  theme_bw() +
+  theme(panel.spacing = unit(1, "cm"))+
+
+  theme(
+    text = element_text(size = 20),
+    #legend.position = "none",
+    strip.background = element_rect(fill = "white")
+  ) +
+   ggtitle("Density (Plants/ha)") +
+  theme(plot.title = element_text(hjust = 0.5, size = 20))+
+  labs(tag = "B",
+   fill = "Harvesting Scenario", 
+    color=  "Harvesting Scenario",
+    x = bquote("Size of network"), 
+    y = "Infected networks AH/# plants"
+  ) 
+
+
+ggsave(FIG_HIST_HAR_2,filename=paste("../../output/graficas/NETWORK/", "Fig.5B_NetHar2.png", sep=""),  height = 6, width = 21) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+```
+
+
+
+
+
+
+
+Fig 5 B
+```{r}
+
+FIG_CUM_HAR_2 <- DF_HIST_HAR %>%
+    filter(numPlants ==500|numPlants ==2000|numPlants ==5000)%>%
+
+  ggplot(aes(x = degree)) +
+  # Primary y-axis: meanFrecDeg (bars)
+  
+  geom_line(aes(y = meanPlantCUM, color = factor(porcionCosecha)), linewidth = 1) +
+  geom_ribbon(aes(ymin = meanPlantCUM - sdPlantCUM, ymax = meanPlantCUM + sdPlantCUM, fill = factor(porcionCosecha)), alpha = 0.4) +
+ 
+
+ scale_fill_manual(values = mycols2)+
+   scale_color_manual(values = mycols2)+
+
+
+  # Faceting
+  facet_wrap(~numPlants, nrow = 1) +
+  # Theme and labels
+  theme_bw() +
+  
+    theme(panel.spacing = unit(1, "cm"))+
+
+  theme(
+    text = element_text(size = 20),
+    #legend.position = "none",
+    strip.background = element_rect(fill = "white")
+  ) + 
+  ggtitle("Density (Plants/ha)") +
+  theme(plot.title = element_text(hjust = 0.5, size = 20))+
+  labs(tag = "C",
+    fill = "Harvesting Scenario", 
+    color=  "Harvesting Scenario",
+    x = bquote("Size of network"), 
+    y = "Cumulated infected plants AH(%)"
+  ) 
+
+
+ggsave(FIG_CUM_HAR_2,filename=paste("../../output/graficas/NETWORK/", "Fig5C_CumHar.png", sep=""),  height = 6, width = 21) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+
+
+```
+
+#### Try to make figure 5 directly
+
+```{r}
+library(patchwork)
+FIG5 <- FIG_STEPS_INF/FIG_HIST_HAR_2/FIG_CUM_HAR_2
+
+ggsave(FIG5,filename=paste("../../output/graficas/NETWORK/", "Fig5_total.png", sep=""),  height = 18, width = 21) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+```
+two version that i dont use in the paper
+
+```{r}
+
+FIG_CUM_HAR <- DF_HIST_HAR %>%
+  ggplot(aes(x = degree)) +
+  # Primary y-axis: meanFrecDeg (bars)
+  
+  geom_line(aes(y = meanPlantCUM, color = factor(numPlants)), linewidth = 1) +
+  geom_ribbon(aes(ymin = meanPlantCUM - sdPlantCUM, ymax = meanPlantCUM + sdPlantCUM, fill = factor(numPlants)), alpha = 0.4) +
+ 
+
+scale_fill_viridis_d(option = "inferno", direction = -1, end = 0.8)  +
+scale_color_viridis_d(option = "inferno", direction = -1, end = 0.8)  +
+
+  # Faceting
+  facet_wrap(~porcionCosecha, ncol = 1) +
+  # Theme and labels
+  theme_bw() +
+  theme(
+    text = element_text(size = 25),
+    #legend.position = "none",
+    strip.background = element_rect(fill = "white")
+  ) +
+  labs(
+    tag = "C",
+    fill = "Density (Plants/ha)", 
+    color=  "Density (Plants/ha)",
+    x = bquote("Size of network"), 
+    y = "Cumulative percentage of infected plants AH"
+  ) 
+
+
+ggsave(FIG_CUM_HAR,filename=paste("../../output/graficas/NETWORK/", "Fig_CumHar.png", sep=""),  height = 10, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+
+
+
+```
+
 ```{r}
 FIG_HIST_HAR <- DF_HIST_HAR %>%
   ggplot(aes(x = degree)) +
@@ -974,152 +1078,11 @@ scale_fill_viridis_d(option = "inferno", direction = -1, end = 0.8)  +
   ) 
 
 
-ggsave(FIG_HIST_HAR,filename=paste("../../output/graficas/SUP_FIG/", "NetHar.png", sep=""),  height = 10, width = 15) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-```
-
-VERSIOIN  2
-
-```{r}
-
-
-FIG_HIST_HAR_2 <- DF_HIST_HAR %>%
-  group_by(numPlants, porcionCosecha) %>%
-  mutate(maxNet = sum(meanFrecDeg)) %>%
-  filter(numPlants ==500|numPlants ==2000|numPlants ==5000)%>%
-  ggplot(aes(x = degree)) +
-  # Primary y-axis: meanFrecDeg (bars)
-  geom_col(aes(y = meanFrecDeg/numPlants,
-               fill= as.factor(porcionCosecha)), 
-           position = "dodge",
-           color = "black",
-           width = 0.8,
-           alpha=0.7) +
-  
-  
-
- scale_fill_manual(values = mycols2)+
- scale_color_manual(values = mycols2 )+
-
-  # Faceting
-  facet_wrap(~numPlants, nrow = 1) +
-  
-  # Theme and labels
-  theme_bw() +
-  theme(panel.spacing = unit(1, "cm"))+
-
-  theme(
-    text = element_text(size = 25),
-    #legend.position = "none",
-    strip.background = element_rect(fill = "white")
-  ) +
-  labs(
-   fill = "Harvesting Scenario", 
-    color=  "Harvesting Scenario",
-    x = bquote("Size of network"), 
-    y = "Infected networks AH/# plants"
-  ) 
-
-
-ggsave(FIG_HIST_HAR_2,filename=paste("../../output/graficas/SUP_FIG/", "NetHar2.png", sep=""),  height = 6, width = 21) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
+ggsave(FIG_HIST_HAR,filename=paste("../../output/graficas/NETWORK/", "Fig_NetHar.png", sep=""),  height = 10, width = 15) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
 ```
 
 
-
-
-
-```{r}
-
-FIG_CUM_HAR <- DF_HIST_HAR %>%
-  ggplot(aes(x = degree)) +
-  # Primary y-axis: meanFrecDeg (bars)
-  
-  geom_line(aes(y = meanPlantCUM, color = factor(numPlants)), linewidth = 1) +
-  geom_ribbon(aes(ymin = meanPlantCUM - sdPlantCUM, ymax = meanPlantCUM + sdPlantCUM, fill = factor(numPlants)), alpha = 0.4) +
- 
-
-scale_fill_viridis_d(option = "inferno", direction = -1, end = 0.8)  +
-scale_color_viridis_d(option = "inferno", direction = -1, end = 0.8)  +
-
-  # Faceting
-  facet_wrap(~porcionCosecha, ncol = 1) +
-  # Theme and labels
-  theme_bw() +
-  theme(
-    text = element_text(size = 25),
-    #legend.position = "none",
-    strip.background = element_rect(fill = "white")
-  ) +
-  labs(
-    fill = "Density (Plants/ha)", 
-    color=  "Density (Plants/ha)",
-    x = bquote("Size of network"), 
-    y = "Cumulative percentage of infected plants AH"
-  ) 
-
-
-ggsave(FIG_CUM_HAR,filename=paste("../../output/graficas/SUP_FIG/", "CumHar.png", sep=""),  height = 10, width = 10) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-
-
-
-```
-
-VERSIO 2
-
-```{r}
-
-FIG_CUM_HAR_2 <- DF_HIST_HAR %>%
-    filter(numPlants ==500|numPlants ==2000|numPlants ==5000)%>%
-
-  ggplot(aes(x = degree)) +
-  # Primary y-axis: meanFrecDeg (bars)
-  
-  geom_line(aes(y = meanPlantCUM, color = factor(porcionCosecha)), linewidth = 1) +
-  geom_ribbon(aes(ymin = meanPlantCUM - sdPlantCUM, ymax = meanPlantCUM + sdPlantCUM, fill = factor(porcionCosecha)), alpha = 0.4) +
- 
-
- scale_fill_manual(values = mycols2)+
-   scale_color_manual(values = mycols2)+
-
-
-  # Faceting
-  facet_wrap(~numPlants, nrow = 1) +
-  # Theme and labels
-  theme_bw() +
-    theme(panel.spacing = unit(1, "cm"))+
-
-  theme(
-    text = element_text(size = 24.5),
-    #legend.position = "none",
-    strip.background = element_rect(fill = "white")
-  ) +
-  labs(
-    fill = "Harvesting Scenario", 
-    color=  "Harvesting Scenario",
-    x = bquote("Size of network"), 
-    y = "Cumulated infected plants AH(%)"
-  ) 
-
-
-ggsave(FIG_CUM_HAR_2,filename=paste("../../output/graficas/SUP_FIG/", "CumHar2.png", sep=""),  height = 6, width = 21) # ID will be the unique identifier. and change the extension from .png to whatever you like (eps, pdf etc).
-
-
-
-```
-
-
-```{r}
-FIG_MAX_NET <- DF_HIST %>%
-  ungroup()%>%
-  group_by(numPlants, porcionCosecha, Rep) %>%
-  summarise(totNet = sum(frecDegree))%>%
-  group_by(numPlants)%>%
-  summarise(meanTotNet = mean(totNet), sdTotNet = sd(totNet))%>%
-  mutate(meanNetPlant =  meanTotNet/numPlants, sdNetPlant = sdTotNet/numPlants)
-```
-
-
-
-####para volvero codigo plano (y poderlo correr desde la terminal)
+####to make this code R base
 
 ```{r}
 library(knitr)
